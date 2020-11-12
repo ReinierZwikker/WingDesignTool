@@ -4,7 +4,7 @@ database_connector = DatabaseConnector()
 
 wingbox_file = '../Database/wingbox.json'
 
-halfspan = database_connector.load_value("halfspan")
+halfspan = database_connector.load_value("wing_span")/2
 quarter_chord_sweep = database_connector.load_value("quarter_chord_sweep")
 dihedral_angle = database_connector.load_value("dihedral_angle")
 
