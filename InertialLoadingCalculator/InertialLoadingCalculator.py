@@ -1,35 +1,43 @@
 ### ------ Workpackage 4.1: Inertial loading calculations ------ ###
 import scipy
+import numpy as np
 from Database.database_functions import DatabaseConnector
 database_connector = DatabaseConnector()
+import Importer.xflr5
 
 #Import basic geometry
-b = database_connector.load_value("wing_span")
-d|_fus = database_connector.load_value("df,outer")
-r_fus = d_fus/2
+wing_span = database_connector.load_value("wing_span")
+Outer_diameter = database_connector.load_value("df,outer")
+radius_fuselage = Outer_diameter/2
+surface_area = database_connector.load_value("surface_area")
 
-#Import lift distribution function
-from filename import liftfunctionname as L
+#Define the flight conditions
+velocity = 0.0 #m/s
+density = 0.0 #kg/m^2
 
 #Import weight and location of the engine
-W_eng = database_connector.load_value("engine_weight")
-y_eng = database_connector.load_value("engine_spanwise_location")
+weight_engine = database_connector.load_value("engine_weight")
+spanwise_location_engine = database_connector.load_value("engine_spanwise_location")
 
-#Calculate/Import the weight of the wing (use fraction from class II)
-W_wing = database_connector.load_value("wing_weight")
+#Import the weight of the wing and fuel (Class II)
+weight_wing = database_connector.load_value("wing_weight")
+weight_fuel = database_connector.load_value("fuel_max")
 
-#Calculate final lift distribution
-L_final = L - W_wing
 
-#Calculate the moment function from the tip to the engine (excluding engine)
-#Moment @ tip equals zero
 
-M1 = scipy.integrate.quad(L_final,y_eng,b/2)
+#Define the lift distribution
+def lift_distribution(y):
+    return xflr5.lift_coef_function_0(y)* 0.5 * density * velocity^2 * surface_area
 
-#Calculate the moment function from the engine (including) to the fuselage
-#Moment @ engine equals the max moment minus the weight of the engine
+#Calculate the final force distribution
+def final_force_distribution(y):
+    #if  spanwise_location_engine < y:
+    return lift_distribution(y) - weight_wing - weight_fuel
+    #elif y == spanwise_location_engine:
+    #    return lift_distribution(y) - weight_wing - weight_fuel - weight_engine
 
-M2 = scipy.integrate.quad(L_final,r_fus,y_eng)
-
+#Integrate to shear function
+def shear_force_function(y):
+    return 
 
 
