@@ -41,7 +41,4 @@ def final_force_distribution(y):
 def shear_force_function(y):
     return 
 
-# Calculate the moment function from the engine (including) to the fuselage
-# Moment @ engine equals the max moment minus the weight of the engine
 
-M2 = scipy.integrate.quad(L_final, r_fus, y_eng)
