@@ -12,6 +12,8 @@ Add this at the top of your file:
 
 When you want to load a value, use:
 
+`variable = database_connector.load_value("value_name")`
+  or
 `variable = database_connector.load_wingbox_value("value_name")`
 
 Value names should always be lowercase/snakecase. No spaces are allowed in the name.
