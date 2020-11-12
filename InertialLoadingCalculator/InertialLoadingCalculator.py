@@ -1,23 +1,22 @@
 ### ------ Workpackage 4.1: Inertial loading calculations ------ ###
 import scipy
+from Database.database_functions import DatabaseConnector
+database_connector = DatabaseConnector()
 
 #Import basic geometry
-from database import wingspan as b
-from database import fuselagediamter as d_fus
-
+b = database_connector.load_value("wing_span")
+d|_fus = database_connector.load_value("df,outer")
 r_fus = d_fus/2
 
 #Import lift distribution function
 from filename import liftfunctionname as L
 
 #Import weight and location of the engine
-
-from database import weightengine as W_eng
-from database import ylocationengine as y_eng
+W_eng = database_connector.load_value("engine_weight")
+y_eng = database_connector.load_value("engine_spanwise_location")
 
 #Calculate/Import the weight of the wing (use fraction from class II)
-
-from database import weightwing as W_wing
+W_wing = database_connector.load_value("wing_weight")
 
 #Calculate final lift distribution
 L_final = L - W_wing
@@ -32,5 +31,5 @@ M1 = scipy.integrate.quad(L_final,y_eng,b/2)
 
 M2 = scipy.integrate.quad(L_final,r_fus,y_eng)
 
-hi!
+
 
