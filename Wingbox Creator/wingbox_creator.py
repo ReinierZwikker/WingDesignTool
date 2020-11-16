@@ -8,9 +8,6 @@ halfspan = database_connector.load_value("wing_span")/2
 quarter_chord_sweep = database_connector.load_value("quarter_chord_sweep")
 dihedral_angle = database_connector.load_value("dihedral_angle")
 
-# TODO Things to calculate before: Twist
-# TODO Things to get from other sources: Dimension Data, Material Data
-
 
 wingbox_definition = {'length': halfspan,
                       'height': 0.2,
@@ -28,9 +25,6 @@ wingbox_definition = {'length': halfspan,
                       'rib_thickness': 0.1,
                       'stiffener_thickness': 0.1
                       }
-
-
-# TODO Things to calculate from this data and integrate in the wingbox definition: Variation Of MoI and Torsional Stiffness
 
 
 with open(wingbox_file, "w") as wingbox_database:
