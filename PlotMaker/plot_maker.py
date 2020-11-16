@@ -17,7 +17,3 @@ ax.plot(aerodynamic_data.chord_function.x, aerodynamic_data.drag_induced_functio
         label='drag induced 10')
 plt.legend()
 plt.show()
-
-
-def make_plot(horizontal_values, vertical_values, color="blue", style=""):
-    pass
