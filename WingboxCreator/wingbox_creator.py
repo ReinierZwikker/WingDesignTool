@@ -48,6 +48,8 @@ wingbox_definition = {'length': halfspan,
 with open(wingbox_file, "w") as wingbox_database:
     json.dump(wingbox_definition, wingbox_database, indent=4)
 
+
+
 """"Determination of the wingbox coordinates """
 
 
@@ -92,4 +94,13 @@ file_name = '\\NACA_2412_many_points_plot.txt'  # the number of points generated
 # spar position data
 spar_pos = [0.15, 0.60]
 
-print(wingbox_points(importer_folder + file_name, spar_pos)[0])
+wingbox_points = wingbox_points(importer_folder + file_name, spar_pos)
+
+
+# wingbox_points = database_connector.load_value("wingbox_points")
+#
+# database_connector.save_value('rolling_moment_coef_10', wingbox_points)
+# database_connector.commit_to_database()
+
+
+# print(wingbox_points(importer_folder + file_name, spar_pos))
