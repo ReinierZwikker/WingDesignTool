@@ -3,9 +3,15 @@
 import numpy as np
 import scipy as sp
 from scipy import interpolate
-from Database.database_functions import DatabaseConnector
 import os
 import inspect
+try:
+    from Database.database_functions import DatabaseConnector
+except ModuleNotFoundError:
+    import sys
+    from os import path
+    sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
+    from Database.database_functions import DatabaseConnector
 
 database_connector = DatabaseConnector()
 
