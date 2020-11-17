@@ -98,5 +98,7 @@
     "vertical_surface_area": 62.41,
     "vertical_aspect_ratio": 1.605,
     "vertical_span": 10.01,
-    "vertical_taper_ratio": 0.351
+    "vertical_taper_ratio": 0.351,
+    "rolling_moment_coef_0": 1.34455e-16,
+    "rolling_moment_coef_10": -2.31966e-16
 }

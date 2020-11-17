@@ -1,6 +1,12 @@
 import json
 import sys
-from os import path, listdir
+import os
+import inspect
+from os import path
+import scipy as sp
+from scipy import interpolate
+import numpy as np
+
 
 try:
     from Database.database_functions import DatabaseConnector
@@ -45,26 +51,45 @@ with open(wingbox_file, "w") as wingbox_database:
 """"Determination of the wingbox coordinates """
 
 
+def txt_to_array_converter(name):
+    # the x and y are arranged vertically
+    a_foil_array_1_top_surface = np.genfromtxt(name, skip_header=1, skip_footer=4501, usecols=(1, 0))
+    a_foil_array_1_bottom_surface = np.genfromtxt(name, skip_header=4501, usecols=(1, 0))
+
+    # the x and y are arranged horizontally
+    a_foil_array_2_top_surface = [a_foil_array_1_top_surface[:, 0], a_foil_array_1_top_surface[:, 1]]
+    a_foil_array_2_bottom_surface = [a_foil_array_1_bottom_surface[:, 0], a_foil_array_1_bottom_surface[:, 1]]
+
+    return a_foil_array_2_top_surface, a_foil_array_2_bottom_surface
+
+
+def value_finder(spar_lst, a_foil_array):  # I know it is not the pretties but it is easy to read, forgive me
+
+    wingbox_vertices = []
+
+    for n in range(0, 2):
+        for x in spar_lst:
+            y = sp.interpolate.interp1d(a_foil_array[n][0], a_foil_array[n][1], kind="cubic",
+                                        fill_value="extrapolate")(x)
+            wingbox_vertices.append((x, y))
+
+    # arrange them such that the 1st is the top left corner and the other follow in clockwise direction
+    wingbox_vertices = [wingbox_vertices[0], wingbox_vertices[1], wingbox_vertices[3], wingbox_vertices[2]]
+
+    return wingbox_vertices
+
+
+def wingbox_points(name, spar_lst):
+    wingbox_vertices = value_finder(spar_lst, txt_to_array_converter(name))
+
+    return wingbox_vertices
+
+
+# file position data
 importer_folder = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
-file_name = "\NACA_2412_many_points_plot.txt"
+file_name = '\\NACA_2412_many_points_plot.txt'  # the number of points generated is 9002
 
-#calling wingbox_points fuctions as follows: wingbox_points(importer_folder + file_name)
-def wingbox_points(name)
-    with open(name, 'r') as file:
-        
+# spar position data
+spar_pos = [0.15, 0.60]
 
-
-
-lst = os.listdir(folder)
-
-# Open file in folder to read
-sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
-
-# Read Reference texts
-textfile_content = textfile_open.readlines()
-
-# Get reference frequencies add to list of lists
-text_language_freq = getfreq(textfile_content)
-lgfreqs.append(text_language_freq)
-
-textfile_open.close()
+print(wingbox_points(importer_folder + file_name, spar_pos))
