@@ -1,5 +1,12 @@
 import json
-from Database.database_functions import DatabaseConnector
+try:
+    from Database.database_functions import DatabaseConnector
+except ModuleNotFoundError:
+    import sys
+    from os import path
+    sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
+    from Database.database_functions import DatabaseConnector
+
 database_connector = DatabaseConnector()
 
 wingbox_file = '../Database/wingbox.json'
