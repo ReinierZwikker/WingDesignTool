@@ -53,8 +53,8 @@ with open(wingbox_file, "w") as wingbox_database:
 
 def txt_to_array_converter(name):
     # the x and y are arranged vertically
-    a_foil_array_1_top_surface = np.genfromtxt(name, skip_header=1, skip_footer=4501, usecols=(1, 0))
-    a_foil_array_1_bottom_surface = np.genfromtxt(name, skip_header=4501, usecols=(1, 0))
+    a_foil_array_1_top_surface = np.genfromtxt(name, skip_header=1, skip_footer=100, usecols=(0,1))
+    a_foil_array_1_bottom_surface = np.genfromtxt(name, skip_header=101, usecols=(0, 1))
 
     # the x and y are arranged horizontally
     a_foil_array_2_top_surface = [a_foil_array_1_top_surface[:, 0], a_foil_array_1_top_surface[:, 1]]
