@@ -15,8 +15,8 @@ except ModuleNotFoundError:
 
 database_connector = DatabaseConnector()
 
-aerodynamic_data_file_0 = '\MainWing_a0.00_v10.00ms.txt'
-aerodynamic_data_file_10 = '\MainWing_a10.00_v10.00ms.txt'
+aerodynamic_data_file_0 = '\\MainWing_a0.00_v10.00ms.txt'
+aerodynamic_data_file_10 = '\\MainWing_a10.00_v10.00ms.txt'
 
 """
 Output of this function is a numpy array, where [1] is the second data point, so in essence rows. In that data point:
