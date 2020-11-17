@@ -46,10 +46,12 @@ with open(wingbox_file, "w") as wingbox_database:
 
 
 importer_folder = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+file_name = "\NACA_2412_many_points_plot.txt"
 
-
-textfile_open = open(, "r", errors='ignore')
-
+#calling wingbox_points fuctions as follows: wingbox_points(importer_folder + file_name)
+def wingbox_points(name)
+    with open(name, 'r') as file:
+        
 
 
 
