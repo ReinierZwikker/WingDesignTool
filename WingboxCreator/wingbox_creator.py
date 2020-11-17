@@ -44,11 +44,19 @@ with open(wingbox_file, "w") as wingbox_database:
 
 """"Determination of the wingbox coordinates """
 
-#lst = os.listdir(folder)
+
+importer_folder = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+
+
+textfile_open = open(, "r", errors='ignore')
+
+
+
+
+lst = os.listdir(folder)
 
 # Open file in folder to read
 sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
-textfile_open = open(, "r", errors='ignore')
 
 # Read Reference texts
 textfile_content = textfile_open.readlines()
