@@ -69,8 +69,8 @@ def value_finder(spar_lst, a_foil_array):  # I know it is not the pretties but i
 
     for n in range(0, 2):
         for x in spar_lst:
-            y = sp.interpolate.interp1d(a_foil_array[n][0], a_foil_array[n][1], kind="cubic",
-                                        fill_value="extrapolate")(x)
+            y = round(float(sp.interpolate.interp1d(a_foil_array[n][0], a_foil_array[n][1], kind="cubic",
+                                        fill_value="extrapolate")(x)), 4)
             wingbox_vertices.append((x, y))
 
     # arrange them such that the 1st is the top left corner and the other follow in clockwise direction
@@ -87,9 +87,9 @@ def wingbox_points(name, spar_lst):
 
 # file position data
 importer_folder = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
-file_name = '\\NACA_2412_many_points_plot.txt'  # the number of points generated is 9002
+file_name = '\\NACA_2412_many_points_plot.txt'  # the number of points generated is 201
 
 # spar position data
 spar_pos = [0.15, 0.60]
 
-print(wingbox_points(importer_folder + file_name, spar_pos))
+print(wingbox_points(importer_folder + file_name, spar_pos)[0])
