@@ -36,7 +36,7 @@
     "l_tailcone/df,outer": 3.3,
     "engines": 2,
     "engine_type": "CF6-80A",
-    "engine_weight": 4835.29,
+    "engine_weight": 47434.1949,
     "engine_spanwise_location": 10.625,
     "engine_chord": 7.46,
     "d_engine": 2.69,
@@ -99,5 +99,7 @@
     "vertical_aspect_ratio": 1.605,
     "vertical_span": 10.01,
     "vertical_taper_ratio": 0.351,
-    "wing_weight": 211915.7919
+    "wing_weight": 211915.7919,
+    "rolling_moment_coef_0": 1.34455e-16,
+    "rolling_moment_coef_10": -2.31966e-16
 }

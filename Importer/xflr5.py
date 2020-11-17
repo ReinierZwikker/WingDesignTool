@@ -60,3 +60,5 @@ angle_induced_function_10 = sp.interpolate.interp1d(aerodynamic_data_10[:, 0], a
 lift_coef_function_10 = sp.interpolate.interp1d(aerodynamic_data_10[:, 0], aerodynamic_data_10[:, 3], kind='cubic', fill_value="extrapolate")
 drag_induced_function_10 = sp.interpolate.interp1d(aerodynamic_data_10[:, 0], aerodynamic_data_10[:, 4], kind='cubic', fill_value="extrapolate")
 moment_coef_function_10 = sp.interpolate.interp1d(aerodynamic_data_10[:, 0], aerodynamic_data_10[:, 5], kind='cubic', fill_value="extrapolate")
+
+
