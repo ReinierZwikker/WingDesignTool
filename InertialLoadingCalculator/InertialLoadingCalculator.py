@@ -24,7 +24,7 @@ Outer_diameter = database_connector.load_value("df,outer")
 radius_fuselage = Outer_diameter / 2
 surface_area = database_connector.load_value("surface_area")
 
-global_length_step = 0.1  # [m]
+global_length_step = 1  # [m]
 
 # Define the flight conditions
 test_velocity = 10.0  # m/s
@@ -53,16 +53,16 @@ def final_force_distribution(y, length_step, density, velocity):
 
 # Integrate to shear function
 def shear_force_function(y, length_step, density, velocity):
-    distributed_shear_force = sp.integrate.quad(final_force_distribution, radius_fuselage, y, (length_step, density, velocity))[0]
+    distributed_shear_force = sp.integrate.quad(final_force_distribution, y, wing_span/2, (length_step, density, velocity))[0]
     if y < spanwise_location_engine:
-        return distributed_shear_force + weight_engine
+        return distributed_shear_force - weight_engine
     else:
         return distributed_shear_force
 
 
 # Integrate to moment function
 def moment_function(y, length_step, density, velocity):
-    return sp.integrate.quad(shear_force_function, radius_fuselage, y, (length_step, density, velocity))[0]
+    return sp.integrate.quad(shear_force_function, y, wing_span/2, (length_step, density, velocity))[0]
 
 
 shear_force_data = []
@@ -72,19 +72,19 @@ for y in np.arange(radius_fuselage, wing_span / 2, global_length_step):
     print(f"{y:.2f} / {wing_span/2}:")
     start_time_2 = time.time()
     shear_force_data.append(shear_force_function(y, global_length_step, test_density, test_velocity))
-    print(time.time() - start_time_2)
+    print("shear:", time.time() - start_time_2)
     start_time_3 = time.time()
     moment_data.append(moment_function(y, global_length_step, test_density, test_velocity))
-    print(time.time() - start_time_2)
-print(time.time() - start_time_1)
+    print("moment:", time.time() - start_time_2)
+print("total:", time.time() - start_time_1)
 # TODO Very slow from engine spanwise position?
 
-plt.subplot(121)
-plt.plot(np.arange(wing_span / 2, radius_fuselage, -global_length_step), shear_force_data, label="Shear")
+plt.subplot(211)
+plt.plot(np.arange(radius_fuselage, wing_span / 2, global_length_step), shear_force_data, label="Shear")
 plt.ylabel("Shear force (N/m2)")
 plt.xlabel("Wing location (m)")
-plt.subplot(122)
-plt.plot(np.arange(wing_span / 2, radius_fuselage, -global_length_step), moment_data, label="Moment")
+plt.subplot(212)
+plt.plot(np.arange(radius_fuselage, wing_span / 2, global_length_step), moment_data, label="Moment")
 plt.ylabel("Moment (N/m)")
 plt.xlabel("Wing location (m)")
 plt.show()
