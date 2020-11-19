@@ -79,6 +79,7 @@
     "wing_span": 53.58,
     "surface_area": 358.8270606,
     "aspect_ratio": 8,
+    "halfspan": 26.7890672,
     "root_chord": 10.41,
     "tip_chord": 2.99,
     "dihedral_angle": 2,
@@ -97,5 +98,7 @@
     "vertical_surface_area": 62.41,
     "vertical_aspect_ratio": 1.605,
     "vertical_span": 10.01,
-    "vertical_taper_ratio": 0.351
+    "vertical_taper_ratio": 0.351,
+    "rolling_moment_coef_0": 1.34455e-16,
+    "rolling_moment_coef_10": -2.31966e-16
 }

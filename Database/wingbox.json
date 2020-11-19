@@ -1,7 +1,24 @@
 {
-    "length": 26.7890672,
+    "length": 26.79,
     "height": 0.2,
-    "width": 23,
+    "wingbox_corner_points": [
+        [
+            0.15,
+            0.0659
+        ],
+        [
+            0.6,
+            0.0628
+        ],
+        [
+            0.6,
+            -0.027
+        ],
+        [
+            0.15,
+            -0.0408
+        ]
+    ],
     "quarter_chord_sweep": 32.34,
     "dihedral_angle": 2,
     "stringers_top": [
