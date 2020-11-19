@@ -1,21 +1,28 @@
-#Scroll all the way down for instructions
+# Scroll all the way down for instructions
 
 import numpy as np
 import scipy as sp
 from scipy import interpolate
-from Database.database_functions import DatabaseConnector
 import os
 import inspect
+try:
+    from Database.database_functions import DatabaseConnector
+except ModuleNotFoundError:
+    import sys
+    from os import path
+    sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
+    from Database.database_functions import DatabaseConnector
 database_connector = DatabaseConnector()
 
 aerodynamic_data_file_0 = '\MainWing_a0.00_v10.00ms.txt'
 aerodynamic_data_file_10 = '\MainWing_a10.00_v10.00ms.txt'
 
-
 """
 Output of this function is a numpy array, where [1] is the second data point, so in essence rows. In that data point:
 [0] is the y-span, [1] is the chord, [2] the induced angle of attack, [3] the Cl, [4] the induced Cd, [5] is Cm around c/4
 """
+
+
 def main_wing_xflr5(name):
     main_wing = np.genfromtxt(name, skip_header=40, skip_footer=1029, usecols=(0, 1, 2, 3, 5, 7))
     return main_wing
@@ -60,5 +67,3 @@ angle_induced_function_10 = sp.interpolate.interp1d(aerodynamic_data_10[:, 0], a
 lift_coef_function_10 = sp.interpolate.interp1d(aerodynamic_data_10[:, 0], aerodynamic_data_10[:, 3], kind='cubic', fill_value="extrapolate")
 drag_induced_function_10 = sp.interpolate.interp1d(aerodynamic_data_10[:, 0], aerodynamic_data_10[:, 4], kind='cubic', fill_value="extrapolate")
 moment_coef_function_10 = sp.interpolate.interp1d(aerodynamic_data_10[:, 0], aerodynamic_data_10[:, 5], kind='cubic', fill_value="extrapolate")
-
-
