@@ -1,0 +1,51 @@
+{
+    "length": 26.7890672,
+    "height": 0.2,
+    "width": 23,
+    "quarter_chord_sweep": 32.34,
+    "dihedral_angle": 2,
+    "stringers_top": [
+        0.1,
+        0.2,
+        0.5,
+        0.7,
+        0.9
+    ],
+    "stringers_bottom": [
+        0.1,
+        0.2,
+        0.5,
+        0.7,
+        0.9
+    ],
+    "stringers_leading": [
+        0.2,
+        0.5,
+        0.7
+    ],
+    "stringers_trailing": [
+        0.2,
+        0.5,
+        0.7
+    ],
+    "ribs": [
+        0.1,
+        0.2,
+        0.5,
+        0.7,
+        0.9
+    ],
+    "stiffeners": [
+        0.1,
+        0.2,
+        0.3,
+        0.5,
+        0.6,
+        0.7,
+        0.9
+    ],
+    "sheet_thickness": 0.1,
+    "stringer_thickness": 0.1,
+    "rib_thickness": 0.1,
+    "stiffener_thickness": 0.1
+}
