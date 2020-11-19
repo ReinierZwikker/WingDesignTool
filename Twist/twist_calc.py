@@ -32,9 +32,10 @@ A2 = 0.5 * (b2+b3)(wingbox_points[1][0]-wingbox_points[.][.])
 
 # Matrix of the shear flow and change of angle. 1st variable is q1 second is q2 third is dThetha/dy.
 def change_of_twist_angle(y):
-    matrix = np.array([[2*A1*chord_function(y)*chord_function(y), 2*A2chord_function(y)*chord_function(y), 0], 
-                [(((((b1+a1+a2)*chord_function(y))/t1)+(b3*chord_function(y)/t3))/2*A1*chord_function(y)*chord_function(y)*G), -((b3*chord_function(y)/t3)/2*A1*chord_function(y)*chord_function(y)*G), -1], 
-                [-((b3*chord_function(y)/t3)/2*A2*chord_function(y)*chord_function(y)*G), (((((b2+c1+c2)*chord_function(y))/t1)+(b3*chord_function(y)/t3))/2*A2*chord_function(y)*chord_function(y)*G), -1]])
+    chord = chord_function(y)
+    matrix = np.array([[2*A1*chord*chord, 2*A2*chord*chord, 0], 
+                [(((((b1+a1+a2)*chord)/t1)+(b3*chord/t3))/2*A1*chord*chord*G), -((b3*chord/t3)/2*A1*chord*chord*G), -1], 
+                [-((b3*chord/t3)/2*A2*chord*chord*G), (((((b2+c1+c2)*chord/t1)+(b3*chord/t3))/2*A2*chord*chord*G), -1]])
     solution_vector = np.array([TorquePlaceHolder(), 0, 0])
     return np.linalg.solve(matrix, solution_vector)
 
