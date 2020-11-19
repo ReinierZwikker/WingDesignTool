@@ -16,6 +16,9 @@ except ModuleNotFoundError:
 
 database_connector = DatabaseConnector()
 
+G = database_connector.load_wingbox_value("shear_modulus_Pa")
+t1 = database_connector.load_wingbox_value("...")
+t3 = database_connector.load_wingbox_value("...")
 wingbox_points = database_connector.load_wingbox_value("wingbox_corner_points")
 b1 = wingbox_points[0][1] - wingbox_points[3][1]
 b2 = wingbox_points[1][1] - wingbox_points[2][1]
@@ -24,11 +27,12 @@ a1 = 0
 a2 = 0
 c1 = 0
 c2 = 0
-
+A1 = 0.5 * (b1+b3)(wingbox_points[.][.]-wingbox_points[0][0])
+A2 = 0.5 * (b2+b3)(wingbox_points[1][0]-wingbox_points[.][.])
 
 # Matrix of the shear flow and change of angle. 1st variable is q1 second is q2 third is dThetha/dy.
 def change_of_twist_angle(y):
-    matrix = np.array([[]])
+    matrix = np.array([[2*A1, 2*A2, 0], [((((b1+a1+a2)*chord_function(y))/t1)+(b3*chord_function(y)/t3))])
     return
 
 
