@@ -14,8 +14,13 @@ except ModuleNotFoundError:
 
 database_connector = DatabaseConnector()
 
+wingbox_points = database_connector.load_value()
+b1 = 
 
-# Torsional constant J. Takes line integral of winbox and cross-sectional area as input. Both with regards to y: span.
+# Matrix of the shear flow and change of angle. 1st variable is q1 second is q2 third is dThetha/dy.
+def change_of_twist_angle():
+
+
 
 
 # Torsional constant calculation
