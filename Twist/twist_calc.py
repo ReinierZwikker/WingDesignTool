@@ -32,6 +32,14 @@ def change_of_twist_angle(y):
     return
 
 
+# Height of the middle spar based on imported value
+wingbox_corner_points = database_connector.load_wingbox_value("wingbox_corner_points")
+wingbox_centroid_location = database_connector.load_wingbox_value("wingbox_centroid_location")
+
+def spar_positions(wingbox_corner_points, wingbox_centroid_location):
+
+
+
 
 # Torsional constant calculation
 def J_y(d_theta_d_y, G, T_y):
