@@ -64,5 +64,7 @@
     "sheet_thickness": 0.1,
     "stringer_thickness": 0.1,
     "rib_thickness": 0.1,
-    "stiffener_thickness": 0.1
+    "stiffener_thickness": 0.1,
+    "shear_modulus_GPa": 26,
+    "shear_modulus_Pa": 26000000000
 }
