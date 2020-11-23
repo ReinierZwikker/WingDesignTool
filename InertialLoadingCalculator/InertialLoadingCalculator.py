@@ -53,6 +53,9 @@ fuel_tank_length = (fuel_tank_engine_stop - fuel_tank_start) + (fuel_tank_stop -
 thickness_to_chord_ratio = database_connector.load_value("thickness_to_chord_ratio")
 cd_0 = database_connector.load_value("cd0")
 
+include_fuel_tanks = True
+include_engine = True
+
 
 # Define the lift and drag distribution
 def lift_distribution(y, length_step, density, velocity):
@@ -71,9 +74,9 @@ print(drag_distribution(10, global_length_step, test_density, test_velocity))
 # Calculate the final force distribution
 def z_final_force_distribution(y, length_step, density, velocity):
     value = lift_distribution(y, length_step, density, velocity) - weight_wing / (wing_span / (2 * length_step))
-    if (fuel_tank_start < y < fuel_tank_engine_stop) or (fuel_tank_engine_start < y < fuel_tank_stop):
+    if (fuel_tank_start < y < fuel_tank_engine_stop) or (fuel_tank_engine_start < y < fuel_tank_stop) and include_fuel_tanks:
         value -= weight_fuel / (fuel_tank_length / length_step)
-    if spanwise_location_engine - (engine_weight_width / 2) < y < spanwise_location_engine + (engine_weight_width / 2):
+    if spanwise_location_engine - (engine_weight_width / 2) < y < spanwise_location_engine + (engine_weight_width / 2) and include_engine:
         value -= weight_engine / (engine_weight_width / length_step)
     return value
 
