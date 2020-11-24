@@ -37,10 +37,10 @@ Area_second = 0.5 * (b_two + b_three) * (wingbox_points[2][0] - wingbox_points[1
 def rate_twist(y):
     chord = chord_function(y)
     matrix = np.array([[2 * Area_first * chord * chord, 2 * Area_second * chord * chord, 0],
-                       [(((((b_one + a_one + a_two) * chord) / t1) + (b_three * chord / t3)) / 2 * Area_first * chord * chord * G),
-                        -1 * ((b_three * chord / t3) / 2 * Area_first * chord * chord * G), -1],
-                       [-1 * ((b_three * chord / t3) / 2 * Area_second * chord * chord * G),
-                        (((((b_two + c_one + c_two) * chord / t1) + (b_three * chord / t3)) / 2 * Area_second * chord * chord * G)), -1]])
+                       [(((((b_one + a_one + a_two) * chord) / t1) + (b_three * chord / t3)) / (2 * Area_first * chord * chord * G)),
+                        -1 * ((b_three * chord / t3) / (2 * Area_first * chord * chord * G)), -1],
+                       [-1 * ((b_three * chord / t3) / (2 * Area_second * chord * chord * G)),
+                        (((((b_two + c_one + c_two) * chord / t1) + (b_three * chord / t3)) / (2 * Area_second * chord * chord * G))), -1]])
     solution_vector = np.array([1, 0, 0])  # TorquePlaceHolder() in first array slot
     q1, q2, dThetha = np.linalg.solve(matrix, solution_vector)
     return dThetha
