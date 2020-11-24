@@ -17,8 +17,8 @@ except ModuleNotFoundError:
 database_connector = DatabaseConnector()
 
 G = database_connector.load_wingbox_value("shear_modulus_pa")
-t1 = 0.03  # database_connector.load_wingbox_value("...")
-t3 = 0.03  # database_connector.load_wingbox_value("...")
+t1 = 0.003  # database_connector.load_wingbox_value("...")
+t3 = 0.003  # database_connector.load_wingbox_value("...")
 
 wingbox_points = database_connector.load_wingbox_value("wingbox_points")
 
@@ -41,15 +41,18 @@ def rate_twist(y):
                         -1 * ((b_three * chord / t3) / (2 * Area_first * chord * chord * G)), -1],
                        [-1 * ((b_three * chord / t3) / (2 * Area_second * chord * chord * G)),
                         (((((b_two + c_one + c_two) * chord / t1) + (b_three * chord / t3)) / (2 * Area_second * chord * chord * G))), -1]])
-    solution_vector = np.array([1, 0, 0])  # TorquePlaceHolder() in first array slot
+    solution_vector = np.array([50000, 0, 0])  # TorquePlaceHolder() in first array slot
     q1, q2, dThetha = np.linalg.solve(matrix, solution_vector)
     return dThetha
 
-def twist_angle():
+def twist_angle_rad():
     estimate, error = sp.integrate.quad(rate_twist, 0, database_connector.load_value("halfspan"))
     return estimate
+
+def twist_angle_deg():
+    return twist_angle_rad()*180 / pi
 
 #def stiffness(y):
     #return TorquePlaceHolder()/ rate_twist(y) * G
 
-print(rate_twist(0))
+print(twist_angle_deg())
