@@ -17,8 +17,8 @@ except ModuleNotFoundError:
 database_connector = DatabaseConnector()
 
 G = database_connector.load_wingbox_value("shear_modulus_pa")
-t1 = 0.003  # database_connector.load_wingbox_value("...")
-t3 = 0.003  # database_connector.load_wingbox_value("...")
+t1 = 0.03  # database_connector.load_wingbox_value("...")
+t3 = 0.03  # database_connector.load_wingbox_value("...")
 
 wingbox_points = database_connector.load_wingbox_value("wingbox_points")
 
@@ -34,7 +34,7 @@ Area_second = 0.5 * (b_two + b_three) * (wingbox_points[2][0] - wingbox_points[1
 
 
 # Matrix of the shear flow and change of angle. 1st variable is q1 second is q2 third is dThetha/dy.
-def change_of_twist_angle(y):
+def rate_twist(y):
     chord = chord_function(y)
     matrix = np.array([[2 * Area_first * chord * chord, 2 * Area_second * chord * chord, 0],
                        [(((((b_one + a_one + a_two) * chord) / t1) + (b_three * chord / t3)) / 2 * Area_first * chord * chord * G),
@@ -47,5 +47,7 @@ def change_of_twist_angle(y):
 
 
 def twist_angle():
-    estimate, error = sp.integrate.quad(change_of_twist_angle, 0, database_connector.load_value("halfspan"))
+    estimate, error = sp.integrate.quad(rate_twist, 0, database_connector.load_value("halfspan"))
     return estimate
+
+print(rate_twist(0))
