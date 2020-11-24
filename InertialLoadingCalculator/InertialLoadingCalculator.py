@@ -4,7 +4,6 @@ import numpy as np
 from scipy import integrate
 import time
 import matplotlib.pyplot as plt
-from Integrator import Integration
 
 try:
     from Integrator import Integration
@@ -13,10 +12,10 @@ try:
 except ModuleNotFoundError:
     import sys
     from os import path
-
     sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
     import Importer.xflr5 as aerodynamic_data
     from Database.database_functions import DatabaseConnector
+    from Integrator import Integration
 
 database_connector = DatabaseConnector()
 
@@ -26,7 +25,7 @@ outer_diameter = database_connector.load_value("df,outer")
 radius_fuselage = outer_diameter / 2
 surface_area = database_connector.load_value("surface_area")
 
-global_length_step = 0.1  # [m]
+global_length_step = 1  # [m]
 LUT_rounding = 10  # digits
 
 # Define the flight conditions
@@ -59,29 +58,24 @@ include_engine = True
 
 # Define the lift and drag distribution
 def lift_distribution(y, length_step, density, velocity):
-    return aerodynamic_data.lift_coef_function_10(y) * 0.5 * density * (velocity ** 2) * (surface_area / (wing_span / (2 * length_step)))
+    return aerodynamic_data.lift_coef_function_10(y) * 0.5 * density * (velocity ** 2) * aerodynamic_data.chord_function(y) * length_step
 
 
 def drag_distribution(y, length_step, density, velocity):
     # TODO check if drag_induced is right
-    return (aerodynamic_data.drag_induced_function_10(y) + cd_0) * 0.5 * density * (velocity ** 2) * aerodynamic_data.chord_function(y) * \
-           thickness_to_chord_ratio * length_step
-
-
-print(drag_distribution(10, global_length_step, test_density, test_velocity))
+    return (aerodynamic_data.drag_induced_function_10(y) + cd_0) * 0.5 * density * (velocity ** 2) * aerodynamic_data.chord_function(y) * length_step
 
 
 # Calculate the final force distribution
 def z_final_force_distribution(y, length_step, density, velocity):
-    value = lift_distribution(y, length_step, density, velocity) - weight_wing / (wing_span / (2 * length_step))
-    if (fuel_tank_start < y < fuel_tank_engine_stop) or (fuel_tank_engine_start < y < fuel_tank_stop) and include_fuel_tanks:
+    value = lift_distribution(y, length_step, density, velocity) # - weight_wing / surface_area * aerodynamic_data.chord_function(y) * length_step
+    if ((fuel_tank_start < y < fuel_tank_engine_stop) or (fuel_tank_engine_start < y < fuel_tank_stop)) and include_fuel_tanks:
         value -= weight_fuel / (fuel_tank_length / length_step)
-    if spanwise_location_engine - (engine_weight_width / 2) < y < spanwise_location_engine + (engine_weight_width / 2) and include_engine:
-        value -= weight_engine / (engine_weight_width / length_step)
+    if spanwise_location_engine - length_step / 2 < y < spanwise_location_engine + length_step / 2 and include_engine:
+        value -= weight_engine
     return value
 
 
-# TODO This is very low?
 # TODO Add contribution due to thrust
 def x_final_force_distribution(y, length_step, density, velocity):
     return drag_distribution(y, length_step, density, velocity)
@@ -97,6 +91,7 @@ def add_engine_component(func, y, moment_arm):
 
 # Spanwise locations to move through for graphs
 spanwise_locations_list = np.arange(radius_fuselage, wing_span / 2, global_length_step)
+# spanwise_locations_list = np.arange(0, 10, global_length_step)
 
 """
 Sign-convention:
@@ -107,11 +102,14 @@ z: upwards
 
 
 # Setting up the integrals
-x_shear_integral = Integration(z_final_force_distribution, LUT_rounding)
-x_moment_integral = Integration(x_shear_integral.get_value, LUT_rounding)
+# x_shear_integral = Integration(z_final_force_distribution, min(spanwise_locations_list), max(spanwise_locations_list))
+# x_moment_integral = Integration(x_shear_integral.get_value, min(spanwise_locations_list), max(spanwise_locations_list))
 
-z_shear_integral = Integration(x_final_force_distribution, LUT_rounding)
-z_moment_integral = Integration(z_shear_integral.get_value, LUT_rounding)
+x_shear_integral = Integration(z_final_force_distribution, min(spanwise_locations_list), max(spanwise_locations_list), flip_sign=True)
+x_moment_integral = Integration(x_shear_integral.get_value, min(spanwise_locations_list), max(spanwise_locations_list), flip_sign=True)
+
+z_shear_integral = Integration(x_final_force_distribution, min(spanwise_locations_list), max(spanwise_locations_list), flip_sign=True)
+z_moment_integral = Integration(z_shear_integral.get_value, min(spanwise_locations_list), max(spanwise_locations_list), flip_sign=True)
 
 
 # Data list for the results
@@ -133,21 +131,12 @@ print("Calculating shear and moment.\nIntegrating... (this can take a while)")
 for spanwise_location in spanwise_locations_list:
     z_force_data.append(z_final_force_distribution(spanwise_location, global_length_step, test_density, test_velocity))
     x_force_data.append(x_final_force_distribution(spanwise_location, global_length_step, test_density, test_velocity))
-    # Old way using added point loads:
-    # x_shear_force_data.append(
-    #     add_engine_component(-x_shear_integral.integrate(spanwise_location, wing_span / 2, global_length_step, test_density, test_velocity),
-    #                          spanwise_location,
-    #                          1))
-    # x_moment_data.append(
-    #     add_engine_component(x_moment_integral.integrate(spanwise_location, wing_span / 2, global_length_step, test_density, test_velocity),
-    #                          spanwise_location,
-    #                          -(spanwise_location_engine - spanwise_location)))
 
-    x_shear_force_data.append(-x_shear_integral.integrate(spanwise_location, wing_span / 2, global_length_step, test_density, test_velocity))
-    x_moment_data.append(x_moment_integral.integrate(spanwise_location, wing_span / 2, global_length_step, test_density, test_velocity))
+    x_shear_force_data.append(x_shear_integral.integrate(spanwise_location, global_length_step, test_density, test_velocity))
+    x_moment_data.append(x_moment_integral.integrate(spanwise_location, global_length_step, test_density, test_velocity))
 
-    z_shear_force_data.append(-z_shear_integral.integrate(spanwise_location, wing_span / 2, global_length_step, test_density, test_velocity))
-    z_moment_data.append(z_moment_integral.integrate(spanwise_location, wing_span / 2, global_length_step, test_density, test_velocity))
+    z_shear_force_data.append(z_shear_integral.integrate(spanwise_location, global_length_step, test_density, test_velocity))
+    z_moment_data.append(z_moment_integral.integrate(spanwise_location, global_length_step, test_density, test_velocity))
 
 # More time keeping & printing
 print(f"total time: {(time.time() - start_time_1) / 60:.3f} min")
