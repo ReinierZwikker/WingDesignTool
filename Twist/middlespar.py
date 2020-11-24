@@ -13,7 +13,7 @@ except ModuleNotFoundError:
 database_connector = DatabaseConnector()
 
 wingbox_corner_points = database_connector.load_wingbox_value("wingbox_corner_points")
-wingbox_centroid_location = [0.37216, 0.01494] #database_connector.load_wingbox_value("wingbox_centroid_location")
+wingbox_centroid_location = [0.37216, 0.01494] #  database_connector.load_wingbox_value("wingbox_centroid_location")
 
 
 def spar_positions():

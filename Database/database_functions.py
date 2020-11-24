@@ -7,8 +7,8 @@ class DatabaseConnector:
 
     def __init__(self):
         self.__database_folder = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
-        self.__database_file = self.__database_folder + '/database.json'
-        self.__wingbox_file = self.__database_folder + '/wingbox.json'
+        self.__database_file = self.__database_folder + '\\database.json'
+        self.__wingbox_file = self.__database_folder + '\\wingbox.json'
         with open(self.__database_file) as database:
             self.__database_dict = json.load(database)
         with open(self.__wingbox_file) as wingbox:
