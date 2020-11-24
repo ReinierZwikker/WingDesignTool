@@ -103,5 +103,6 @@
     "rolling_moment_coef_0": 1.34455e-16,
     "rolling_moment_coef_10": -2.31966e-16,
     "cd0": 0.01898,
+    "engine_max_thrust": 214000,
     "comments": "Wing Surface Area is including Yehudi\n"
 }
