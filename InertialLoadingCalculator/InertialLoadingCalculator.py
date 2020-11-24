@@ -23,6 +23,9 @@ wing_span = database_connector.load_value("wing_span")
 Outer_diameter = database_connector.load_value("df,outer")
 radius_fuselage = Outer_diameter / 2
 surface_area = database_connector.load_value("surface_area")
+root_chord = database_connector.load_value("root_chord")
+tip_chord = database_connector.load_value("tip_chord")
+taper_ratio = database_connector.load_value("taper_ratio")
 
 global_length_step = 0.1  # [m]
 
@@ -68,6 +71,9 @@ def moment_function(y, length_step, density, velocity):
     return - sp.integrate.quad(shear_force_function, y, wing_span/2, (length_step, density, velocity))[0]
 
 
+def pitching_moment_function(y, density, velocity, chord):
+    return aerodynamic_data.moment_coef_function_10(y) * 0.5 * density * (velocity**2) * surface_area * chord
+
 chord_list = np.arange(radius_fuselage, wing_span / 2, global_length_step)
 
 shear_force_data = []
@@ -85,6 +91,7 @@ for y in np.arange(radius_fuselage, wing_span / 2, global_length_step):
 print("total:", time.time() - start_time_1)
 # TODO Very slow from engine spanwise position? Kinda fixed
 
+
 plt.subplot(221)
 plt.plot()
 
@@ -97,3 +104,4 @@ plt.plot(np.arange(radius_fuselage, wing_span / 2, global_length_step), moment_d
 plt.ylabel("Moment (Nm)")
 plt.xlabel("Wing location (m)")
 plt.show()
+
