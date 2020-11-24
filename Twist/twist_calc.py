@@ -45,9 +45,11 @@ def rate_twist(y):
     q1, q2, dThetha = np.linalg.solve(matrix, solution_vector)
     return dThetha
 
-
 def twist_angle():
     estimate, error = sp.integrate.quad(rate_twist, 0, database_connector.load_value("halfspan"))
     return estimate
+
+#def stiffness(y):
+    #return TorquePlaceHolder()/ rate_twist(y) * G
 
 print(rate_twist(0))
