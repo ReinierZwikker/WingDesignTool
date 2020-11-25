@@ -75,10 +75,9 @@ def drag_distribution(y, length_step, density, velocity):
 
 
 def pitching_moment_function(y, density, velocity, length_step):
-    # 0.5 rho V^2 S c
-    # print(aerodynamic_data.moment_coef_function_10(y))
-    return -aerodynamic_data.moment_coef_function_10(y) * 0.5 * density * (velocity ** 2) * aerodynamic_data.chord_function(
-        y) * aerodynamic_data.chord_function(y)  # * length_step
+    #0.5 rho V^2 S c
+    print(aerodynamic_data.moment_coef_function_10(y))
+    return -aerodynamic_data.moment_coef_function_10(y) * 0.5 * density * (velocity**2) * aerodynamic_data.chord_function(y)  * aerodynamic_data.chord_function(y)
 
 
 # Calculate the final force distribution
@@ -115,10 +114,6 @@ def add_thrust_moment(y, length_step, moment_arm):
 spanwise_locations_list = np.arange(radius_fuselage, wing_span / 2, global_length_step)
 # spanwise_locations_list = np.arange(0, 10, global_length_step)
 
-# spanwise_locations_list_10 = np.arange(radius_fuselage, wing_span / 2, global_length_step/10)
-# spanwise_locations_list_100 = np.arange(radius_fuselage, wing_span / 2, global_length_step/100)
-# spanwise_locations_list_1000 = np.arange(radius_fuselage, wing_span / 2, global_length_step/1000)
-
 """
 Sign-convention:
 x: towards nose
@@ -139,10 +134,6 @@ z_moment_integral = Integration(z_shear_integral.get_value, min(spanwise_locatio
 
 # Data list for the results
 z_force_data = []
-z_force_data_10 = []
-z_force_data_100 = []
-z_force_data_1000 = []
-
 x_shear_force_data = []
 x_moment_data = []
 
