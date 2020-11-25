@@ -15,6 +15,15 @@ p_0 = 101325.0  # Pa
 rho_0 = 1.225  # Kg/m^# 3
 
 # Airplane Data
+try:
+    from Database.database_functions import DatabaseConnector
+except ModuleNotFoundError:
+    import sys
+    from os import path
+    sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
+    from Database.database_functions import DatabaseConnector
+
+
 MLW =
 
 # MLW, MTOW, MZFW, Zmo!!!!, CLalpha
