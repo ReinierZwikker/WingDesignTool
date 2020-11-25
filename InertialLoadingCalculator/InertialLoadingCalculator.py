@@ -78,7 +78,7 @@ def pitching_moment_function(y, density, velocity, length_step):
     # 0.5 rho V^2 S c
     # print(aerodynamic_data.moment_coef_function_10(y))
     return -aerodynamic_data.moment_coef_function_10(y) * 0.5 * density * (velocity ** 2) * aerodynamic_data.chord_function(
-        y) * length_step * aerodynamic_data.chord_function(y)
+        y) * aerodynamic_data.chord_function(y)  # * length_step
 
 
 # Calculate the final force distribution
@@ -170,7 +170,7 @@ for spanwise_location in spanwise_locations_list:
 
     y_torsion_data.append(
         pitching_moment_function(spanwise_location, test_density, test_velocity, global_length_step) + add_engine_moment(spanwise_location, global_length_step,
-                                                                                                                         moment_arm_engine) + add_thrust_moment(
+                                                                                                                         moment_arm_engine) - add_thrust_moment(
             spanwise_location, global_length_step, moment_arm_thrust))
 
 
@@ -191,42 +191,42 @@ for spanwise_location in spanwise_locations_list:
 print(f"total time: {(time.time() - start_time_1) / 60:.3f} min")
 print(f"LUT lengths: {len(x_shear_integral.LUT)}, {len(x_moment_integral.LUT)}, {len(z_shear_integral.LUT)}, {len(z_moment_integral.LUT)}")
 
+fig, axs = plt.subplots(4, 2)
+
+fig.suptitle(f"Inertial Loading for V={test_velocity} [m/s] at rho={test_density} [kg/m3] using steps of {global_length_step} [m]", fontsize=20)
 # Make plots for the x direction
-plt.subplots_adjust(left=0.07, bottom=0.07, right=0.97, top=0.95, wspace=0.10, hspace=0.27)
-plt.subplot(421)
-plt.title("z: Lift and Weight")
-plt.plot(spanwise_locations_list, [x/1000 for x in z_force_data], label="Force")
-plt.ylabel("Applied Force in z (kN)")
-plt.subplot(423)
-plt.title("x: Shear due to Lift and Weight")
-plt.plot(spanwise_locations_list, [x/1000 for x in x_shear_force_data], label="Shear")
-plt.ylabel("Shear force in x (kN)")
-plt.subplot(425)
-plt.title("x: Moment due to Lift and Weight")
-plt.plot(spanwise_locations_list, [x/1000 for x in x_moment_data], label="Moment")
-plt.ylabel("Moment in x (kNm)")
+fig.subplots_adjust(left=0.07, bottom=0.07, right=0.97, top=0.90, wspace=0.10, hspace=0.30)
+axs[0, 0].set_title("z: Lift and Weight")
+axs[0, 0].plot(spanwise_locations_list, [x/1000 for x in z_force_data], label="Force")
+axs[0, 0].set_ylabel("Applied Force in z (kN)")
+
+axs[1, 0].set_title("x: Shear due to Lift and Weight")
+axs[1, 0].plot(spanwise_locations_list, [x/1000 for x in x_shear_force_data], label="Shear")
+axs[1, 0].set_ylabel("Shear force in x (kN)")
+
+axs[2, 0].set_title("x: Moment due to Lift and Weight")
+axs[2, 0].plot(spanwise_locations_list, [x/1000 for x in x_moment_data], label="Moment")
+axs[2, 0].set_ylabel("Moment in x (kNm)")
 
 # Make plots for the z direction
-plt.subplot(422)
-plt.title("x: Drag and Thrust")
-plt.plot(spanwise_locations_list, [x/1000 for x in x_force_data], label="Force")
-plt.ylabel("Applied Force in x (kN)")
-plt.subplot(424)
-plt.title("z: Shear due to Drag and Thrust")
-plt.plot(spanwise_locations_list, [x/1000 for x in z_shear_force_data], label="Shear")
-plt.ylabel("Shear force in z (kN)")
-plt.subplot(426)
-plt.title("z: Moment due to Drag and Thrust")
-plt.plot(spanwise_locations_list, [x/1000 for x in z_moment_data], label="Moment")
-plt.ylabel("Moment in z (kNm)")
-plt.xlabel("Wing location (m)")
+axs[0, 1].set_title("x: Drag and Thrust")
+axs[0, 1].plot(spanwise_locations_list, [x/1000 for x in x_force_data], label="Force")
+axs[0, 1].set_ylabel("Applied Force in x (kN)")
+
+axs[1, 1].set_title("z: Shear due to Drag and Thrust")
+axs[1, 1].plot(spanwise_locations_list, [x/1000 for x in z_shear_force_data], label="Shear")
+axs[1, 1].set_ylabel("Shear force in z (kN)")
+
+axs[2, 1].set_title("z: Moment due to Drag and Thrust")
+axs[2, 1].plot(spanwise_locations_list, [x/1000 for x in z_moment_data], label="Moment")
+axs[2, 1].set_ylabel("Moment in z (kNm)")
+axs[2, 1].set_xlabel("Wing location (m)")
 
 # Make plots for the u direction (torsion)
-plt.subplot(427)
-plt.title("u: Torsion")
-plt.plot(spanwise_locations_list, [x/1000 for x in y_torsion_data], label="Torsion")
-plt.ylabel("Torsion in y (kNm)")
-plt.xlabel("Wing location (m)")
+axs[3, 0].set_title("u: Torsion")
+axs[3, 0].plot(spanwise_locations_list, [x/1000 for x in y_torsion_data], label="Torsion")
+axs[3, 0].set_ylabel("Torsion in y (kNm)")
+axs[3, 0].set_xlabel("Wing location (m)")
 
 # show and pop plots
 plt.show()
