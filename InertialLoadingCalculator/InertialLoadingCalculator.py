@@ -225,4 +225,4 @@ plt.show()
 
 # Saving results
 with open('./data.pickle', 'wb') as file:
-    pickle.dump((z_force_data, x_shear_force_data, x_moment_data, x_force_data, z_shear_force_data, z_moment_data, y_torsion_data), file)
+    pickle.dump((spanwise_locations_list, z_force_data, x_shear_force_data, x_moment_data, x_force_data, z_shear_force_data, z_moment_data, y_torsion_data), file)
