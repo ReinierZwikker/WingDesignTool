@@ -14,7 +14,7 @@ T_0 = 288.15  # K
 p_0 = 101325.0  # Pa
 rho_0 = 1.225  # Kg/m^# 3
 
-# Airplane Data
+# Airplane Data from connector
 try:
     from Database.database_functions import DatabaseConnector
 except ModuleNotFoundError:
@@ -25,11 +25,13 @@ except ModuleNotFoundError:
 
     sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
     from Database.database_functions import DatabaseConnector
-    from WingData.chord_function import chord_function
+    # from WingData.chord_function import chord_function
 
 database_connector = DatabaseConnector()
 
-MLW = database_connector.('mtow')
+MLW = database_connector.load_value("mlw_N")
+
+
 
 
 # MLW, MTOW, MZFW, Zmo!!!!, CLalpha
