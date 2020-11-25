@@ -4,7 +4,7 @@ from math import pi, sin, cos, tan, e, sqrt, exp
 
 # # Import Wos, CLalpha,rho, V
 # # WoS is W/S (W over S)
-H = 1
+
 
 # Physical constants
 g_0 = 9.80665  # m/s^2
@@ -15,7 +15,7 @@ p_0 = 101325.0  # Pa
 rho_0 = 1.225  # Kg/m^# 3
 
 # Airplane Data
-
+MLW =
 
 # MLW, MTOW, MZFW, Zmo!!!!, CLalpha
 
@@ -56,11 +56,11 @@ def ISA_T_P_d(h, T_data, g_data, p_data):
 
 # Definition of Functions
 
-def WoS(W, S):
+def WoS(W, S): # Wing loading
     return W / S
 
 
-def V_B(WoS, rho, c, CLalpha, g, rho_0, Uref, V_C, Vs1):
+def V_B(WoS, rho, c, CLalpha, g, rho_0, Uref, V_C, Vs1):    # design speed for maximum gust intensity
     mu = (2 * WoS) / (rho * c * CLalpha * g)
     K_g = (0.88 * mu) / (5.3 + mu)
     A = K_g * rho_0 * Uref * V_C * CLalpha
@@ -103,7 +103,7 @@ def F_g(MLW, MTOW, MZFW, Zmo):  # flight profile alleviation factor from CS25.34
     return 0.5 * (F_gz + F_gm)
 
 
-def dn_s(H, WoS, CLalpha, rho, V, t, U_ds, g):
+def dn_s(H, WoS, CLalpha, rho, V, t, U_ds, g):      # load factor
     # pre-ds calculations
     w = pi * V / H  # radial frequency of the response (omega)
     la = (2 * WoS) / (CLalpha * rho * V * g)  # lambda
