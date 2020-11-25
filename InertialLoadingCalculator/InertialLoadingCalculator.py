@@ -26,9 +26,12 @@ surface_area = database_connector.load_value("surface_area")
 root_chord = database_connector.load_value("root_chord")
 tip_chord = database_connector.load_value("tip_chord")
 taper_ratio = database_connector.load_value("taper_ratio")
-chord_at_engine_location = database_connector.load_value("engine_chord")
-moment_arm_engine = 0.7 * chord_at_engine_location
-radius_engine = database_connector.load_value("d_engine")
+spanwise_location_engine = database_connector.load_value("engine_spanwise_location")
+
+chord_at_engine_location = aerodynamic_data.chord_function(spanwise_location_engine)
+radius_engine = database_connector.load_value("d_engine")/2
+
+moment_arm_engine = (0.25 + 0.2) * aerodynamic_data.chord_function(spanwise_location_engine)
 moment_arm_thrust = 1.5 * radius_engine
 
 global_length_step = 0.1  # [m]
@@ -39,8 +42,7 @@ test_density = 1.225  # kg/m^2
 
 # Import weight and location of the engine
 weight_engine = database_connector.load_value("engine_weight")
-spanwise_location_engine = database_connector.load_value("engine_spanwise_location")
-engine_weight_width = 1
+engine_weight_width = 0.1
 engine_thrust = database_connector.load_value("engine_max_thrust")
 
 # Import the weight of the wing and fuel (Class II)
