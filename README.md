@@ -6,24 +6,45 @@ Group B05
 
 Add this at the top of your file:
 
-`from Database.database_functions import DatabaseConnector`
+```python
+try:
+    import <Modules that dont work here>
+except ModuleNotFoundError:
+    import sys
+    from os import path
+    sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
+    import <Modules that dont work here>
+```
 
-`database_connector = DatabaseConnector()`
+```python
+database_connector = DatabaseConnector()
+```
 
 When you want to load a value, use:
 
-`variable = database_connector.load_value("value_name")`
+```python
+variable = database_connector.load_value("value_name")
+```
   or
-`variable = database_connector.load_wingbox_value("value_name")`
+```python
+variable = database_connector.load_wingbox_value("value_name")
+```
 
 Value names should always be lowercase/snakecase. No spaces are allowed in the name.
 
 When you want to save a value, use:
 
-`database_connector.save_value("value_name", value)`
-
+```python
+database_connector.save_value("value_name", value)
+```
+  or
+```python
+variable = database_connector.save_wingbox_value("value_name")
+```
 Again only lowercase and underscores!
 
 When you are done with the database, you need to commit the changes to the file!
 
-`database_connector.commit_to_database()` 
+```python
+database_connector.commit_to_database()
+```
