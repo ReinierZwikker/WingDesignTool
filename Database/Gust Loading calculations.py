@@ -23,9 +23,13 @@ except ModuleNotFoundError:
     sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
     from Database.database_functions import DatabaseConnector
 
+    sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
+    from Database.database_functions import DatabaseConnector
+    from WingData.chord_function import chord_function
+
 database_connector = DatabaseConnector()
 
-MLW = DatabaseConnector('mtow')
+MLW = database_connector.('mtow')
 
 
 # MLW, MTOW, MZFW, Zmo!!!!, CLalpha
