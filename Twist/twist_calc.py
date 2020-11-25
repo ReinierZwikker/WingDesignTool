@@ -67,8 +67,10 @@ def twist_angle_rad():
     estimate, error = sp.integrate.quad(rate_twist, 0, database_connector.load_value("wing_span")/2)
     return estimate
 
+
 def twist_angle_deg():
-    return twist_angle_rad()*180 / pi
+    return twist_angle_rad() * 180 / pi
+
 
 def stiffness(y):
     return torsion(y)/ rate_twist(y) * G
