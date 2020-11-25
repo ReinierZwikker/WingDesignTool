@@ -2,11 +2,7 @@
 
 from math import pi, sin, cos, tan, e, sqrt, exp
 
-# # Import Wos, CLalpha,rho, V
-# # WoS is W/S (W over S)
-
-
-# Physical constants
+# Physical constants (these values are also present in the ISA calculator and the il Cl_alpha calculator)
 g_0 = 9.80665  # m/s^2
 R = 287.0  # J/kgK
 # Sea level values:
@@ -20,6 +16,7 @@ try:
 except ModuleNotFoundError:
     import sys
     from os import path
+
     sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
     from Database.database_functions import DatabaseConnector
 
@@ -29,20 +26,23 @@ except ModuleNotFoundError:
 
 database_connector = DatabaseConnector()
 
-MLW = database_connector.load_value("operating_altitude_m")
-
-
-
-
-# MLW, MTOW, MZFW, Zmo!!!!, CLalpha
+MLW = database_connector.load_value("mlw_n")
+MTOW = database_connector.load_value("mtow")
+Zmo = database_connector.load_value("max_ceiling_m")
+operating_altitude = database_connector.load_value("operating_altitude_m")
+Cl_alpha_0 = database_connector.load_value("cl-alpha_curve")
 
 
 # ISA Calculator
-def ISA_T_P_d(h, T_data, g_data, p_data):
+def ISA_T_P_d(h):
     end = False
-    T_0 = T_data
-    g_0 = g_data
-    p_0 = p_data
+
+    # constants
+    g_0 = 9.80665  # m/s^2
+    R = 287.0  # J/kgK
+    # Sea level values:
+    T_0 = 288.15  # K
+    p_0 = 101325.0  # Pa
     h_0 = 0
 
     atm_layers = [0.0, 11000.0, 20000.0, 32000.0, 47000.0, 51000.0, 71000.0, 86000.0]
@@ -72,11 +72,11 @@ def ISA_T_P_d(h, T_data, g_data, p_data):
 
 # Definition of Functions
 
-def WoS(W, S): # Wing loading
+def WoS(W, S):  # Wing loading
     return W / S
 
 
-def V_B(WoS, rho, c, CLalpha, g, rho_0, Uref, V_C, Vs1):    # design speed for maximum gust intensity
+def V_B(WoS, rho, c, CLalpha, g, rho_0, Uref, V_C, Vs1):  # design speed for maximum gust intensity
     mu = (2 * WoS) / (rho * c * CLalpha * g)
     K_g = (0.88 * mu) / (5.3 + mu)
     A = K_g * rho_0 * Uref * V_C * CLalpha
@@ -119,7 +119,7 @@ def F_g(MLW, MTOW, MZFW, Zmo):  # flight profile alleviation factor from CS25.34
     return 0.5 * (F_gz + F_gm)
 
 
-def dn_s(H, WoS, CLalpha, rho, V, t, U_ds, g):      # load factor
+def dn_s(H, WoS, CLalpha, rho, V, t, U_ds, g):  # load factor
     # pre-ds calculations
     w = pi * V / H  # radial frequency of the response (omega)
     la = (2 * WoS) / (CLalpha * rho * V * g)  # lambda
@@ -136,69 +136,24 @@ def dn_s(H, WoS, CLalpha, rho, V, t, U_ds, g):      # load factor
     return dn_s
 
 
+def Cl_alpha(Cl_alpha_0, V, T):
+    # Cl alpha at cruise Mach
+    # M = cruise Mach
+    M = V / sqrt(1.4 * 287 * T)
+    # CLa0 = CLa at M=0
+    CLaM = Cl_alpha_0 / (sqrt(1 - M ** 2))
+    return CLaM
+
+
+# Iterations infos
+H_interval = (9, max(107, 0.5 * 12.5 * (database_connector.load_value("root_chord") +
+                                        database_connector.load_value("tip_chord"))))
+# List of weights constituting limit conditions
+
+
 # Body
 
-
-# # iteration involves flight velocity, altitude, weight and gust gradient distance
-# U_ds = U_ds(U_ref(H), F_g(MLW, MTOW, MZFW, Zmo), H)  # function of gust gradient distance
-#
-# Delta_n = dn_s(H, WoS, CLalpha, rho, V, t, U_ds, g_0)  # find which V goes there  thus what t
-
-#
-#
-# def CLaM(CLa0, M):
-#     # Cl alpha at cruise Mach
-#     # M = cruise Mach
-#     # CLa0 = CLa at M=0
-#     CLaM = CLa0 / (math.sqrt(1 - M ** 2))
-#     return CLaM
-#
-#
-#
-# # if __name__ == '__main__':
-# #    main()
-#
-# g = 9.80665
-# rho_0 = 1.225
-# MLW =  # MZFW - reserve fuel !!!! this i could not find yet
-
-#
-# # load factor
-#
-# R1 = R1(MLW, MTOW)
-#
-# # import MZFW
-# R2 = R2(MZFW, MTOW)
-#
-# F_gm = F_gm(R2, R1)
-#
-# # import Zmo from ____
-# F_gz = F_gz(Zmo)
-#
-# F_g = F_g(F_gz, F_gm)
-#
-# Uref = Uref(h)
-#
-# # import Uref, H
-# U_ds = U_ds(Uref, F_g, H)
-#
-# # t =
-#
-#
-# # import WoS, CLalpha, rho, V
-# la = la(WoS, CLalpha, rho, V, g)
-#
-# w = w(V, H)
-#
-# dn_s = dn_s(w, la, t, U_ds, g)
-#
-# # V_B
-# # import WoS, rho, c, CLalpha, Uref, V_C, Vs1
-#
-# mu = mu(WoS, rho, c, CLalpha, g)
-#
-# K_g = K_g(mu)
-#
-# V_B = V_B(K_g, rho_0, Uref, V_C, CLalpha, WoS, Vs1)
-
-print(MLW)
+# iteration involves flight velocity, altitude, weight and gust gradient distance
+U_ds = U_ds(U_ref(H), F_g(MLW, MTOW, MZFW, Zmo), H)  # function of gust gradient distance
+ISA_values = ISA_T_P_d(h)
+Delta_n = dn_s(H, WoS, Cl_alpha(Cl_alpha_0, V, ISA_values[0]), ISA_values[2], V, t, U_ds, g_0)  # find which V goes there thus what t
