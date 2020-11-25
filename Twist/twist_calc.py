@@ -53,15 +53,17 @@ def rate_twist(y):
                        [-1 * ((b_three * chord / t3) / (2 * Area_second * chord * chord * G)),
                         (((((b_two + c_one + c_two) * chord / t1) + (b_three * chord / t3)) / (2 * Area_second * chord * chord * G))), -1]])
     solution_vector = np.array([torsion(y), 0, 0])
-    q1, q2, dThetha = np.linalg.solve(matrix, solution_vector)
-    return dThetha
+    q1, q2, dtheta = np.linalg.solve(matrix, solution_vector)
+    return dtheta
 
-def twist_lst():
-    twist_integral = Integration(rate_twist, 0, database_connector.load_value("wing_span")/2)
+
+def twist_lst_deg():
+    twist_integral = Integration(rate_twist, database_connector.load_value("wing_span")/2, 0, flip_sign=True)
     twist_lst = []
     for i in y_span_lst:
-        twist_lst.append(twist_integral.integrate(i, step, ))
-    return
+        twist_lst.append(twist_integral.integrate(i, -1*step))
+    return [x*180/pi for x in twist_lst]
+
 
 def twist_angle_rad():
     estimate, error = sp.integrate.quad(rate_twist, 0, database_connector.load_value("wing_span")/2)
@@ -73,6 +75,16 @@ def twist_angle_deg():
 
 
 def stiffness(y):
-    return torsion(y)/ rate_twist(y) * G
+    return torsion(y) / (rate_twist(y) * G)
 
+
+def stiffness_lst():
+    lst = []
+    for i in y_span_lst:
+        lst.append(stiffness(i))
+    return lst
+
+
+print(stiffness_lst())
 print(twist_angle_deg())
+print(min(twist_lst_deg()))
