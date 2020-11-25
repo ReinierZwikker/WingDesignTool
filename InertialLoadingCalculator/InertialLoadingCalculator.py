@@ -2,6 +2,7 @@
 import numpy as np
 import time
 import matplotlib.pyplot as plt
+import pickle
 
 try:
     from Integrator import Integration
@@ -76,7 +77,7 @@ def drag_distribution(y, length_step, density, velocity):
 
 def pitching_moment_function(y, density, velocity, length_step):
     #0.5 rho V^2 S c
-    print(aerodynamic_data.moment_coef_function_10(y))
+    # print(aerodynamic_data.moment_coef_function_10(y))
     return -aerodynamic_data.moment_coef_function_10(y) * 0.5 * density * (velocity**2) * aerodynamic_data.chord_function(y)  * aerodynamic_data.chord_function(y)
 
 
@@ -221,3 +222,7 @@ axs[3, 0].set_xlabel("Wing location (m)")
 
 # show and pop plots
 plt.show()
+
+# Saving results
+with open('./data.pickle', 'wb') as file:
+    pickle.dump((z_force_data, x_shear_force_data, x_moment_data, x_force_data, z_shear_force_data, z_moment_data, y_torsion_data), file)
