@@ -42,17 +42,20 @@ def rate_twist(y):
                        [-1 * ((b_three * chord / t3) / (2 * Area_second * chord * chord * G)),
                         (((((b_two + c_one + c_two) * chord / t1) + (b_three * chord / t3)) / (2 * Area_second * chord * chord * G))), -1]])
     solution_vector = np.array([50000, 0, 0])  # TorquePlaceHolder() in first array slot
-    q1, q2, dThetha = np.linalg.solve(matrix, solution_vector)
-    return dThetha
+    q1, q2, d_theta = np.linalg.solve(matrix, solution_vector)
+    return d_theta
+
 
 def twist_angle_rad():
     estimate, error = sp.integrate.quad(rate_twist, 0, database_connector.load_value("halfspan"))
     return estimate
 
-def twist_angle_deg():
-    return twist_angle_rad()*180 / pi
 
-#def stiffness(y):
-    #return TorquePlaceHolder()/ rate_twist(y) * G
+def twist_angle_deg():
+    return twist_angle_rad() * 180 / pi
+
+
+# def stiffness(y):
+# return TorquePlaceHolder()/ rate_twist(y) * G
 
 print(twist_angle_deg())
