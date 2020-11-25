@@ -27,8 +27,8 @@ class Integration:
                     print(f"retrieved {location_i:.10f} {self.LUT[round(location_i, self.__LUT_rounding)]:.1f}\ttotal {integral_value:.1f}")
             else:
                 # print("Cannot find value in LUT!")
-                prev_value = self.__function(location_i - (length_step / 2), length_step, *args)
-                next_value = self.__function(location_i + (length_step / 2), length_step, *args)
+                prev_value = self.__function(location_i - (length_step / 2), *args)
+                next_value = self.__function(location_i + (length_step / 2), *args)
                 value = trapz_area(prev_value, next_value, length_step)
                 integral_value += value
                 if self.__verbose:
