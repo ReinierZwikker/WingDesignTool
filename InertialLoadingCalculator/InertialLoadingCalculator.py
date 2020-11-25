@@ -154,11 +154,11 @@ for spanwise_location in spanwise_locations_list:
     z_force_data.append(z_final_force_distribution(spanwise_location, global_length_step, test_density, test_velocity))
     x_force_data.append(x_final_force_distribution(spanwise_location, global_length_step, test_density, test_velocity))
 
-    x_shear_force_data.append(x_shear_integral.integrate(spanwise_location, global_length_step, test_density, test_velocity))
-    x_moment_data.append(x_moment_integral.integrate(spanwise_location, global_length_step, test_density, test_velocity))
+    x_shear_force_data.append(x_shear_integral.integrate(spanwise_location, global_length_step, global_length_step, test_density, test_velocity))
+    x_moment_data.append(x_moment_integral.integrate(spanwise_location, global_length_step, global_length_step, test_density, test_velocity))
 
-    z_shear_force_data.append(z_shear_integral.integrate(spanwise_location, global_length_step, test_density, test_velocity))
-    z_moment_data.append(z_moment_integral.integrate(spanwise_location, global_length_step, test_density, test_velocity))
+    z_shear_force_data.append(z_shear_integral.integrate(spanwise_location, global_length_step, global_length_step, test_density, test_velocity))
+    z_moment_data.append(z_moment_integral.integrate(spanwise_location, global_length_step, global_length_step, test_density, test_velocity))
 
     y_torsion_data.append(
         pitching_moment_function(spanwise_location, test_density, test_velocity, global_length_step) + add_engine_moment(spanwise_location, global_length_step,
