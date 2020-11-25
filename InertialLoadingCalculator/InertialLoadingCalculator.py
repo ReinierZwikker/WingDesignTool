@@ -25,9 +25,12 @@ surface_area = database_connector.load_value("surface_area")
 root_chord = database_connector.load_value("root_chord")
 tip_chord = database_connector.load_value("tip_chord")
 taper_ratio = database_connector.load_value("taper_ratio")
-chord_at_engine_location = database_connector.load_value("engine_chord")
-moment_arm_engine = 0.7* chord_at_engine_location
-radius_engine = database_connector.load_value("d_engine")
+spanwise_location_engine = database_connector.load_value("engine_spanwise_location")
+
+chord_at_engine_location = aerodynamic_data.chord_function(spanwise_location_engine)
+radius_engine = database_connector.load_value("d_engine")/2
+
+moment_arm_engine = (0.25 + 0.2) * aerodynamic_data.chord_function(spanwise_location_engine)
 moment_arm_thrust = 1.5 * radius_engine
 
 global_length_step = 1  # [m]
@@ -39,7 +42,6 @@ test_density = 1.225  # kg/m^2
 
 # Import weight and location of the engine
 weight_engine = database_connector.load_value("engine_weight")
-spanwise_location_engine = database_connector.load_value("engine_spanwise_location")
 engine_weight_width = 0.1
 engine_thrust = database_connector.load_value("engine_max_thrust")
 
@@ -160,7 +162,7 @@ for spanwise_location in spanwise_locations_list:
     z_shear_force_data.append(z_shear_integral.integrate(spanwise_location, global_length_step, test_density, test_velocity))
     z_moment_data.append(z_moment_integral.integrate(spanwise_location, global_length_step, test_density, test_velocity))
 
-    y_torsion_data.append(pitching_moment_function(spanwise_location, test_density, test_velocity, global_length_step) + add_engine_moment(spanwise_location,global_length_step, moment_arm_engine) + add_thrust_moment(spanwise_location, global_length_step, moment_arm_thrust))
+    y_torsion_data.append(pitching_moment_function(spanwise_location, test_density, test_velocity, global_length_step) + add_engine_moment(spanwise_location,global_length_step, moment_arm_engine) - add_thrust_moment(spanwise_location, global_length_step, moment_arm_thrust))
 
 # More time keeping & printing
 print(f"total time: {(time.time() - start_time_1) / 60:.3f} min")
