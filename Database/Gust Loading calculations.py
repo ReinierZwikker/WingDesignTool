@@ -23,11 +23,12 @@ except ModuleNotFoundError:
     sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
     from Database.database_functions import DatabaseConnector
 
+database_connector = DatabaseConnector()
 
-MLW =
+MLW = DatabaseConnector('mtow')
+
 
 # MLW, MTOW, MZFW, Zmo!!!!, CLalpha
-
 
 
 # ISA Calculator
@@ -132,10 +133,10 @@ def dn_s(H, WoS, CLalpha, rho, V, t, U_ds, g):      # load factor
 # Body
 
 
-# iteration involves flight velocity, altitude, weight and gust gradient distance
-U_ds = U_ds(U_ref(H), F_g(MLW, MTOW, MZFW, Zmo), H)  # function of gust gradient distance
-
-Delta_n = dn_s(H, WoS, CLalpha, rho, V, t, U_ds, g_0)  # find which V goes there  thus what t
+# # iteration involves flight velocity, altitude, weight and gust gradient distance
+# U_ds = U_ds(U_ref(H), F_g(MLW, MTOW, MZFW, Zmo), H)  # function of gust gradient distance
+#
+# Delta_n = dn_s(H, WoS, CLalpha, rho, V, t, U_ds, g_0)  # find which V goes there  thus what t
 
 #
 #
@@ -193,3 +194,5 @@ Delta_n = dn_s(H, WoS, CLalpha, rho, V, t, U_ds, g_0)  # find which V goes there
 # K_g = K_g(mu)
 #
 # V_B = V_B(K_g, rho_0, Uref, V_C, CLalpha, WoS, Vs1)
+
+print(MLW)
