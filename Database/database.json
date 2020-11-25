@@ -20,7 +20,7 @@
     "mtow": 1303083.7,
     "max_ceiling_m": 13100,
     "operating_altitude_m": 10670,
-    "mlw_N": 1015414,
+    "mlw_n": 1015414,
     "airfoil": "NACA2412",
     "mcrit_wing": 0.8,
     "dd_mach_number": 0.86,

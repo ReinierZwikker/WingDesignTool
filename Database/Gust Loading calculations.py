@@ -29,7 +29,7 @@ except ModuleNotFoundError:
 
 database_connector = DatabaseConnector()
 
-MLW = database_connector.load_value("mlw_N")
+MLW = database_connector.load_value("operating_altitude_m")
 
 
 
