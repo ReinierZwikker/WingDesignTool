@@ -77,7 +77,7 @@ def drag_distribution(y, length_step, density, velocity):
 def pitching_moment_function(y, density, velocity, length_step):
     #0.5 rho V^2 S c
     print(aerodynamic_data.moment_coef_function_10(y))
-    return -aerodynamic_data.moment_coef_function_10(y) * 0.5 * density * (velocity**2) *aerodynamic_data.chord_function(y) * length_step * aerodynamic_data.chord_function(y)
+    return -aerodynamic_data.moment_coef_function_10(y) * 0.5 * density * (velocity**2) * aerodynamic_data.chord_function(y)  * aerodynamic_data.chord_function(y)
 
 
 # Calculate the final force distribution
