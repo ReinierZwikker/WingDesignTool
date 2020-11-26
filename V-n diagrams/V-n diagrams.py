@@ -16,8 +16,7 @@ except ModuleNotFoundError:
 
 database_connector = DatabaseConnector()
 
-#get height in m
-h = database_connector.load_value("operating_altitude_m")
+h = database_connector.load_value("operating_altitude_m") #height in m
 
 # ISA Calculator
 def ISA_T_P_d(h):
@@ -63,6 +62,7 @@ C_L_max_clean = database_connector.load_value("cl_max_clean")
 V_C_TRUE = database_connector.load_value("cruise_mach") * np.sqrt(1.4 * 287 * T)
 S = database_connector.load_value("surface_area")
 
+
 rho_0 = 1.225 #sea
 w = mtow #weight
 W = (w/9.81)/0.454 #weight in lb for n_max
@@ -98,7 +98,7 @@ fig = plt.figure()
 ax = fig.add_subplot(1, 1, 1)
 ax.spines['bottom'].set_position('zero')
 y_ticks = np.arange(-2, 4, 0.5)
-x_ticks = np.arange(0, 400, 20)
+x_ticks = np.arange(0, 250, 20)
 plt.xticks(x_ticks)
 plt.yticks(y_ticks)
 plt.xlabel('V_EAS')
