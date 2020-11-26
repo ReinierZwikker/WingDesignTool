@@ -15,7 +15,7 @@
     "flap_chord_ratio": 0.35,
     "slat_chord_ratio": 0.15,
     "stall_speed": 44.9,
-    "cruise_speed": 300,
+    "cruise_Mach": 0.8,
     "oew": 537322.6,
     "mtow": 1303083.7,
     "max_ceiling_m": 13100,

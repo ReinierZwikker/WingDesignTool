@@ -29,7 +29,7 @@ database_connector = DatabaseConnector()
 MLW = database_connector.load_value("mlw_n")
 MTOW = database_connector.load_value("mtow")
 OEW = database_connector.load_value("oew")
-MZFW = OEW +
+MZFW = OEW + database_connector.load_value("payload_max_n")
 Zmo = database_connector.load_value("max_ceiling_m")
 operating_altitude = database_connector.load_value("operating_altitude_m")
 Cl_alpha_0 = database_connector.load_value("cl-alpha_curve")
@@ -149,6 +149,7 @@ def Cl_alpha(Cl_alpha_0, V, T):
     # M = cruise Mach
     M = V / sqrt(1.4 * 287 * T)
     # CLa0 = CLa at M=0
+
     CLaM = Cl_alpha_0 / (sqrt(1 - M ** 2))
     return CLaM
 
@@ -192,32 +193,36 @@ F_g = F_g(MLW, MTOW, MZFW, Zmo)
 # place holder
 list_H_h_W_V_Deltan = [0, 0, 0, 0, 0]
 
-# finding the time that produces the highest Delta-n
-t_evaluation_list = [0, 0]
-for t in range(0, 2, 0.1):  # to find the time at which the dns is maximum for every combination of the other variables
-    H_mock = 9
-    dn_s_mock = dn_s(H_mock, WoS, CLalpha, rho, 10, t, U_ds(U_ref(H_mock), F_g, H_mock), g)
-    if dn_s_mock > t_evaluation_list[1]:
-        t_evaluation_list = [t, dn_s_mock]
+# # finding the time that produces the highest Delta-n (found to be H/V or simply half a cycle)
+# t_evaluation_list = [0, 0]
+# for t in range(0, 20, 1):  # to find the time at which the dns is maximum for every combination of the other variables
+#     H_mock = 9
+#     V_mock = H_mock
+#     dn_s_mock = dn_s(H_mock, WoS(MTOW, S), Cl_alpha(Cl_alpha_0, V_mock, 288.15),
+#     1.225, V_mock, t/10, U_ds(U_ref(H_mock), F_g, H_mock), g_0)
+#     if dn_s_mock > t_evaluation_list[1]:
+#         t_evaluation_list = [t, dn_s_mock]
 
-    # iteration involves (in order) gust gradient distance, altitude, weight and flight velocity
 
-# for H in range(H_interval[0], H_interval[1] + 3, 5):  # gust gradient iterator
-#     U_ref = U_ref(H)
-#     U_ds = U_ds(U_ref, F_g, H)  # function of gust gradient distance
-#     for h in range(0, operating_altitude, 100):  # altitude iterator
-#         ISA_values = ISA_T_P_d(h)
-#         for W in W_list:  # weight iterator
-#             WoS = WoS(W, S)
-#             V_S1 = V_S1(W, ISA_values[2], rho_0, S, C_L_max_clean)
-#             V_list = [V_S0(W, ISA_values[2], rho_0, S, C_L_max_flapped), V_S1,
-#                       V_A(V_S1, n_limit_VA),
-#                       V_B(WoS, ISA_values[2], mean_geometric_chord, Cl_alpha_0, g, rho_0, Uref, V_C, V_S1),
-#                       V_C, V_D(V_C)]
-#             for V in V_list:  # speed iterator
-#                 Delta_n = dn_s(H, WoS, Cl_alpha(Cl_alpha_0, V, ISA_values[0]), ISA_values[2], V, t, U_ds, g_0)
-#
-#                 if Delta_n > list_H_h_W_V_Deltan[4]:
-#                     list_H_h_W_V_Deltan = [H, h, W, V, Delta_n]
 
-print(t_evaluation_list)
+# iteration involves (in order) gust gradient distance, altitude, weight and flight velocity
+
+for H in range(H_interval[0], H_interval[1] + 3, 5):  # gust gradient iterator
+    U_ref = U_ref(H)
+    U_ds = U_ds(U_ref, F_g, H)  # function of gust gradient distance
+    for h in range(0, operating_altitude, 100):  # altitude iterator
+        ISA_values = ISA_T_P_d(h)
+        for W in W_list:  # weight iterator
+            WoS = WoS(W, S)
+            V_S1 = V_S1(W, ISA_values[2], rho_0, S, C_L_max_clean)
+            V_list = [V_S0(W, ISA_values[2], rho_0, S, C_L_max_flapped), V_S1,
+                      V_A(V_S1, n_limit_VA(MTOW)),
+                      V_B(WoS, ISA_values[2], mean_geometric_chord, Cl_alpha_0, g_0, rho_0, U_ref, V_C, V_S1),
+                      V_C, V_D(V_C)]
+            for V in V_list:  # speed iterator
+                Delta_n = dn_s(H, WoS, Cl_alpha(Cl_alpha_0, V, ISA_values[0]), ISA_values[2], V, H/V, U_ds, g_0)
+
+                if Delta_n > list_H_h_W_V_Deltan[4]:
+                    list_H_h_W_V_Deltan = [H, h, W, V, Delta_n]
+
+print(list_H_h_W_V_Deltan)
