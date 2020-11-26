@@ -36,7 +36,7 @@ Cl_alpha_0 = database_connector.load_value("cl-alpha_curve")
 S = database_connector.load_value("surface_area")
 C_L_max_flapped = database_connector.load_value("cl_max_flapped")
 C_L_max_clean = database_connector.load_value("cl_max_clean")
-V_C = database_connector.load_value("cruise_speed")  # TAS cruise speed
+V_C = database_connector.load_value("cruise_mach")  # TAS cruise speed
 mean_geometric_chord = 0.5 * (database_connector.load_value("root_chord") +
                               database_connector.load_value("tip_chord"))
 
