@@ -20,13 +20,14 @@ database_connector = DatabaseConnector()
 
 #constants
 mtow = database_connector.load_value("mtow")
-C_L_max_flapped = 2.47 #database_connector.load_value("cl_max_flapped")
+C_L_max_flapped = database_connector.load_value("cl_max_flapped")
 C_L_max_clean = database_connector.load_value("cl_max_clean")
 V_C_TRUE = database_connector.load_value("cruise_speed") #TRUE cruise speed
 S = database_connector.load_value("surface_area")
 rho_0 = 1.225 #sea
 #rho = 0.38035 #cruise
-h = 2000
+
+h = 10668 #height in m
 
 w = mtow #weight
 W = (w/9.81)/0.454 #weight in lb for n_max
