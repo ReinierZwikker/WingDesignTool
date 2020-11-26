@@ -52,7 +52,7 @@
     "x_oew+fuel": 23.7,
     "x_forward_cg": 23.22,
     "x_aft_cg": 24.1,
-    "payload_max": 313600,
+    "payload_max_n": 313812.8,
     "fuel_max": 451948.3,
     "pax": 250,
     "nsa": 7,

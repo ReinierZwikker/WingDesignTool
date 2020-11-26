@@ -28,9 +28,17 @@ database_connector = DatabaseConnector()
 
 MLW = database_connector.load_value("mlw_n")
 MTOW = database_connector.load_value("mtow")
+OEW = database_connector.load_value("oew")
+MZFW = OEW +
 Zmo = database_connector.load_value("max_ceiling_m")
 operating_altitude = database_connector.load_value("operating_altitude_m")
 Cl_alpha_0 = database_connector.load_value("cl-alpha_curve")
+S = database_connector.load_value("surface_area")
+C_L_max_flapped = database_connector.load_value("cl_max_flapped")
+C_L_max_clean = database_connector.load_value("cl_max_clean")
+V_C = database_connector.load_value("cruise_speed")  # TAS cruise speed
+mean_geometric_chord = 0.5 * (database_connector.load_value("root_chord") +
+                              database_connector.load_value("tip_chord"))
 
 
 # ISA Calculator
@@ -145,15 +153,71 @@ def Cl_alpha(Cl_alpha_0, V, T):
     return CLaM
 
 
+def V_S0(W, rho, rho_0, S, C_L_max_flapped):  # stall speed with flaps extended, TAS
+    return (sqrt((2 * W) / (C_L_max_flapped * rho_0 * S))) * sqrt(rho / rho_0) * sqrt(rho_0 / rho)
+
+
+def V_S1(W, rho, rho_0, S, C_L_max_clean):  # stall speed with flaps retracted,TAS
+    return (sqrt((2 * W) / (C_L_max_clean * rho_0 * S))) * sqrt(rho / rho_0) * sqrt(rho_0 / rho)
+
+
+def V_A(V_S1, n_limit_VA):  # manoeuvring speed
+    return V_S1 * (sqrt(n_limit_VA))
+
+
+def n_limit_VA(MTOW):
+    W = (MTOW / 9.81) / 0.454  # weight in lb for n_max
+    n_max = 2.1 + ((24000) / (W + 10000))  # max load factor
+    if n_max < 2.5:
+        n_max = 2.5
+    elif n_max > 3.8:
+        n_max = 3.8
+    else:
+        n_max = n_max
+    return n_max
+
+
+def V_D(V_C):  # design dive speed
+    return V_C / 0.8
+
+
 # Iterations infos
-H_interval = (9, max(107, 0.5 * 12.5 * (database_connector.load_value("root_chord") +
-                                        database_connector.load_value("tip_chord"))))
-# List of weights constituting limit conditions
+H_interval = (9, max(107, 12.5 * mean_geometric_chord))
+W_list = [OEW, MLW, MTOW]  # List of weights constituting limit conditions
 
+# REAL PROGRAM (Iterator to find the max load at the maximum conditions)
 
-# Body
+# pre-iteration variable
+F_g = F_g(MLW, MTOW, MZFW, Zmo)
+# place holder
+list_H_h_W_V_Deltan = [0, 0, 0, 0, 0]
 
-# iteration involves flight velocity, altitude, weight and gust gradient distance
-U_ds = U_ds(U_ref(H), F_g(MLW, MTOW, MZFW, Zmo), H)  # function of gust gradient distance
-ISA_values = ISA_T_P_d(h)
-Delta_n = dn_s(H, WoS, Cl_alpha(Cl_alpha_0, V, ISA_values[0]), ISA_values[2], V, t, U_ds, g_0)  # find which V goes there thus what t
+# finding the time that produces the highest Delta-n
+t_evaluation_list = [0, 0]
+for t in range(0, 2, 0.1):  # to find the time at which the dns is maximum for every combination of the other variables
+    H_mock = 9
+    dn_s_mock = dn_s(H_mock, WoS, CLalpha, rho, 10, t, U_ds(U_ref(H_mock), F_g, H_mock), g)
+    if dn_s_mock > t_evaluation_list[1]:
+        t_evaluation_list = [t, dn_s_mock]
+
+    # iteration involves (in order) gust gradient distance, altitude, weight and flight velocity
+
+# for H in range(H_interval[0], H_interval[1] + 3, 5):  # gust gradient iterator
+#     U_ref = U_ref(H)
+#     U_ds = U_ds(U_ref, F_g, H)  # function of gust gradient distance
+#     for h in range(0, operating_altitude, 100):  # altitude iterator
+#         ISA_values = ISA_T_P_d(h)
+#         for W in W_list:  # weight iterator
+#             WoS = WoS(W, S)
+#             V_S1 = V_S1(W, ISA_values[2], rho_0, S, C_L_max_clean)
+#             V_list = [V_S0(W, ISA_values[2], rho_0, S, C_L_max_flapped), V_S1,
+#                       V_A(V_S1, n_limit_VA),
+#                       V_B(WoS, ISA_values[2], mean_geometric_chord, Cl_alpha_0, g, rho_0, Uref, V_C, V_S1),
+#                       V_C, V_D(V_C)]
+#             for V in V_list:  # speed iterator
+#                 Delta_n = dn_s(H, WoS, Cl_alpha(Cl_alpha_0, V, ISA_values[0]), ISA_values[2], V, t, U_ds, g_0)
+#
+#                 if Delta_n > list_H_h_W_V_Deltan[4]:
+#                     list_H_h_W_V_Deltan = [H, h, W, V, Delta_n]
+
+print(t_evaluation_list)
