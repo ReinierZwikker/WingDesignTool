@@ -20,10 +20,10 @@ except ModuleNotFoundError:
 database_connector = DatabaseConnector()
 
 # Import basic geometry
-wing_span = database_connector.load_value("wing_span")
+wing_span = database_connector.load_value("wing_span") / 2
 outer_diameter = database_connector.load_value("df,outer")
 radius_fuselage = outer_diameter / 2
-surface_area = database_connector.load_value("surface_area")
+surface_area = database_connector.load_value("surface_area") / 2
 root_chord = database_connector.load_value("root_chord")
 tip_chord = database_connector.load_value("tip_chord")
 taper_ratio = database_connector.load_value("taper_ratio")
@@ -35,26 +35,28 @@ radius_engine = database_connector.load_value("d_engine")/2
 moment_arm_engine = (0.25 + 0.2) * aerodynamic_data.chord_function(spanwise_location_engine)
 moment_arm_thrust = 1.5 * radius_engine
 
-global_length_step = 0.1  # [m]
+global_length_step = 0.01  # [m]
 
 # Define the flight conditions
-test_velocity = 100.0  # m/s
-test_density = 1.225  # kg/m^2
+test_velocity = 60  # m/s
+test_density = 1.255  # kg/m^2
+lift_coef_function = aerodynamic_data.lift_coef_function_10
+drag_induced_function = aerodynamic_data.drag_induced_function_10
+moment_coef_function = aerodynamic_data.moment_coef_function_10
 
 # Import weight and location of the engine
 weight_engine = database_connector.load_value("engine_weight")
-engine_weight_width = 0.1
-engine_thrust = database_connector.load_value("engine_max_thrust")
+engine_thrust = database_connector.load_value("engine_max_thrust") / 2
 
 # Import the weight of the wing and fuel (Class II)
-weight_wing = database_connector.load_value("wing_weight")
-weight_fuel = database_connector.load_value("fuel_max")
+weight_wing = database_connector.load_value("wing_weight") / 2
+weight_fuel = database_connector.load_value("fuel_max") / 2
 
 # Defining where the fuel tanks should be
-fuel_tank_start = 0 * (wing_span / 2)
-fuel_tank_engine_stop = spanwise_location_engine - 0.75
-fuel_tank_engine_start = spanwise_location_engine + 0.75
-fuel_tank_stop = 0.9 * (wing_span / 2)
+fuel_tank_start = 0 * wing_span
+fuel_tank_engine_stop = spanwise_location_engine - 0.25
+fuel_tank_engine_start = spanwise_location_engine + 0.25
+fuel_tank_stop = 0.9 * wing_span
 fuel_tank_length = (fuel_tank_engine_stop - fuel_tank_start) + (fuel_tank_stop - fuel_tank_engine_start)
 
 # Import values for the drag estimation
@@ -63,27 +65,27 @@ cd_0 = database_connector.load_value("cd0")
 
 include_fuel_tanks = True
 include_engine = True
-fuel_tank_level = 0.5  # level of the fuel tanks from 0 to 1
+fuel_tank_level = 1  # level of the fuel tanks from 0 to 1
 
 
 # Define the lift and drag distribution
 def lift_distribution(y, length_step, density, velocity):
-    return aerodynamic_data.lift_coef_function_10(y) * 0.5 * density * (velocity ** 2) * aerodynamic_data.chord_function(y)
+    return lift_coef_function(y) * 0.5 * density * (velocity ** 2) * aerodynamic_data.chord_function(y)
 
 
 def drag_distribution(y, length_step, density, velocity):
-    return (aerodynamic_data.drag_induced_function_10(y) + cd_0) * 0.5 * density * (velocity ** 2) * aerodynamic_data.chord_function(y)
+    return (drag_induced_function(y) + cd_0) * 0.5 * density * (velocity ** 2) * aerodynamic_data.chord_function(y)
 
 
 def pitching_moment_function(y, density, velocity, length_step):
     #0.5 rho V^2 S c
     # print(aerodynamic_data.moment_coef_function_10(y))
-    return -aerodynamic_data.moment_coef_function_10(y) * 0.5 * density * (velocity**2) * aerodynamic_data.chord_function(y)  * aerodynamic_data.chord_function(y)
+    return -moment_coef_function(y) * 0.5 * density * (velocity**2) * aerodynamic_data.chord_function(y) * aerodynamic_data.chord_function(y)
 
 
 # Calculate the final force distribution
 def z_final_force_distribution(y, length_step, density, velocity):
-    value = lift_distribution(y, length_step, density, velocity) - weight_wing / (surface_area / 2) * aerodynamic_data.chord_function(y)
+    value = lift_distribution(y, length_step, density, velocity) - weight_wing / surface_area * aerodynamic_data.chord_function(y)
     if ((fuel_tank_start < y < fuel_tank_engine_stop) or (fuel_tank_engine_start < y < fuel_tank_stop)) and include_fuel_tanks:
         value -= (weight_fuel / fuel_tank_length) * fuel_tank_level
     if spanwise_location_engine - length_step / 2 < y < spanwise_location_engine + length_step / 2 and include_engine:
@@ -112,7 +114,7 @@ def add_thrust_moment(y, length_step, moment_arm):
 
 
 # Spanwise locations to move through for graphs
-spanwise_locations_list = np.arange(radius_fuselage, wing_span / 2, global_length_step)
+spanwise_locations_list = np.arange(radius_fuselage, wing_span, global_length_step)
 # spanwise_locations_list = np.arange(0, 10, global_length_step)
 
 """
@@ -219,6 +221,8 @@ axs[3, 0].set_title("u: Torsion")
 axs[3, 0].plot(spanwise_locations_list, [x/1000 for x in y_torsion_data], label="Torsion")
 axs[3, 0].set_ylabel("Torsion in y (kNm)")
 axs[3, 0].set_xlabel("Wing location (m)")
+
+axs[3, 1].set_visible(False)
 
 # show and pop plots
 plt.show()

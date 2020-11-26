@@ -30,14 +30,14 @@ class DatabaseConnector:
         try:
             return self.__wingbox_dict[name.lower().replace(" ", "_")]
         except KeyError:
-            print("This value does not exist!")
+            print("This value does not exist! Did you use capital letters?")
             return None
 
     def save_value(self, name, value):
-        self.__database_dict[name] = value
+        self.__database_dict[name.lower().replace(" ", "_")] = value
 
     def save_wingbox_value(self, name, value):
-        self.__wingbox_dict[name] = value
+        self.__wingbox_dict[name.lower().replace(" ", "_")] = value
 
     def commit_to_database(self):
         with open(self.__database_file + str(2), "w") as databackup:
