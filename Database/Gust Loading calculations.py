@@ -36,7 +36,12 @@ Cl_alpha_0 = database_connector.load_value("cl-alpha_curve")
 S = database_connector.load_value("surface_area")
 C_L_max_flapped = database_connector.load_value("cl_max_flapped")
 C_L_max_clean = database_connector.load_value("cl_max_clean")
-V_C = database_connector.load_value("cruise_mach")  # TAS cruise speed
+
+
+def V_C(T):  # TAS cruise speed
+    return database_connector.load_value("cruise_mach") * sqrt(1.4 * 287 * T)
+
+
 mean_geometric_chord = 0.5 * (database_connector.load_value("root_chord") +
                               database_connector.load_value("tip_chord"))
 
@@ -149,7 +154,8 @@ def Cl_alpha(Cl_alpha_0, V, T):
     # M = cruise Mach
     M = V / sqrt(1.4 * 287 * T)
     # CLa0 = CLa at M=0
-
+    print(V)
+    print(M)
     CLaM = Cl_alpha_0 / (sqrt(1 - M ** 2))
     return CLaM
 
@@ -204,7 +210,6 @@ list_H_h_W_V_Deltan = [0, 0, 0, 0, 0]
 #         t_evaluation_list = [t, dn_s_mock]
 
 
-
 # iteration involves (in order) gust gradient distance, altitude, weight and flight velocity
 
 for H in range(H_interval[0], H_interval[1] + 3, 5):  # gust gradient iterator
@@ -215,12 +220,14 @@ for H in range(H_interval[0], H_interval[1] + 3, 5):  # gust gradient iterator
         for W in W_list:  # weight iterator
             WoS = WoS(W, S)
             V_S1 = V_S1(W, ISA_values[2], rho_0, S, C_L_max_clean)
+            V_C = V_C(ISA_values[0])
+            print(V_C)
             V_list = [V_S0(W, ISA_values[2], rho_0, S, C_L_max_flapped), V_S1,
                       V_A(V_S1, n_limit_VA(MTOW)),
                       V_B(WoS, ISA_values[2], mean_geometric_chord, Cl_alpha_0, g_0, rho_0, U_ref, V_C, V_S1),
                       V_C, V_D(V_C)]
             for V in V_list:  # speed iterator
-                Delta_n = dn_s(H, WoS, Cl_alpha(Cl_alpha_0, V, ISA_values[0]), ISA_values[2], V, H/V, U_ds, g_0)
+                Delta_n = dn_s(H, WoS, Cl_alpha(Cl_alpha_0, V, ISA_values[0]), ISA_values[2], V, H / V, U_ds, g_0)
 
                 if Delta_n > list_H_h_W_V_Deltan[4]:
                     list_H_h_W_V_Deltan = [H, h, W, V, Delta_n]
