@@ -21,11 +21,12 @@ database_connector = DatabaseConnector()
 #constants
 mtow = database_connector.load_value("mtow")
 C_L_max_flapped = 2.47 #database_connector.load_value("cl_max_flapped")
-C_L_max_clean = 1.56 #database_connector.load_value("cl_max_clean")
+C_L_max_clean = database_connector.load_value("cl_max_clean")
 V_C_TRUE = database_connector.load_value("cruise_speed") #TRUE cruise speed
 S = database_connector.load_value("surface_area")
 rho_0 = 1.225 #sea
-rho = 0.38035 #cruise
+#rho = 0.38035 #cruise
+h = 2000
 
 w = mtow #weight
 W = (w/9.81)/0.454 #weight in lb for n_max
@@ -58,7 +59,7 @@ def ISA_T_P_d(h):
         h1 = min(h, atm_layers[atm_layerx])  # altitude
         T = T_0 + lay_coeff[atm_layerx] * (h1 - h_0)  # temperature
         if lay_coeff[atm_layerx] == 0.0:  # pressure
-            p = p_0 * exp((-g_0 / (R * T)) * (h1 - h_0))
+            p = p_0 * np.exp((-g_0 / (R * T)) * (h1 - h_0))
         else:
             p = p_0 * (T / T_0) ** (-g_0 / (lay_coeff[atm_layerx] * R))
         rho = p / (R * T)  # density
@@ -72,7 +73,7 @@ def ISA_T_P_d(h):
             atm_layerx = 1 + atm_layerx
 
     return T, p, rho
-
+T, p, rho  = ISA_T_P_d(h)
 
 V_S0 = (np.sqrt((2*w)/(C_L_max_flapped*rho_0*S)))*np.sqrt(rho/rho_0) #stall speed with flaps extended.(should always be accompanied by a specification of which configuration the flaps are in (e.g. landing, take-off, etc.) EAS.
 V_S1 = (np.sqrt((2*w)/(C_L_max_clean*rho_0*S)))*np.sqrt(rho/rho_0) #stall speed with flaps retracted EAS.

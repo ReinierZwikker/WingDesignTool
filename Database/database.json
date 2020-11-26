@@ -28,7 +28,7 @@
     "aoa_cruise": 0.9,
     "cl_max": 1.56,
     "cl_max_clean": 1.56,
-    "cl_max_clean_flapped": 2.47,
+    "cl_max_flapped": 2.47,
     "cl-alpha_curve": 0.07551,
     "0l_aoa": -2.1,
     "stall_aoa": 22.46,
