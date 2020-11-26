@@ -62,7 +62,6 @@ C_L_max_clean = database_connector.load_value("cl_max_clean")
 V_C_TRUE = database_connector.load_value("cruise_mach") * np.sqrt(1.4 * 287 * T)
 S = database_connector.load_value("surface_area")
 
-
 rho_0 = 1.225 #sea
 w = mtow #weight
 W = (w/9.81)/0.454 #weight in lb for n_max
