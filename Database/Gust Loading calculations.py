@@ -89,10 +89,10 @@ def WoS(W, S):  # Wing loading
     return W / S
 
 
-def V_B(WoS, rho, c, CLalpha, g, rho_0, Uref, V_C, Vs1):  # design speed for maximum gust intensity
+def V_B(WoS, rho, c, CLalpha, g, rho_0, Uref, VC, Vs1):  # design speed for maximum gust intensity
     mu = (2 * WoS) / (rho * c * CLalpha * g)
     K_g = (0.88 * mu) / (5.3 + mu)
-    A = K_g * rho_0 * Uref * V_C * CLalpha
+    A = K_g * rho_0 * Uref * VC * CLalpha
     B = 2 * WoS
     return Vs1 * sqrt(1 + (A / B))
 
@@ -211,21 +211,20 @@ list_H_h_W_V_Deltan = [0, 0, 0, 0, 0]
 # iteration involves (in order) gust gradient distance, altitude, weight and flight velocity
 
 for H in range(H_interval[0], H_interval[1] + 3, 5):  # gust gradient iterator
-    U_ref = U_ref(H)
-    U_ds = U_ds(U_ref, F_g, H)  # function of gust gradient distance
+    Uref = U_ref(H)
+    Uds = U_ds(Uref, F_g, H)  # function of gust gradient distance
     for h in range(0, operating_altitude, 100):  # altitude iterator
         ISA_values = ISA_T_P_d(h)
         for X in W_list:  # weight iterator
             WS = WoS(X, S)
             VS1 = V_S1(X, ISA_values[2], rho_0, S, C_L_max_clean)
             VC = V_C(ISA_values[0])
-            print(VC)
             V_list = [V_S0(X, ISA_values[2], rho_0, S, C_L_max_flapped), VS1,
                       V_A(VS1, n_limit_VA(MTOW)),
-                      V_B(WS, ISA_values[2], mean_geometric_chord, Cl_alpha_0, g_0, rho_0, U_ref, V_C, VS1),
+                      V_B(WS, ISA_values[2], mean_geometric_chord, Cl_alpha_0, g_0, rho_0, Uref, VC, VS1),
                       VC, V_D(VC)]
             for V in V_list:  # speed iterator
-                Delta_n = dn_s(H, WS, Cl_alpha(Cl_alpha_0, V, ISA_values[0]), ISA_values[2], V, H / V, U_ds, g_0)
+                Delta_n = dn_s(H, WS, Cl_alpha(Cl_alpha_0, V, ISA_values[0]), ISA_values[2], V, H / V, Uds, g_0)
 
                 if Delta_n > list_H_h_W_V_Deltan[4]:
                     list_H_h_W_V_Deltan = [H, h, X, V, Delta_n]
