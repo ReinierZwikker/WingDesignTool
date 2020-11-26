@@ -1,6 +1,20 @@
-from Database.database_functions import DatabaseConnector
+# from Database.database_functions import DatabaseConnector
 import matplotlib.pyplot as plt
 import numpy as np
+
+
+try:
+    from Database.database_functions import DatabaseConnector
+except ModuleNotFoundError:
+    import sys
+    from os import path
+
+    sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
+    from Database.database_functions import DatabaseConnector
+
+    sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
+    from Database.database_functions import DatabaseConnector
+
 
 database_connector = DatabaseConnector()
 
