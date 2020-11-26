@@ -216,16 +216,16 @@ for H in range(H_interval[0], H_interval[1] + 3, 5):  # gust gradient iterator
     for h in range(0, operating_altitude, 100):  # altitude iterator
         ISA_values = ISA_T_P_d(h)
         for X in W_list:  # weight iterator
-            WoS = WoS(X, S)
-            V_S1 = V_S1(X, ISA_values[2], rho_0, S, C_L_max_clean)
-            V_C = V_C(ISA_values[0])
-            print(V_C)
-            V_list = [V_S0(X, ISA_values[2], rho_0, S, C_L_max_flapped), V_S1,
-                      V_A(V_S1, n_limit_VA(MTOW)),
-                      V_B(WoS, ISA_values[2], mean_geometric_chord, Cl_alpha_0, g_0, rho_0, U_ref, V_C, V_S1),
-                      V_C, V_D(V_C)]
+            WS = WoS(X, S)
+            VS1 = V_S1(X, ISA_values[2], rho_0, S, C_L_max_clean)
+            VC = V_C(ISA_values[0])
+            print(VC)
+            V_list = [V_S0(X, ISA_values[2], rho_0, S, C_L_max_flapped), VS1,
+                      V_A(VS1, n_limit_VA(MTOW)),
+                      V_B(WS, ISA_values[2], mean_geometric_chord, Cl_alpha_0, g_0, rho_0, U_ref, V_C, VS1),
+                      VC, V_D(VC)]
             for V in V_list:  # speed iterator
-                Delta_n = dn_s(H, WoS, Cl_alpha(Cl_alpha_0, V, ISA_values[0]), ISA_values[2], V, H / V, U_ds, g_0)
+                Delta_n = dn_s(H, WS, Cl_alpha(Cl_alpha_0, V, ISA_values[0]), ISA_values[2], V, H / V, U_ds, g_0)
 
                 if Delta_n > list_H_h_W_V_Deltan[4]:
                     list_H_h_W_V_Deltan = [H, h, X, V, Delta_n]
