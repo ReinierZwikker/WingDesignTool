@@ -16,26 +16,7 @@ except ModuleNotFoundError:
 
 database_connector = DatabaseConnector()
 
-#constants
-mtow = database_connector.load_value("mtow")
-C_L_max_flapped = database_connector.load_value("cl_max_flapped")
-C_L_max_clean = database_connector.load_value("cl_max_clean")
-V_C_TRUE = database_connector.load_value("cruise_mach") * np.sqrt(1.4 * 287 * T)
-S = database_connector.load_value("surface_area")
 h = database_connector.load_value("operating_altitude_m") #height in m
-
-rho_0 = 1.225 #sea
-w = mtow #weight
-W = (w/9.81)/0.454 #weight in lb for n_max
-
-#constraints
-n_max = 2.1 + ((24000)/(W + 10000))#max load factor
-if n_max < 2.5:
-    n_max = 2.5
-elif n_max > 3.8:
-    n_max = 3.8
-else:
-    n_max = n_max
 
 # ISA Calculator
 def ISA_T_P_d(h):
@@ -73,6 +54,27 @@ def ISA_T_P_d(h):
 
     return T, p, rho
 T, p, rho  = ISA_T_P_d(h)
+
+#constants
+mtow = database_connector.load_value("mtow")
+C_L_max_flapped = database_connector.load_value("cl_max_flapped")
+C_L_max_clean = database_connector.load_value("cl_max_clean")
+V_C_TRUE = database_connector.load_value("cruise_mach") * np.sqrt(1.4 * 287 * T)
+S = database_connector.load_value("surface_area")
+
+
+rho_0 = 1.225 #sea
+w = mtow #weight
+W = (w/9.81)/0.454 #weight in lb for n_max
+
+#constraints
+n_max = 2.1 + ((24000)/(W + 10000))#max load factor
+if n_max < 2.5:
+    n_max = 2.5
+elif n_max > 3.8:
+    n_max = 3.8
+else:
+    n_max = n_max
 
 V_S0 = (np.sqrt((2*w)/(C_L_max_flapped*rho_0*S)))*np.sqrt(rho/rho_0) #stall speed with flaps extended.(should always be accompanied by a specification of which configuration the flaps are in (e.g. landing, take-off, etc.) EAS.
 V_S1 = (np.sqrt((2*w)/(C_L_max_clean*rho_0*S)))*np.sqrt(rho/rho_0) #stall speed with flaps retracted EAS.
