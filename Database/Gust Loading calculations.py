@@ -154,8 +154,6 @@ def Cl_alpha(Cl_alpha_0, V, T):
     # M = cruise Mach
     M = V / sqrt(1.4 * 287 * T)
     # CLa0 = CLa at M=0
-    print(V)
-    print(M)
     CLaM = Cl_alpha_0 / (sqrt(1 - M ** 2))
     return CLaM
 
@@ -185,7 +183,7 @@ def n_limit_VA(MTOW):
 
 
 def V_D(V_C):  # design dive speed
-    return V_C / 0.8
+    return V_C / 0.85
 
 
 # Iterations infos
