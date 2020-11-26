@@ -215,12 +215,12 @@ for H in range(H_interval[0], H_interval[1] + 3, 5):  # gust gradient iterator
     U_ds = U_ds(U_ref, F_g, H)  # function of gust gradient distance
     for h in range(0, operating_altitude, 100):  # altitude iterator
         ISA_values = ISA_T_P_d(h)
-        for W in W_list:  # weight iterator
-            WoS = WoS(W, S)
-            V_S1 = V_S1(W, ISA_values[2], rho_0, S, C_L_max_clean)
+        for X in W_list:  # weight iterator
+            WoS = WoS(X, S)
+            V_S1 = V_S1(X, ISA_values[2], rho_0, S, C_L_max_clean)
             V_C = V_C(ISA_values[0])
             print(V_C)
-            V_list = [V_S0(W, ISA_values[2], rho_0, S, C_L_max_flapped), V_S1,
+            V_list = [V_S0(X, ISA_values[2], rho_0, S, C_L_max_flapped), V_S1,
                       V_A(V_S1, n_limit_VA(MTOW)),
                       V_B(WoS, ISA_values[2], mean_geometric_chord, Cl_alpha_0, g_0, rho_0, U_ref, V_C, V_S1),
                       V_C, V_D(V_C)]
@@ -228,6 +228,6 @@ for H in range(H_interval[0], H_interval[1] + 3, 5):  # gust gradient iterator
                 Delta_n = dn_s(H, WoS, Cl_alpha(Cl_alpha_0, V, ISA_values[0]), ISA_values[2], V, H / V, U_ds, g_0)
 
                 if Delta_n > list_H_h_W_V_Deltan[4]:
-                    list_H_h_W_V_Deltan = [H, h, W, V, Delta_n]
+                    list_H_h_W_V_Deltan = [H, h, X, V, Delta_n]
 
 print(list_H_h_W_V_Deltan)
