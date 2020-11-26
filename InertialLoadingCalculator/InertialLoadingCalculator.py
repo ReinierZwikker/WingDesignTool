@@ -38,15 +38,15 @@ moment_arm_thrust = 1.5 * radius_engine
 global_length_step = 0.01  # [m]
 
 # Define the flight conditions
-test_velocity = 60  # m/s
-test_density = 1.255  # kg/m^2
+test_velocity = 296.0  # m/s
+test_density = 0.38035  # kg/m^2
 lift_coef_function = aerodynamic_data.lift_coef_function_10
 drag_induced_function = aerodynamic_data.drag_induced_function_10
 moment_coef_function = aerodynamic_data.moment_coef_function_10
 
 # Import weight and location of the engine
 weight_engine = database_connector.load_value("engine_weight")
-engine_thrust = database_connector.load_value("engine_max_thrust") / 2
+engine_thrust = database_connector.load_value("engine_max_thrust") 
 
 # Import the weight of the wing and fuel (Class II)
 weight_wing = database_connector.load_value("wing_weight") / 2

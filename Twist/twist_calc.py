@@ -3,6 +3,7 @@ import scipy as sp
 from scipy import integrate, interpolate
 from math import *
 import pickle
+import matplotlib.pyplot as plt
 
 try:
     from Database.database_functions import DatabaseConnector
@@ -35,7 +36,7 @@ c_two = sqrt((wingbox_points[3][1] - wingbox_points[4][1]) ** 2 + (wingbox_point
 Area_first = 0.5 * (b_one + b_three) * (wingbox_points[1][0] - wingbox_points[0][0])
 Area_second = 0.5 * (b_two + b_three) * (wingbox_points[2][0] - wingbox_points[1][0])
 
-with open("./data.pickle", 'rb') as file:
+with open("../InertialLoadingCalculator/data.pickle", 'rb') as file:
     data = pickle.load(file)
 
 y_span_lst = data[0]
@@ -88,3 +89,6 @@ def stiffness_lst():
 print(stiffness_lst())
 print(twist_angle_deg())
 print(min(twist_lst_deg()))
+
+plt.plot(y_span_lst,twist_lst_deg())
+plt.show()
