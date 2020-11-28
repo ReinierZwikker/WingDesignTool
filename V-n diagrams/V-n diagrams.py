@@ -16,7 +16,7 @@ except ModuleNotFoundError:
 
 database_connector = DatabaseConnector()
 
-h = database_connector.load_value("operating_altitude_m") #height in m
+h = 0 #database_connector.load_value("operating_altitude_m") #height in m
 
 # ISA Calculator
 def ISA_T_P_d(h):
@@ -67,7 +67,7 @@ w = mtow #weight
 W = (w/9.81)/0.454 #weight in lb for n_max
 
 #constraints
-n_max = 2.1 + ((24000)/(W + 10000))#max load factor
+n_max = 2.1 + ((24000)/(W + 10000)) #max load factor
 if n_max < 2.5:
     n_max = 2.5
 elif n_max > 3.8:
@@ -75,8 +75,8 @@ elif n_max > 3.8:
 else:
     n_max = n_max
 
-V_S0 = (np.sqrt((2*w)/(C_L_max_flapped*rho_0*S)))*np.sqrt(rho/rho_0) #stall speed with flaps extended.(should always be accompanied by a specification of which configuration the flaps are in (e.g. landing, take-off, etc.) EAS.
-V_S1 = (np.sqrt((2*w)/(C_L_max_clean*rho_0*S)))*np.sqrt(rho/rho_0) #stall speed with flaps retracted EAS.
+V_S0 = (np.sqrt((2*w)/(C_L_max_flapped*rho*S)))*np.sqrt(rho/rho_0) #stall speed with flaps extended.(should always be accompanied by a specification of which configuration the flaps are in (e.g. landing, take-off, etc.) EAS.
+V_S1 = (np.sqrt((2*w)/(C_L_max_clean*rho*S)))*np.sqrt(rho/rho_0) #stall speed with flaps retracted EAS.
 V_A = V_S1*(np.sqrt(n_max)) #manoeuvring speed
 V_C = V_C_TRUE*np.sqrt(rho/rho_0) #design cruising speed EAS
 V_D = V_C/0.8 #design dive speed
@@ -97,7 +97,7 @@ fig = plt.figure()
 ax = fig.add_subplot(1, 1, 1)
 ax.spines['bottom'].set_position('zero')
 y_ticks = np.arange(-2, 4, 0.5)
-x_ticks = np.arange(0, 250, 20)
+x_ticks = np.arange(0, 400, 20)
 plt.xticks(x_ticks)
 plt.yticks(y_ticks)
 plt.xlabel('V_EAS')
