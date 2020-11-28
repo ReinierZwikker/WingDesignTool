@@ -132,7 +132,7 @@ z_shear_integral = Integration(x_final_force_distribution, min(spanwise_location
 z_moment_integral = Integration(z_shear_integral.get_value, min(spanwise_locations_list), max(spanwise_locations_list), flip_sign=True)
 
 
-def calculate_inertial_loading():
+def calculate_inertial_loading(length_step):
     # Data list for the results
     z_force_data = []
     x_shear_force_data = []
@@ -151,20 +151,20 @@ def calculate_inertial_loading():
 
     # For every spanwise location, first integrate to shear then integrate to moment
     for spanwise_location in spanwise_locations_list:
-        z_force_data.append(z_final_force_distribution(spanwise_location, global_length_step, test_density, test_velocity))
-        x_force_data.append(x_final_force_distribution(spanwise_location, global_length_step, test_density, test_velocity))
+        z_force_data.append(z_final_force_distribution(spanwise_location, length_step, test_density, test_velocity))
+        x_force_data.append(x_final_force_distribution(spanwise_location, length_step, test_density, test_velocity))
 
-        x_shear_force_data.append(x_shear_integral.integrate(spanwise_location, global_length_step, global_length_step, test_density, test_velocity))
-        x_moment_data.append(x_moment_integral.integrate(spanwise_location, global_length_step, global_length_step, test_density, test_velocity))
+        x_shear_force_data.append(x_shear_integral.integrate(spanwise_location, length_step, length_step, test_density, test_velocity))
+        x_moment_data.append(x_moment_integral.integrate(spanwise_location, length_step, length_step, test_density, test_velocity))
 
-        z_shear_force_data.append(z_shear_integral.integrate(spanwise_location, global_length_step, global_length_step, test_density, test_velocity))
-        z_moment_data.append(z_moment_integral.integrate(spanwise_location, global_length_step, global_length_step, test_density, test_velocity))
+        z_shear_force_data.append(z_shear_integral.integrate(spanwise_location, length_step, length_step, test_density, test_velocity))
+        z_moment_data.append(z_moment_integral.integrate(spanwise_location, global_length_step, length_step, test_density, test_velocity))
 
         y_torsion_data.append(
-            pitching_moment_function(spanwise_location, test_density, test_velocity, global_length_step) + add_engine_moment(spanwise_location, global_length_step, moment_arm_engine) - add_thrust_moment(spanwise_location, global_length_step, moment_arm_thrust))
+            pitching_moment_function(spanwise_location, test_density, test_velocity, length_step) + add_engine_moment(spanwise_location, length_step, moment_arm_engine) - add_thrust_moment(spanwise_location, length_step, moment_arm_thrust))
 
     # More time keeping & printing
-    print(f"total time: {(time.time() - start_time_1) / 60:.3f} min")
+    print(f"Total integration time: {(time.time() - start_time_1) / 60:.3f} min")
     print(f"LUT lengths: {len(x_shear_integral.LUT)}, {len(x_moment_integral.LUT)}, {len(z_shear_integral.LUT)}, {len(z_moment_integral.LUT)}")
 
     # Saving results
@@ -220,4 +220,4 @@ def plot_inertial_loading(z_force_data, x_force_data, x_shear_force_data, x_mome
 
 
 # UNCOMMENT THIS TO PLOT INERTIAL LOADING:
-# plot_inertial_loading(*calculate_inertial_loading())
+# plot_inertial_loading(*calculate_inertial_loading(global_length_step))
