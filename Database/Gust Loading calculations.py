@@ -261,7 +261,7 @@ for element in x:
     x_lst.append(dn_s(element, lspc[1], lspc[2], lspc[3], lspc[4], lspc[5], lspc[6], lspc[7]))
 plt.plot(x, x_lst, 0.6, color="r")  # x-coor,ycoor,width,color
 plt.xlabel('gust gradient')  # label on x-axis
-plt.ylabel('load factor')  # label on y-axis
+plt.ylabel('delta load factor')  # label on y-axis
 
 plt.subplot(232)
 plt.title('altitude')
@@ -272,7 +272,7 @@ for element in altitude:
     altitude_lst.append(dn_s(lspc[0], lspc[1], Cl_alpha(Cl_alpha_0, lspc[4], ISA_values[0]), ISA_values[2], lspc[4], lspc[5], lspc[6], lspc[7]))
 plt.plot(altitude, altitude_lst, 0.6, color="r")  # x-coor,ycoor,width,color
 plt.xlabel('altitude')  # label on x-axis
-plt.ylabel('load factor')  # label on y-axis
+plt.ylabel('delta load factor')  # label on y-axis
 
 plt.subplot(233)
 plt.title('weight')
@@ -283,7 +283,7 @@ for element in weight:
     weight_lst.append(dn_s(lspc[0], WS, lspc[2], lspc[3], lspc[4], lspc[5], lspc[6], lspc[7]))
 plt.plot(weight, weight_lst, 0.6, color="r")  # x-coor,ycoor,width,color
 plt.xlabel('weight')  # label on x-axis
-plt.ylabel('load factor')  # label on y-axis
+plt.ylabel('delta load factor')  # label on y-axis
 
 plt.subplot(234)
 plt.title('speed')
@@ -294,7 +294,7 @@ for element in speed:
 plt.plot(speed, speed_lst, 0.6, color="r")  # x-coor,ycoor,width,color
 plt.plot([lspc[9], lspc[9]], [0, speed_lst[-1]], '--', label='V_C')
 plt.xlabel('speed')  # label on x-axis
-plt.ylabel('load factor')  # label on y-axis
+plt.ylabel('delta load factor')  # label on y-axis
 
 
 plt.subplot(235)
@@ -313,17 +313,28 @@ for element in time:
 plt.plot([lst_weirdos[0], lst_weirdos[0]], [min(time_lst), max(time_lst)], '--', label='V_C')
 plt.plot(percentage_lst, time_lst, 0.6, color="r")  # x-coor,ycoor,width,color
 plt.xlabel('percentage of time spent in the gust')  # label on x-axis
-plt.ylabel('load factor')  # label on y-axis
+plt.ylabel('delta load factor')  # label on y-axis
+
+
+# this graph requires to manually insert the variables
+h_plot = 0      # to be changed for other graphs
+H_plot = 25
+W_plot = W_list[0]
+WS = WoS(W_plot, S)
+ISA_values = ISA_T_P_d(h_plot)
+Uref = U_ref(H_plot)
+Uds = U_ds(Uref, F_g, H_plot)
 
 plt.subplot(236)
 plt.title('Gust Diagram')
 
-
-speed_lst = []
-speed = range(1, int(lspc[8]), 5)
-for element in speed:
-    speed_lst.append(dn_s(lspc[0], lspc[1], lspc[2], lspc[3], element, lspc[0] / element, lspc[6], lspc[7]))
+VC_lst = []
+VC = range(1, int(V_C(ISA_values[0])))
+a_VC = Cl_alpha(Cl_alpha_0, VC, ISA_values[0])
+for element in VC:
+    VC_lst.append(dn_s(H, WS, a_VC, ISA_values[2], element, H_plot / element, lspc[6], lspc[7]))
 plt.plot(speed, speed_lst, 0.6, color="r")  # x-coor,ycoor,width,color
+Delta_n = dn_s(H, WS, a, ISA_values[2], V, H / V, Uds, g_0)
 
 
 
