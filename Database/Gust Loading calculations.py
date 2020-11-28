@@ -251,7 +251,7 @@ for H in range(H_interval[0], H_interval[1] + 1, 1):  # gust gradient iterator
 
 print(list_H_h_W_V_Deltan)
 
-#Plot the variation in dn with the different variables in first position of 3 lines x 3 columns
+# Plot the variation in dn with the different variables in first position of 3 lines x 3 columns
 plt.suptitle("Variation of Load Factor with Different Variables")
 
 plt.subplot(231)
@@ -270,7 +270,9 @@ altitude_lst = []
 altitude = range(1, operating_altitude, 10)
 for element in altitude:
     ISA_values = ISA_T_P_d(element)
-    altitude_lst.append(dn_s(lspc[0], lspc[1], Cl_alpha(Cl_alpha_0, lspc[4], ISA_values[0]), ISA_values[2], lspc[4], lspc[5], lspc[6], lspc[7]))
+    altitude_lst.append(
+        dn_s(lspc[0], lspc[1], Cl_alpha(Cl_alpha_0, lspc[4], ISA_values[0]), ISA_values[2], lspc[4], lspc[5], lspc[6],
+             lspc[7]))
 plt.plot(altitude, altitude_lst, 0.6, color="r")  # x-coor,ycoor,width,color
 plt.xlabel('altitude')  # label on x-axis
 plt.ylabel('delta load factor')  # label on y-axis
@@ -291,12 +293,13 @@ plt.title('speed')
 speed_lst = []
 speed = range(1, int(lspc[9]), 5)
 for element in speed:
-    speed_lst.append(dn_s(lspc[0], lspc[1], Cl_alpha(Cl_alpha_0, element, ISA_values[0]), lspc[3], element, lspc[0] / element, lspc[6], lspc[7]))
+    speed_lst.append(
+        dn_s(lspc[0], lspc[1], Cl_alpha(Cl_alpha_0, element, ISA_values[0]), lspc[3], element, lspc[0] / element,
+             lspc[6], lspc[7]))
 plt.plot(speed, speed_lst, 0.6, color="r")  # x-coor,ycoor,width,color
 plt.plot([lspc[9], lspc[9]], [0, speed_lst[-1]], '--', label='V_C')
 plt.xlabel('speed')  # label on x-axis
 plt.ylabel('delta load factor')  # label on y-axis
-
 
 plt.subplot(235)
 # plt.title('time')
@@ -305,9 +308,9 @@ percentage_lst = []
 lst_weirdos = []
 time = range(0, int(2 * lspc[0] / lspc[4] * 1000), 1)
 for element in time:
-    bb = dn_s(lspc[0], lspc[1], lspc[2], lspc[3], lspc[4], element/1000, lspc[6], lspc[7])
+    bb = dn_s(lspc[0], lspc[1], lspc[2], lspc[3], lspc[4], element / 1000, lspc[6], lspc[7])
     time_lst.append(bb)
-    percentage_lst.append(element/(2 * lspc[0] / lspc[4])/10)
+    percentage_lst.append(element / (2 * lspc[0] / lspc[4]) / 10)
     if bb < 0:
         lst_weirdos.append(percentage_lst[-1])
 
@@ -316,15 +319,11 @@ plt.plot(percentage_lst, time_lst, 0.6, color="r")  # x-coor,ycoor,width,color
 plt.xlabel('percentage of time spent in the gust')  # label on x-axis
 plt.ylabel('delta load factor')  # label on y-axis
 
-
-
-
-
 plt.subplot(236)
 plt.title('Gust Diagram')
 
 # this graph requires to manually insert the variables
-h_plot = 0      # to be changed for other graphs
+h_plot = 0  # to be changed for other graphs
 H_plot = 25
 W_plot = W_list[0]
 WS_plot = WoS(W_plot, S)
@@ -333,15 +332,13 @@ Uref_plot = U_ref(H_plot)
 Uds_plot = U_ds(Uref_plot, F_g, H_plot)
 VS1_plot = V_S1(W_plot, ISA_values[2], rho_0, S, C_L_max_clean)
 
-
 VC_plot_max = int(V_C(ISA_values[0]))
 a_VC = Cl_alpha(Cl_alpha_0, VC_plot_max, ISA_values[0])
 dn_VC = (dn_s(H_plot, WS_plot, a_VC, ISA_values[2], VC_plot_max, H_plot / VC_plot_max, Uds_plot, g_0))
 
-
 VD_plot_max = int(V_D(VC_plot_max))
 a_VD = Cl_alpha(Cl_alpha_0, VD_plot_max, ISA_values[0])
-dn_VD = (dn_s(H_plot, WS_plot, a_VD, ISA_values[2], VD_plot_max, H_plot / VD_plot_max, Uds_plot, g_0))
+dn_VD = (dn_s(H_plot, WS_plot, a_VD, ISA_values[2], VD_plot_max, H_plot / VD_plot_max, 0.5 * Uds_plot, g_0))
 
 VB_plot_max = int(V_B(WS_plot, ISA_values[2], mean_geometric_chord, Cl_alpha_0, g_0, rho_0, Uref_plot, VC_plot_max,
                       VS1_plot))
@@ -353,14 +350,13 @@ plt.plot([0, VB_plot_max], [0, dn_VB], 0.6, color="r")  # x-coor,ycoor,width,col
 plt.plot([0, VC_plot_max], [0, dn_VC], '--', color="g")  # x-coor,ycoor,width,color
 plt.plot([0, VD_plot_max], [0, dn_VD], '--', color="b")  # x-coor,ycoor,width,color
 
-#negative lines
+# negative lines
 plt.plot([0, VB_plot_max], [0, - dn_VB], 0.6, color="r")  # x-coor,ycoor,width,color
 plt.plot([0, VC_plot_max], [0, - dn_VC], '--', color="g")  # x-coor,ycoor,width,color
 plt.plot([0, VD_plot_max], [0, - dn_VD], '--', color="b")  # x-coor,ycoor,width,color
 
 # vertical lines
 plt.plot([VB_plot_max, VB_plot_max], [- dn_VC, dn_VC], '--', label='V_B')
-
 
 # print(VB_plot_max)
 # print(VC_plot_max)
@@ -369,16 +365,11 @@ plt.plot([VB_plot_max, VB_plot_max], [- dn_VC, dn_VC], '--', label='V_B')
 # print(dn_VD)
 
 
-
 # connecting lines
-
-
-
 
 
 # plt.plot(time_list[:-1], gamma_list[:-1], 0.6, color="r")  # x-coor,ycoor,width,color
 plt.ylabel('load factor')  # label on x-axis
 plt.xlabel('EAS')  # label on y-axis
-
 
 plt.show()
