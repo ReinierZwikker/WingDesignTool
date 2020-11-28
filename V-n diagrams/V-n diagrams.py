@@ -126,6 +126,8 @@ x6, y6 = [V_S1, V_S1], [n_min, np.power((V_S1/V_S1), 2)]
 x7, y7 = [V_A, V_A], [n_min, n_max]
 #for line V_C
 x8, y8 = [V_C, V_C], [n_min, n_max]
+#for line V_D
+x9, y9 = [V_D, V_D], [0, n_max]
 
 #draw lines
 plt.plot(x1, y1, 'c', x2, y2, 'c', x3, y3, 'c', x4, y4, 'c', x5, y5, 'c')
@@ -134,6 +136,7 @@ plt.plot(x1, y1, 'c', x2, y2, 'c', x3, y3, 'c', x4, y4, 'c', x5, y5, 'c')
 plt.plot(x6, y6, '--', label='V_S1')
 plt.plot(x7, y7, '--', label='V_A')
 plt.plot(x8, y8, '--', label='V_C')
+plt.plot(x9, y9, '--', label='V_D')
 plt.legend(loc='upper left', frameon=False)
 
 #show plot
