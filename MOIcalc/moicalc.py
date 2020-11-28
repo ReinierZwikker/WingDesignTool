@@ -76,11 +76,7 @@ def len_t_angl_area(AC, t1 , t2 ,t3, t4, t5):
     list_ANGL = []
 
     #COORDINATES:___________________________________________________
-
     list_coordinates = [(0.15, 0.0627513), (0.6, 0.0627513), (0.6, -0.02702924), (0.15, -0.04083288)]
-
-
-
     x1 =list_coordinates[0][0]
     y1 = list_coordinates[0][1]
 
@@ -232,17 +228,14 @@ def centroids_of_shapes(AC,F_SP, B_SP, T_PL, B_PL , M_SP):
     return lists_x_y
 
 def spar_cntr_dist_TBPL(centroid, AC):#FOR CALRO PART (return: values = [ , , , ,])
-       #COORDINATES:___________________________________________________
+    #COORDINATES:___________________________________________________
     list_coordinates = [(0.15, 0.0627513), (0.6, 0.0627513), (0.6, -0.02702924), (0.15, -0.04083288)]
     x1 =list_coordinates[0][0]
     y1 = list_coordinates[0][1]
-
     x2 =list_coordinates[1][0]
     y2 = list_coordinates[1][1]
-
     x3 =list_coordinates[2][0]
     y3 = list_coordinates[2][1]
-
     x4 =list_coordinates[3][0]
     y4 = list_coordinates[3][1]
 
@@ -598,7 +591,7 @@ def main(b, t1, t2, t3, t4, t5 , Ns, As): #ns - number of stringers #area of str
 #***********************************************
 #PLOT
 #***********************************************
-def __main_w_c(b): #ns - number of stringers #area of stringers
+def __main_w_c(b): #For plotting
 
     # t1, t2, t3, t4, t5 , Ns, As 
 
@@ -666,15 +659,11 @@ def __plot(__main_w_c):
 
     plt.plot(span, xx)
     plt.subplot(122)
-    plt.title("Iyy")
+    plt.title("Izz")
     plt.ylim(0, 0.2)
     plt.plot(span, yy)
     plt.show()
     return
-
-
-
-
 
 #***********************************************
 # POLAR MOMENT OF INERTIA
@@ -685,3 +674,55 @@ def __plot(__main_w_c):
 # BENDING DEFLECTION 
 #***********************************************
 
+# will depend mainly on constant values that we put inside the the moment of inertia functions
+# E is a constant, therefore (-1/E) is a constant and goes in front of integral
+# v(span) = (-1/E) *integal(0, 26.smth) integral (0 , span) (Mx/Ixx)dspan dspan
+
+def ixx(span):
+    
+    # t1, t2, t3, t4, t5 , Ns, As 
+
+    t1 = 0.01
+    t2 = 0.01
+    t3 = 0.01
+    t4 = 0.01
+    t5 = 0.01
+    Ns = 4
+    As = 0.001
+
+    AC = AC_lenght(b)
+    out = len_t_angl_area(AC, t1 , t2 ,t3, t4, t5)
+
+    F_SP = Part(out[0][0], out[1][0], out[2][0], out[3][0] )
+    B_SP = Part(out[0][1], out[1][1], out[2][1], out[3][1] )
+    T_PL = Part(out[0][2], out[1][2], out[2][2], out[3][2] )
+    B_PL = Part(out[0][3], out[1][3], out[2][3], out[3][3] )
+    M_SP = Part(0, out[1][4], 0, out[3][4] )
+    
+
+    two_spar_centroids = centroids_of_shapes(AC, F_SP, B_SP, T_PL, B_PL , M_SP)
+    two_spar_centroid_wingbox = centroid_nomspar(two_spar_centroids, F_SP, B_SP, T_PL, B_PL , M_SP )
+    middle_spar = mspar( two_spar_centroid_wingbox,AC,F_SP, B_SP, T_PL, B_PL , M_SP)
+    M_SP = Part(middle_spar[3], out[1][4], middle_spar[2], out[3][4] )
+    three_spar_centroid = centroid_w_mspar(middle_spar, two_spar_centroids ,F_SP, B_SP, T_PL, B_PL , M_SP)
+
+    if b <= 10: 
+        new_centroid = three_spar_centroid
+    else: 
+        new_centroid = two_spar_centroid_wingbox
+
+    moment_of_inertia1 = moi(new_centroid , two_spar_centroids , middle_spar, F_SP, B_SP, T_PL, B_PL , M_SP,b)
+    values = spar_cntr_dist_TBPL(new_centroid, AC)
+    moment_of_inertia2 = moi_stringers(b ,values , Ns , As)
+    moment_of_inertia = [a + b for a, b in zip(moment_of_inertia1, moment_of_inertia2)]
+    moixx = moment_of_inertia[0]
+
+
+    return moixx
+#function of Mx(span)
+
+#whole function Mx(span)/Ixx(span)
+
+# (-1/E)*(sp.integrate.quad(func, 0, y)) ? Also non linear functions 
+# first interval is (0 to y) 
+# second interval (0 to 26)
