@@ -104,11 +104,11 @@ plt.xlabel('V_EAS')
 plt.ylabel('n')
 
 #for line 0 to A
-plt.plot(V_EAS_0A, n_0A)
+plt.plot(V_EAS_0A, n_0A, 'c')
 #for line 0 to n=2
-plt.plot(V_EAS_02, n_02)
+plt.plot(V_EAS_02, n_02, 'c')
 #for line 0 to H
-plt.plot(V_EAS_0H, n_0H)
+plt.plot(V_EAS_0H, n_0H, 'c')
 
 #for line A to D n_max
 x1, y1 = [V_A, V_D], [n_max, n_max]
@@ -128,7 +128,7 @@ x7, y7 = [V_A, V_A], [n_min, n_max]
 x8, y8 = [V_C, V_C], [n_min, n_max]
 
 #draw lines
-plt.plot(x1, y1, x2, y2, x3, y3, x4, y4, x5, y5)
+plt.plot(x1, y1, 'c', x2, y2, 'c', x3, y3, 'c', x4, y4, 'c', x5, y5, 'c')
 
 #vertical lines
 plt.plot(x6, y6, '--', label='V_S1')
