@@ -3,6 +3,7 @@ from matplotlib import pyplot as plt
 import numpy as np
 import math
 
+
 try:
     from Database.database_functions import DatabaseConnector
 except ModuleNotFoundError:
@@ -15,6 +16,8 @@ except ModuleNotFoundError:
 database_connector = DatabaseConnector()
 
 
+
+
 # COORDINATES:___________________________________________________
 # list_coordinates = [(0.15, 0.0627513), (0.6, 0.0627513), (0.6, -0.02702924), (0.15, -0.04083288)]
 
@@ -23,8 +26,8 @@ database_connector = DatabaseConnector()
 # ____________________________________________
 
 class Part:
-    def __init__(self, lenght, thickness, area, angle):
-        self.LEN = lenght
+    def __init__(self, length, thickness, area, angle):
+        self.LEN = length
         self.T = thickness
         self.AREA = area
         self.ANGL = angle
@@ -643,16 +646,16 @@ def __plot(__main_w_c):
 # E is a constant, therefore (-1/E) is a constant and goes in front of integral
 # v(span) = (-1/E) *integal(0, 26.smth) integral (0 , span) (Mx/Ixx)dspan dspan
 
-def ixx(span):
+def ixx(b):
     # t1, t2, t3, t4, t5 , Ns, As
 
-    t1 = 0.01
-    t2 = 0.01
-    t3 = 0.01
-    t4 = 0.01
-    t5 = 0.01
-    Ns = 4
-    As = 0.001
+    t1 = 0.02   # spar LE
+    t2 = 0.02   # spar TE
+    t3 = 0.01   # top plate
+    t4 = 0.01   # bottom plate
+    t5 = 0.05   # spar middle
+    Ns = 4      # N of stringers per plate
+    As = 0.002  # Area of single stringer
 
     AC = AC_lenght(b)
     out = len_t_angl_area(AC, t1, t2, t3, t4, t5)
@@ -681,10 +684,4 @@ def ixx(span):
     moixx = moment_of_inertia[0]
 
     return moixx
-# function of Mx(span)
 
-# whole function Mx(span)/Ixx(span)
-
-# (-1/E)*(sp.integrate.quad(func, 0, y)) ? Also non linear functions 
-# first interval is (0 to y) 
-# second interval (0 to 26)
