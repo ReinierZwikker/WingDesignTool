@@ -142,18 +142,18 @@ def dn_s(H, WoS, CLalpha, rho, V, t, U_ds, g):  # load factor
     w = pi * V / H  # radial frequency of the response (omega)
     la = (2 * WoS) / (CLalpha * rho * V * g)  # lambda
 
-    # only valid if 0 < t < 2pi/w
-    A = 1 + (w * la) ** (-2)
-    B = (e ** (-t / la)) / la
-    C = (cos(w * t)) / la
-    D = w * sin(w * t)
-    E = B - C - D
-    F = 1 / A
-    G = U_ds / (2 * g)
-    dn_s = G * (D + (F * E))
+    # # only valid if 0 < t < 2pi/w
+    # A = 1 + (w * la) ** (-2)
+    # B = (e ** (-t / la)) / la
+    # C = (cos(w * t)) / la
+    # D = w * sin(w * t)
+    # E = B - C - D
+    # F = 1 / A
+    # G = U_ds / (2 * g)
+    # dn_s = G * (D + (F * E))
 
-    # dn_s = U_ds / (2 * g) * (w * sin(w * t) + 1 / (1 + (w * la) ** -2) * (1 / la * e ** (- t / la)
-    #                                                                       - 1 / la * cos(w * t) - w * sin(w * t)))
+    dn_s = U_ds / (2 * g) * (w * sin(w * t) + 1 / (1 + (w * la) ** -2) * (1 / la * e ** (- t / la)
+                                                                          - 1 / la * cos(w * t) - w * sin(w * t)))
     return dn_s
 
 
@@ -161,6 +161,7 @@ def Cl_alpha(Cl_alpha_0, V, T):
     # Cl alpha at cruise Mach Prandt-Gauler correction
     # # M = cruise Mach
     M = V / sqrt(1.4 * 287 * T)
+    # print(M)
     # # CLa0 = CLa at M=0
     # CLaM = Cl_alpha_0 / (sqrt(1 - M ** 2))
 
@@ -250,8 +251,8 @@ for H in range(H_interval[0], H_interval[1] + 1, 1):  # gust gradient iterator
 
 print(list_H_h_W_V_Deltan)
 
-# Plot the variation in dn with the different variables in first position of 3 lines x 3 columns
-plt.suptitle("Variation of Load Factor with Different Variables)
+#Plot the variation in dn with the different variables in first position of 3 lines x 3 columns
+plt.suptitle("Variation of Load Factor with Different Variables")
 
 plt.subplot(231)
 plt.title('gust gradient')
@@ -288,9 +289,9 @@ plt.ylabel('delta load factor')  # label on y-axis
 plt.subplot(234)
 plt.title('speed')
 speed_lst = []
-speed = range(1, int(lspc[8]), 5)
+speed = range(1, int(lspc[9]), 5)
 for element in speed:
-    speed_lst.append(dn_s(lspc[0], lspc[1], lspc[2], lspc[3], element, lspc[0] / element, lspc[6], lspc[7]))
+    speed_lst.append(dn_s(lspc[0], lspc[1], Cl_alpha(Cl_alpha_0, element, ISA_values[0]), lspc[3], element, lspc[0] / element, lspc[6], lspc[7]))
 plt.plot(speed, speed_lst, 0.6, color="r")  # x-coor,ycoor,width,color
 plt.plot([lspc[9], lspc[9]], [0, speed_lst[-1]], '--', label='V_C')
 plt.xlabel('speed')  # label on x-axis
@@ -314,33 +315,70 @@ plt.plot([lst_weirdos[0], lst_weirdos[0]], [min(time_lst), max(time_lst)], '--',
 plt.plot(percentage_lst, time_lst, 0.6, color="r")  # x-coor,ycoor,width,color
 plt.xlabel('percentage of time spent in the gust')  # label on x-axis
 plt.ylabel('delta load factor')  # label on y-axis
+
+
+
+
+
+plt.subplot(236)
+plt.title('Gust Diagram')
+
+# this graph requires to manually insert the variables
+h_plot = 0      # to be changed for other graphs
+H_plot = 25
+W_plot = W_list[0]
+WS_plot = WoS(W_plot, S)
+ISA_values = ISA_T_P_d(h_plot)
+Uref_plot = U_ref(H_plot)
+Uds_plot = U_ds(Uref_plot, F_g, H_plot)
+VS1_plot = V_S1(W_plot, ISA_values[2], rho_0, S, C_L_max_clean)
+
+
+VC_plot_max = int(V_C(ISA_values[0]))
+a_VC = Cl_alpha(Cl_alpha_0, VC_plot_max, ISA_values[0])
+dn_VC = (dn_s(H_plot, WS_plot, a_VC, ISA_values[2], VC_plot_max, H_plot / VC_plot_max, Uds_plot, g_0))
+
+
+VD_plot_max = int(V_D(VC_plot_max))
+a_VD = Cl_alpha(Cl_alpha_0, VD_plot_max, ISA_values[0])
+dn_VD = (dn_s(H_plot, WS_plot, a_VD, ISA_values[2], VD_plot_max, H_plot / VD_plot_max, Uds_plot, g_0))
+
+VB_plot_max = int(V_B(WS_plot, ISA_values[2], mean_geometric_chord, Cl_alpha_0, g_0, rho_0, Uref_plot, VC_plot_max,
+                      VS1_plot))
+a_VB = Cl_alpha(Cl_alpha_0, VB_plot_max, ISA_values[0])
+dn_VB = (dn_s(H_plot, WS_plot, a_VB, ISA_values[2], VB_plot_max, H_plot / VB_plot_max, Uds_plot, g_0))
+
+# gust lines
+plt.plot([0, VB_plot_max], [0, dn_VB], 0.6, color="r")  # x-coor,ycoor,width,color
+plt.plot([0, VC_plot_max], [0, dn_VC], '--', color="g")  # x-coor,ycoor,width,color
+plt.plot([0, VD_plot_max], [0, dn_VD], '--', color="b")  # x-coor,ycoor,width,color
+
+#negative lines
+plt.plot([0, VB_plot_max], [0, - dn_VB], 0.6, color="r")  # x-coor,ycoor,width,color
+plt.plot([0, VC_plot_max], [0, - dn_VC], '--', color="g")  # x-coor,ycoor,width,color
+plt.plot([0, VD_plot_max], [0, - dn_VD], '--', color="b")  # x-coor,ycoor,width,color
+
+# vertical lines
+plt.plot([VB_plot_max, VB_plot_max], [- dn_VC, dn_VC], '--', label='V_B')
+
+
+# print(VB_plot_max)
+# print(VC_plot_max)
+# print(VD_plot_max)
 #
-#
-# # this graph requires to manually insert the variables
-# h_plot = 0      # to be changed for other graphs
-# H_plot = 25
-# W_plot = W_list[0]
-# WS = WoS(W_plot, S)
-# ISA_values = ISA_T_P_d(h_plot)
-# Uref = U_ref(H_plot)
-# Uds = U_ds(Uref, F_g, H_plot)
-#
-# plt.subplot(236)
-# plt.title('Gust Diagram')
-#
-# VC_lst = []
-# VC = range(1, int(V_C(ISA_values[0])))
-# a_VC = Cl_alpha(Cl_alpha_0, VC, ISA_values[0])
-# for element in VC:
-#     VC_lst.append(dn_s(H, WS, a_VC, ISA_values[2], element, H_plot / element, lspc[6], lspc[7]))
-# plt.plot(speed, speed_lst, 0.6, color="r")  # x-coor,ycoor,width,color
-# Delta_n = dn_s(H, WS, a, ISA_values[2], V, H / V, Uds, g_0)
-#
-#
-#
+# print(dn_VD)
+
+
+
+# connecting lines
+
+
+
+
+
 # plt.plot(time_list[:-1], gamma_list[:-1], 0.6, color="r")  # x-coor,ycoor,width,color
-# plt.xlabel('load factor')  # label on x-axis
-# plt.ylabel('EAS')  # label on y-axis
+plt.ylabel('load factor')  # label on x-axis
+plt.xlabel('EAS')  # label on y-axis
 
 
 plt.show()
