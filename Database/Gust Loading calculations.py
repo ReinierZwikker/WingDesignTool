@@ -251,7 +251,7 @@ for H in range(H_interval[0], H_interval[1] + 1, 1):  # gust gradient iterator
 print(list_H_h_W_V_Deltan)
 
 # Plot the variation in dn with the different variables in first position of 3 lines x 3 columns
-plt.suptitle("Variation of Load Factor with different variables")
+plt.suptitle("Variation of Load Factor with Different Variables)
 
 plt.subplot(231)
 plt.title('gust gradient')
@@ -314,33 +314,33 @@ plt.plot([lst_weirdos[0], lst_weirdos[0]], [min(time_lst), max(time_lst)], '--',
 plt.plot(percentage_lst, time_lst, 0.6, color="r")  # x-coor,ycoor,width,color
 plt.xlabel('percentage of time spent in the gust')  # label on x-axis
 plt.ylabel('delta load factor')  # label on y-axis
-
-
-# this graph requires to manually insert the variables
-h_plot = 0      # to be changed for other graphs
-H_plot = 25
-W_plot = W_list[0]
-WS = WoS(W_plot, S)
-ISA_values = ISA_T_P_d(h_plot)
-Uref = U_ref(H_plot)
-Uds = U_ds(Uref, F_g, H_plot)
-
-plt.subplot(236)
-plt.title('Gust Diagram')
-
-VC_lst = []
-VC = range(1, int(V_C(ISA_values[0])))
-a_VC = Cl_alpha(Cl_alpha_0, VC, ISA_values[0])
-for element in VC:
-    VC_lst.append(dn_s(H, WS, a_VC, ISA_values[2], element, H_plot / element, lspc[6], lspc[7]))
-plt.plot(speed, speed_lst, 0.6, color="r")  # x-coor,ycoor,width,color
-Delta_n = dn_s(H, WS, a, ISA_values[2], V, H / V, Uds, g_0)
-
-
-
-plt.plot(time_list[:-1], gamma_list[:-1], 0.6, color="r")  # x-coor,ycoor,width,color
-plt.xlabel('load factor')  # label on x-axis
-plt.ylabel('EAS')  # label on y-axis
+#
+#
+# # this graph requires to manually insert the variables
+# h_plot = 0      # to be changed for other graphs
+# H_plot = 25
+# W_plot = W_list[0]
+# WS = WoS(W_plot, S)
+# ISA_values = ISA_T_P_d(h_plot)
+# Uref = U_ref(H_plot)
+# Uds = U_ds(Uref, F_g, H_plot)
+#
+# plt.subplot(236)
+# plt.title('Gust Diagram')
+#
+# VC_lst = []
+# VC = range(1, int(V_C(ISA_values[0])))
+# a_VC = Cl_alpha(Cl_alpha_0, VC, ISA_values[0])
+# for element in VC:
+#     VC_lst.append(dn_s(H, WS, a_VC, ISA_values[2], element, H_plot / element, lspc[6], lspc[7]))
+# plt.plot(speed, speed_lst, 0.6, color="r")  # x-coor,ycoor,width,color
+# Delta_n = dn_s(H, WS, a, ISA_values[2], V, H / V, Uds, g_0)
+#
+#
+#
+# plt.plot(time_list[:-1], gamma_list[:-1], 0.6, color="r")  # x-coor,ycoor,width,color
+# plt.xlabel('load factor')  # label on x-axis
+# plt.ylabel('EAS')  # label on y-axis
 
 
 plt.show()
