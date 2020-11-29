@@ -259,7 +259,9 @@ plt.title('gust gradient')
 x_lst = []
 x = range(H_interval[0], H_interval[1] + 1, 1)
 for element in x:
-    x_lst.append(dn_s(element, lspc[1], lspc[2], lspc[3], lspc[4], lspc[5], lspc[6], lspc[7]))
+    Uref= U_ref(element)
+    Uds = U_ds(Uref, F_g, element)  # function of gust gradient distance
+    x_lst.append(dn_s(element, lspc[1], lspc[2], lspc[3], lspc[4], element / lspc[4], Uds, lspc[7]))
 plt.plot(x, x_lst, 0.6, color="r")  # x-coor,ycoor,width,color
 plt.xlabel('gust gradient')  # label on x-axis
 plt.ylabel('delta load factor')  # label on y-axis
@@ -268,6 +270,7 @@ plt.subplot(232)
 plt.title('altitude')
 altitude_lst = []
 altitude = range(1, operating_altitude, 10)
+
 for element in altitude:
     ISA_values = ISA_T_P_d(element)
     altitude_lst.append(
@@ -346,23 +349,23 @@ a_VB = Cl_alpha(Cl_alpha_0, VB_plot_max, ISA_values[0])
 dn_VB = (dn_s(H_plot, WS_plot, a_VB, ISA_values[2], VB_plot_max, H_plot / VB_plot_max, Uds_plot, g_0))
 
 # gust lines
-plt.plot([0, VB_plot_max], [0, dn_VB], 0.6, color="r")  # x-coor,ycoor,width,color
-plt.plot([0, VC_plot_max], [0, dn_VC], 0.6, color="r")  # x-coor,ycoor,width,color
-plt.plot([0, VD_plot_max], [0, dn_VD], '--', color="r")  # x-coor,ycoor,width,color
+plt.plot([0, VB_plot_max], [1, 1 + dn_VB], 0.6, color="r")  # x-coor,ycoor,width,color
+plt.plot([0, VC_plot_max], [1, 1 + dn_VC], 0.6, color="r")  # x-coor,ycoor,width,color
+plt.plot([0, VD_plot_max], [1, 1 + dn_VD], '--', color="r")  # x-coor,ycoor,width,color
 
 # negative lines
-plt.plot([0, VB_plot_max], [0, - dn_VB], 0.6, color="r")  # x-coor,ycoor,width,color
-plt.plot([0, VC_plot_max], [0, - dn_VC], 0.6, color="r")  # x-coor,ycoor,width,color
-plt.plot([0, VD_plot_max], [0, - dn_VD], '--', color="r")  # x-coor,ycoor,width,color
+plt.plot([0, VB_plot_max], [1, 1 - dn_VB], 0.6, color="r")  # x-coor,ycoor,width,color
+plt.plot([0, VC_plot_max], [1, 1 - dn_VC], 0.6, color="r")  # x-coor,ycoor,width,color
+plt.plot([0, VD_plot_max], [1, 1 - dn_VD], '--', color="r")  # x-coor,ycoor,width,color
 
 # vertical lines
-plt.plot([VB_plot_max, VB_plot_max], [- 0.75 * dn_VC, 0.75 * dn_VC], '--', color="b",  label='V_B')
+plt.plot([VB_plot_max, VB_plot_max], [1 - 0.75 * dn_VC, 1 + 0.75 * dn_VC], '--', color="b",  label='V_B')
 
 
 # connecting lines
-plt.plot([VC_plot_max, VD_plot_max], [dn_VC, dn_VD], 0.6, color="r")
-plt.plot([VC_plot_max, VD_plot_max], [- dn_VC, - dn_VD], 0.6, color="r")
-plt.plot([VD_plot_max, VD_plot_max], [dn_VD, - dn_VD], 0.6, color="r")
+plt.plot([VC_plot_max, VD_plot_max], [1 + dn_VC, 1 + dn_VD], 0.6, color="r")
+plt.plot([VC_plot_max, VD_plot_max], [1 - dn_VC, 1 - dn_VD], 0.6, color="r")
+plt.plot([VD_plot_max, VD_plot_max], [1 + dn_VD, 1 - dn_VD], 0.6, color="r")
 
 # x axis
 plt.plot([0, 1.15 * VD_plot_max], [0, 0], '--', color="r",  label='V_B')
@@ -371,4 +374,4 @@ plt.plot([0, 1.15 * VD_plot_max], [0, 0], '--', color="r",  label='V_B')
 plt.ylabel('load factor')  # label on x-axis
 plt.xlabel('EAS')  # label on y-axis
 
-plt.show()
+# plt.show()

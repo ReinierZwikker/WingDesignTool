@@ -5,7 +5,7 @@ import numpy as np
 
 try:
     from Database.database_functions import DatabaseConnector
-    from Gust_Loading_Calculations_moved import W_list
+    from Gust_Loading_calculations_moved import W_list, U_ref, WoS, U_ds, F_g, rho_0, V_S1
 except ModuleNotFoundError:
     import sys
     from os import path
@@ -15,7 +15,8 @@ except ModuleNotFoundError:
 
     sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
     from Database.database_functions import DatabaseConnector
-    from Gust_Loading_Calculations_moved import W_list
+    from Gust_Loading_calculations_moved import W_list, U_ref, WoS, U_ds, F_g, rho_0, V_S1
+
 
 
 database_connector = DatabaseConnector()
@@ -59,6 +60,7 @@ def ISA_T_P_d(h):
     return T, p, rho
 T, p, rho  = ISA_T_P_d(h)
 
+
 #constants
 mtow = database_connector.load_value("mtow")
 C_L_max_flapped = database_connector.load_value("cl_max_flapped")
@@ -83,7 +85,7 @@ V_S0 = (np.sqrt((2*w)/(C_L_max_flapped*rho*S)))*np.sqrt(rho/rho_0) #stall speed 
 V_S1 = (np.sqrt((2*w)/(C_L_max_clean*rho*S)))*np.sqrt(rho/rho_0) #stall speed with flaps retracted EAS.
 V_A = V_S1*(np.sqrt(n_max)) #manoeuvring speed
 V_C = V_C_TRUE*np.sqrt(rho/rho_0) #design cruising speed EAS
-V_D = V_C/0.8 #design dive speed
+V_D = V_C/0.85 #design dive speed
 #V_F = #design flap speed
 V_EAS_0A = np.arange(0, V_A, 0.1)
 V_EAS_02 = np.arange(0, np.sqrt(2)*V_S0, 0.1)
@@ -149,15 +151,16 @@ plt.legend(loc='upper left', frameon=False)
 
 # this graph requires to manually insert the variables
 h_plot = 0  # to be changed for other graphs
-H_plot = 25
+H_plot = 21
 W_plot = W_list[0]
 WS_plot = WoS(W_plot, S)
 ISA_values = ISA_T_P_d(h_plot)
 Uref_plot = U_ref(H_plot)
 Uds_plot = U_ds(Uref_plot, F_g, H_plot)
+from Gust_Loading_calculations_moved import V_S1, V_C, Cl_alpha, Cl_alpha_0, dn_s, g_0, V_D, V_B, mean_geometric_chord  #leave this here
 VS1_plot = V_S1(W_plot, ISA_values[2], rho_0, S, C_L_max_clean)
 
-VC_plot_max = int(V_C(ISA_values[0]))
+VC_plot_max = int(V_C(ISA_values[0])) * np.sqrt(rho/rho_0) # EAS
 a_VC = Cl_alpha(Cl_alpha_0, VC_plot_max, ISA_values[0])
 dn_VC = (dn_s(H_plot, WS_plot, a_VC, ISA_values[2], VC_plot_max, H_plot / VC_plot_max, Uds_plot, g_0))
 
@@ -166,38 +169,37 @@ a_VD = Cl_alpha(Cl_alpha_0, VD_plot_max, ISA_values[0])
 dn_VD = (dn_s(H_plot, WS_plot, a_VD, ISA_values[2], VD_plot_max, H_plot / VD_plot_max, 0.5 * Uds_plot, g_0))
 
 VB_plot_max = int(V_B(WS_plot, ISA_values[2], mean_geometric_chord, Cl_alpha_0, g_0, rho_0, Uref_plot, VC_plot_max,
-                      VS1_plot))
+                      VS1_plot)) * np.sqrt(rho/rho_0)
 a_VB = Cl_alpha(Cl_alpha_0, VB_plot_max, ISA_values[0])
 dn_VB = (dn_s(H_plot, WS_plot, a_VB, ISA_values[2], VB_plot_max, H_plot / VB_plot_max, Uds_plot, g_0))
 
 # gust lines
-plt.plot([0, VB_plot_max], [0, dn_VB], 0.6, color="r")  # x-coor,ycoor,width,color
-plt.plot([0, VC_plot_max], [0, dn_VC], 0.6, color="r")  # x-coor,ycoor,width,color
-plt.plot([0, VD_plot_max], [0, dn_VD], '--', color="r")  # x-coor,ycoor,width,color
+plt.plot([0, VB_plot_max], [1, 1 + dn_VB], 0.6, color="r")  # x-coor,ycoor,width,color
+plt.plot([0, VC_plot_max], [1, 1 + dn_VC], 0.6, color="r")  # x-coor,ycoor,width,color
+plt.plot([0, VD_plot_max], [1, 1 + dn_VD], '--', color="r")  # x-coor,ycoor,width,color
 
 # negative lines
-plt.plot([0, VB_plot_max], [0, - dn_VB], 0.6, color="r")  # x-coor,ycoor,width,color
-plt.plot([0, VC_plot_max], [0, - dn_VC], 0.6, color="r")  # x-coor,ycoor,width,color
-plt.plot([0, VD_plot_max], [0, - dn_VD], '--', color="r")  # x-coor,ycoor,width,color
+plt.plot([0, VB_plot_max], [1, 1 - dn_VB], 0.6, color="r")  # x-coor,ycoor,width,color
+plt.plot([0, VC_plot_max], [1, 1 - dn_VC], 0.6, color="r")  # x-coor,ycoor,width,color
+plt.plot([0, VD_plot_max], [1, 1 - dn_VD], '--', color="r")  # x-coor,ycoor,width,color
 
 # vertical lines
-plt.plot([VB_plot_max, VB_plot_max], [- 0.75 * dn_VC, 0.75 * dn_VC], '--', color="b",  label='V_B')
+plt.plot([VB_plot_max, VB_plot_max], [1 - 0.75 * dn_VC, 1 + 0.75 * dn_VC], '--', color="b",  label='V_B')
 
 
 # connecting lines
-plt.plot([VC_plot_max, VD_plot_max], [dn_VC, dn_VD], 0.6, color="r")
-plt.plot([VC_plot_max, VD_plot_max], [- dn_VC, - dn_VD], 0.6, color="r")
-plt.plot([VD_plot_max, VD_plot_max], [dn_VD, - dn_VD], 0.6, color="r")
+plt.plot([VC_plot_max, VD_plot_max], [1 + dn_VC, 1 + dn_VD], 0.6, color="r")
+plt.plot([VC_plot_max, VD_plot_max], [1 - dn_VC, 1 - dn_VD], 0.6, color="r")
+plt.plot([VD_plot_max, VD_plot_max], [1 + dn_VD, 1 - dn_VD], 0.6, color="r")
 
-# x axis
-plt.plot([0, 1.15 * VD_plot_max], [0, 0], '--', color="r",  label='V_B')
+# y = 1 axis
+plt.plot([0, 1.15 * VD_plot_max], [1, 1], '--', color="r")
 
 
 plt.ylabel('load factor')  # label on x-axis
 plt.xlabel('EAS')  # label on y-axis
 
-#show plot
-plt.show()
+
 
 #print values
 print("V_S0 =", V_S0)
@@ -207,7 +209,8 @@ print("V_C =", V_C)
 print("V_D =", V_D)
 
 
-
+#show plot
+plt.show()
 
 
 
