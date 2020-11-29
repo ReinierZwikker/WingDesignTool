@@ -603,6 +603,7 @@ def __main_w_c(b):  # For plotting
     values = spar_cntr_dist_TBPL(new_centroid, AC)
 
     moment_of_inertia2 = moi_stringers(b, values, Ns, As)
+    
 
     moment_of_inertia = [a + b for a, b in zip(moment_of_inertia1, moment_of_inertia2)]
 
@@ -614,7 +615,9 @@ def __plot(__main_w_c):
     plt.suptitle("Moment of inertia")
     plt.subplot(121)
     plt.title("Ixx")
-    plt.ylim(0, 0.006)
+    plt.ylabel("Moment of inertia (m^4)")
+    plt.xlabel("Spanwise location on a wing (m)")
+    plt.ylim(0, 0.009)
     yy = []
     xx = []
     span = np.arange(0, 26.7890672, 0.01)
@@ -627,11 +630,14 @@ def __plot(__main_w_c):
     plt.plot(span, xx)
     plt.subplot(122)
     plt.title("Izz")
-    plt.ylim(0, 0.2)
+    plt.ylabel("Moment of inertia (m^4)")
+    plt.xlabel("Spanwise location on a wing (m)")
+    plt.ylim(0, 0.4)
     plt.plot(span, yy)
     plt.show()
     return
 
+__plot(__main_w_c)
 
 # ***********************************************
 # POLAR MOMENT OF INERTIA
