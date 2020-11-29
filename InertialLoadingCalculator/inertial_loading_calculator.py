@@ -67,20 +67,22 @@ include_fuel_tanks = True
 include_engine = True
 fuel_tank_level = 1  # level of the fuel tanks from 0 to 1
 
+load_factor = 3.8
 
 # Define the lift and drag distribution
 def lift_distribution(y, length_step, density, velocity):
-    return lift_coef_function(y) * 0.5 * density * (velocity ** 2) * aerodynamic_data.chord_function(y)
+    return load_factor * lift_coef_function(y) * 0.5 * density * (velocity ** 2) * aerodynamic_data.chord_function(y)
 
 
 def drag_distribution(y, length_step, density, velocity):
-    return (drag_induced_function(y) + cd_0) * 0.5 * density * (velocity ** 2) * aerodynamic_data.chord_function(y)
+    return load_factor * (drag_induced_function(y) + cd_0) * 0.5 * density * (velocity ** 2) * aerodynamic_data.chord_function(y)
 
 
 def pitching_moment_function(y, density, velocity, length_step):
     #0.5 rho V^2 S c
     # print(aerodynamic_data.moment_coef_function_10(y))
-    return -moment_coef_function(y) * 0.5 * density * (velocity**2) * aerodynamic_data.chord_function(y) * aerodynamic_data.chord_function(y)
+    return load_factor * -moment_coef_function(y) * 0.5 * density * (velocity**2) * aerodynamic_data.chord_function(y) * \
+           aerodynamic_data.chord_function(y)
 
 
 # Calculate the final force distribution

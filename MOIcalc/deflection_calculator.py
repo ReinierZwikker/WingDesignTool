@@ -64,6 +64,7 @@ plt.figure(figsize=(20, 5))
 plt.axis('equal')
 plt.minorticks_on()
 plt.grid('minor')
+plt.plot([spanwise_locations_list[0], spanwise_locations_list[-1]], [wing_span*0.30, wing_span*0.30], '--r')
 plt.plot(spanwise_locations_list, deflection_data)
 
 plt.show()
