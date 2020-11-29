@@ -185,6 +185,8 @@ plt.plot([0, VD_plot_max], [1, 1 - dn_VD], '--', color="r")  # x-coor,ycoor,widt
 
 # vertical lines
 plt.plot([VB_plot_max, VB_plot_max], [1 - 0.75 * dn_VC, 1 + 0.75 * dn_VC], '--', color="b",  label='V_B')
+plt.legend(loc='upper left', frameon=False)
+
 
 
 # connecting lines

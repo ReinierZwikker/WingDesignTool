@@ -391,6 +391,6 @@ plt.plot([0, 1.15 * VD_plot_max], [1, 1], '--', color="r", label='V_B')
 plt.plot([0, 1.15 * VD_plot_max], [0, 0], 0.6, color="b", label='V_B')
 
 plt.ylabel('load factor')  # label on x-axis
-plt.xlabel('EAS [m/s]')  # label on y-axis
+plt.xlabel('equivalent airspeed [m/s]')  # label on y-axis
 
 plt.show()
