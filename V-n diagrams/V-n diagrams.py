@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
+
 try:
     from Database.database_functions import DatabaseConnector
     from Gust_Loading_calculations_moved import W_list, U_ref, WoS, U_ds, F_g, rho_0, V_S1, V_C_cruise_altitude
@@ -21,7 +22,7 @@ except ModuleNotFoundError:
 
 database_connector = DatabaseConnector()
 
-h = database_connector.load_value("operating_altitude_m") #database_connector.load_value("operating_altitude_m") #height in m
+h = 0# database_connector.load_value("operating_altitude_m") #database_connector.load_value("operating_altitude_m") #height in m
 
 # ISA Calculator
 def ISA_T_P_d(h):
@@ -71,7 +72,7 @@ V_C_TRUE = V_C_cruise_altitude     #.load_value("cruise_mach") * np.sqrt(1.4 * 2
 S = database_connector.load_value("surface_area")
 
 rho_0 = 1.225 #sea
-w = 0.75*mtow #weight
+w = mtow #weight
 W = (w/9.81)/0.454 #weight in lb for n_max
 
 #constraints
@@ -154,10 +155,12 @@ print("V_A =", V_A)
 print("V_C =", V_C)
 print("V_D =", V_D)
 
+
+
 # GUST DIAGRAM PART
 
 # this graph requires to manually insert the variables
-h_plot = 0  # to be changed for other graphs
+h_plot = h  # to be changed for other graphs
 H_plot = 21
 W_plot = W_list[0]
 WS_plot = WoS(W_plot, S)
@@ -211,8 +214,30 @@ plt.xlabel('EAS')  # label on y-axis
 #show plot
 plt.show()
 
+#choosing highest value
+if n_max > 1+dn_VC:
+    n_max_VC = n_max
+else:
+    n_max_VC = 1+dn_VC
+print("n_max_VC= ", n_max_VC)
 
+if n_min < 1-dn_VC:
+    n_min_VC = n_min
+else:
+    n_min_VC = 1-dn_VC
+print("n_min_VC =", n_min_VC)
 
+if n_max > 1+dn_VD:
+    n_max_VD = n_max
+else:
+    n_max_VD = 1+dn_VD
+print("n_max_VD= ", n_max_VD)
+
+if n_min < 1-dn_VD:
+    n_min_VD = n_min
+else:
+    n_min_VD = 1-dn_VD
+print("n_min_VD =", n_min_VD)
 
 
 
