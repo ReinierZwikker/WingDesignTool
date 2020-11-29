@@ -34,9 +34,12 @@ E_Modulus = 68.9E9
 # first interval is (0 to y)
 # second interval (0 to 26)
 
-
-with open("../InertialLoadingCalculator/data.pickle", 'rb') as file:
-    data = pickle.load(file)
+try:
+    with open("../InertialLoadingCalculator/data.pickle", 'rb') as file:
+        data = pickle.load(file)
+except FileNotFoundError:
+    with open("./data.pickle", 'rb') as file:
+        data = pickle.load(file)
 
 spanwise_locations_list = data[0]
 x_moment_data = data[3]
