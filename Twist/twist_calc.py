@@ -21,8 +21,9 @@ except ModuleNotFoundError:
 database_connector = DatabaseConnector()
 
 G = database_connector.load_wingbox_value("shear_modulus_pa")
-t1 = 0.003  # database_connector.load_wingbox_value("...")
-t3 = 0.003  # database_connector.load_wingbox_value("...")
+t1 = 0.003  # database_connector.load_wingbox_value("...") left and right spar
+t2 = 0.003  # database_connector.load_wingbox_value("...") skin
+t3 = 0.003  # database_connector.load_wingbox_value("...") mid spar
 
 wingbox_points = database_connector.load_wingbox_value("wingbox_points")
 
@@ -35,6 +36,7 @@ c_one = sqrt((wingbox_points[1][1] - wingbox_points[2][1]) ** 2 + (wingbox_point
 c_two = sqrt((wingbox_points[3][1] - wingbox_points[4][1]) ** 2 + (wingbox_points[3][0] - wingbox_points[4][0]) ** 2)
 Area_first = 0.5 * (b_one + b_three) * (wingbox_points[1][0] - wingbox_points[0][0])
 Area_second = 0.5 * (b_two + b_three) * (wingbox_points[2][0] - wingbox_points[1][0])
+Area_single = 0.5 * (b_one + b_two) * (wingbox_points[2][0] - wingbox_points[0][0])
 
 with open("../InertialLoadingCalculator/data.pickle", 'rb') as file:
     data = pickle.load(file)
@@ -56,6 +58,13 @@ def rate_twist(y):
     solution_vector = np.array([torsion(y), 0, 0])
     q1, q2, dtheta = np.linalg.solve(matrix, solution_vector)
     return dtheta
+
+
+def single_cell_stiffness(y):
+    chord = chord_function(y)
+    line_int = ((a_one+c_one+a_two+c_two)*chord)/t2 + ((b_one+b_two)*chord)/t1
+
+    return
 
 
 def twist_lst_deg():
@@ -92,3 +101,5 @@ print(min(twist_lst_deg()))
 
 plt.plot(y_span_lst,twist_lst_deg())
 plt.show()
+
+print(Area_single)
