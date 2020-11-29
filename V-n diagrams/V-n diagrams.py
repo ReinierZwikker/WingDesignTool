@@ -62,6 +62,7 @@ T, p, rho  = ISA_T_P_d(h)
 
 
 #constants
+mlw = database_connector.load_value("mlw_n")
 oew = database_connector.load_value("oew")
 mtow = database_connector.load_value("mtow")
 C_L_max_flapped = database_connector.load_value("cl_max_flapped")
@@ -70,7 +71,7 @@ V_C_TRUE = V_C_cruise_altitude     #.load_value("cruise_mach") * np.sqrt(1.4 * 2
 S = database_connector.load_value("surface_area")
 
 rho_0 = 1.225 #sea
-w = oew #weight
+w = mlw #weight
 W = (w/9.81)/0.454 #weight in lb for n_max
 
 #constraints
