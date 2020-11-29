@@ -2,8 +2,10 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
+
 try:
     from Database.database_functions import DatabaseConnector
+    from Gust_Loading_Calculations_moved import W_list
 except ModuleNotFoundError:
     import sys
     from os import path
@@ -13,6 +15,8 @@ except ModuleNotFoundError:
 
     sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
     from Database.database_functions import DatabaseConnector
+    from Gust_Loading_Calculations_moved import W_list
+
 
 database_connector = DatabaseConnector()
 
@@ -138,6 +142,59 @@ plt.plot(x7, y7, '--', label='V_A')
 plt.plot(x8, y8, '--', label='V_C')
 plt.plot(x9, y9, '--', label='V_D')
 plt.legend(loc='upper left', frameon=False)
+
+
+
+# GUST DIAGRAM PART
+
+# this graph requires to manually insert the variables
+h_plot = 0  # to be changed for other graphs
+H_plot = 25
+W_plot = W_list[0]
+WS_plot = WoS(W_plot, S)
+ISA_values = ISA_T_P_d(h_plot)
+Uref_plot = U_ref(H_plot)
+Uds_plot = U_ds(Uref_plot, F_g, H_plot)
+VS1_plot = V_S1(W_plot, ISA_values[2], rho_0, S, C_L_max_clean)
+
+VC_plot_max = int(V_C(ISA_values[0]))
+a_VC = Cl_alpha(Cl_alpha_0, VC_plot_max, ISA_values[0])
+dn_VC = (dn_s(H_plot, WS_plot, a_VC, ISA_values[2], VC_plot_max, H_plot / VC_plot_max, Uds_plot, g_0))
+
+VD_plot_max = int(V_D(VC_plot_max))
+a_VD = Cl_alpha(Cl_alpha_0, VD_plot_max, ISA_values[0])
+dn_VD = (dn_s(H_plot, WS_plot, a_VD, ISA_values[2], VD_plot_max, H_plot / VD_plot_max, 0.5 * Uds_plot, g_0))
+
+VB_plot_max = int(V_B(WS_plot, ISA_values[2], mean_geometric_chord, Cl_alpha_0, g_0, rho_0, Uref_plot, VC_plot_max,
+                      VS1_plot))
+a_VB = Cl_alpha(Cl_alpha_0, VB_plot_max, ISA_values[0])
+dn_VB = (dn_s(H_plot, WS_plot, a_VB, ISA_values[2], VB_plot_max, H_plot / VB_plot_max, Uds_plot, g_0))
+
+# gust lines
+plt.plot([0, VB_plot_max], [0, dn_VB], 0.6, color="r")  # x-coor,ycoor,width,color
+plt.plot([0, VC_plot_max], [0, dn_VC], 0.6, color="r")  # x-coor,ycoor,width,color
+plt.plot([0, VD_plot_max], [0, dn_VD], '--', color="r")  # x-coor,ycoor,width,color
+
+# negative lines
+plt.plot([0, VB_plot_max], [0, - dn_VB], 0.6, color="r")  # x-coor,ycoor,width,color
+plt.plot([0, VC_plot_max], [0, - dn_VC], 0.6, color="r")  # x-coor,ycoor,width,color
+plt.plot([0, VD_plot_max], [0, - dn_VD], '--', color="r")  # x-coor,ycoor,width,color
+
+# vertical lines
+plt.plot([VB_plot_max, VB_plot_max], [- 0.75 * dn_VC, 0.75 * dn_VC], '--', color="b",  label='V_B')
+
+
+# connecting lines
+plt.plot([VC_plot_max, VD_plot_max], [dn_VC, dn_VD], 0.6, color="r")
+plt.plot([VC_plot_max, VD_plot_max], [- dn_VC, - dn_VD], 0.6, color="r")
+plt.plot([VD_plot_max, VD_plot_max], [dn_VD, - dn_VD], 0.6, color="r")
+
+# x axis
+plt.plot([0, 1.15 * VD_plot_max], [0, 0], '--', color="r",  label='V_B')
+
+
+plt.ylabel('load factor')  # label on x-axis
+plt.xlabel('EAS')  # label on y-axis
 
 #show plot
 plt.show()
