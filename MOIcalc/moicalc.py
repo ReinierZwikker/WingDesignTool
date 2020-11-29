@@ -574,6 +574,7 @@ def __main_w_c(b):  # For plotting
     Ns = 4
     As = 0.001
 
+
     AC = AC_lenght(b)
     out = len_t_angl_area(AC, t1, t2, t3, t4, t5)
 
@@ -646,16 +647,33 @@ def __plot(__main_w_c):
 # E is a constant, therefore (-1/E) is a constant and goes in front of integral
 # v(span) = (-1/E) *integal(0, 26.smth) integral (0 , span) (Mx/Ixx)dspan dspan
 
+wing_span = database_connector.load_value("wing_span") / 2
+
+
 def ixx(b):
     # t1, t2, t3, t4, t5 , Ns, As
 
-    t1 = 0.02   # spar LE
-    t2 = 0.02   # spar TE
+    """
+    CHANGE THESE VALUES!
+    """
+
+    t1 = 0.10   # spar LE
+    t2 = 0.10   # spar TE
     t3 = 0.01   # top plate
     t4 = 0.01   # bottom plate
-    t5 = 0.05   # spar middle
-    Ns = 4      # N of stringers per plate
-    As = 0.002  # Area of single stringer
+    t5 = 0.10   # spar middle
+    As = 0.001  # Area of single stringer
+    if b < 15:
+        Ns = 50     # N of stringers per plate
+    elif b < 20:
+        Ns = 40
+    else:
+        Ns = 30
+
+    # stringer_mass = (Ns * 2) * wing_span * As + 4 * 10 * As
+
+    # Janky mass calc
+    # print(f"mass stringer: {}")
 
     AC = AC_lenght(b)
     out = len_t_angl_area(AC, t1, t2, t3, t4, t5)
