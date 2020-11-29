@@ -59,10 +59,10 @@ torsion = sp.interpolate.interp1d(y_span_lst, torsion_lst, kind="cubic", fill_va
 def dtheta_multi(y):
     chord = chord_function(y)
     matrix = np.array([[2 * Area_first * chord * chord, 2 * Area_second * chord * chord, 0],
-                       [(((((b_one + a_one + a_two) * chord) / t1) + (b_three * chord / t3)) / (2 * Area_first * chord * chord * G)),
+                       [(((((a_one + a_two) * chord) / t2) + (b_one * chord / t1) + (b_three * chord / t3)) / (2 * Area_first * chord * chord * G)),
                         -1 * ((b_three * chord / t3) / (2 * Area_first * chord * chord * G)), -1],
                        [-1 * ((b_three * chord / t3) / (2 * Area_second * chord * chord * G)),
-                        (((((b_two + c_one + c_two) * chord / t1) + (b_three * chord / t3)) / (2 * Area_second * chord * chord * G))), -1]])
+                        (((((c_one + c_two) * chord / t2) + (b_two * chord / t1) + (b_three * chord / t3)) / (2 * Area_second * chord * chord * G))), -1]])
     solution_vector = np.array([torsion(y), 0, 0])
     q1, q2, dtheta = np.linalg.solve(matrix, solution_vector)
     return dtheta
