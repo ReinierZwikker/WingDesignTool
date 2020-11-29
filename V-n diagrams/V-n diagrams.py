@@ -5,7 +5,7 @@ import numpy as np
 
 try:
     from Database.database_functions import DatabaseConnector
-    from Gust_Loading_calculations_moved import W_list, U_ref, WoS, U_ds, F_g, rho_0, V_S1
+    from Gust_Loading_calculations_moved import W_list, U_ref, WoS, U_ds, F_g, rho_0, V_S1, V_C_cruise_altitude
 except ModuleNotFoundError:
     import sys
     from os import path
@@ -15,7 +15,7 @@ except ModuleNotFoundError:
 
     sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
     from Database.database_functions import DatabaseConnector
-    from Gust_Loading_calculations_moved import W_list, U_ref, WoS, U_ds, F_g, rho_0, V_S1
+    from Gust_Loading_calculations_moved import W_list, U_ref, WoS, U_ds, F_g, rho_0, V_S1, V_C_cruise_altitude
 
 
 
@@ -65,7 +65,7 @@ T, p, rho  = ISA_T_P_d(h)
 mtow = database_connector.load_value("mtow")
 C_L_max_flapped = database_connector.load_value("cl_max_flapped")
 C_L_max_clean = database_connector.load_value("cl_max_clean")
-V_C_TRUE = database_connector.load_value("cruise_mach") * np.sqrt(1.4 * 287 * T)
+V_C_TRUE = V_C_cruise_altitude     #.load_value("cruise_mach") * np.sqrt(1.4 * 287 * T)
 S = database_connector.load_value("surface_area")
 
 rho_0 = 1.225 #sea
@@ -160,7 +160,7 @@ Uds_plot = U_ds(Uref_plot, F_g, H_plot)
 from Gust_Loading_calculations_moved import V_S1, V_C, Cl_alpha, Cl_alpha_0, dn_s, g_0, V_D, V_B, mean_geometric_chord  #leave this here
 VS1_plot = V_S1(W_plot, ISA_values[2], rho_0, S, C_L_max_clean)
 
-VC_plot_max = int(V_C(ISA_values[0])) * np.sqrt(rho/rho_0) # EAS
+VC_plot_max = int(V_C_cruise_altitude) * np.sqrt(rho/rho_0)  # EAS
 a_VC = Cl_alpha(Cl_alpha_0, VC_plot_max, ISA_values[0])
 dn_VC = (dn_s(H_plot, WS_plot, a_VC, ISA_values[2], VC_plot_max, H_plot / VC_plot_max, Uds_plot, g_0))
 
