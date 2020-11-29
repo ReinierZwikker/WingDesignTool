@@ -62,7 +62,7 @@ T, p, rho  = ISA_T_P_d(h)
 
 
 #constants
-oew = database_connector.load_value("eow")
+oew = database_connector.load_value("oew")
 mtow = database_connector.load_value("mtow")
 C_L_max_flapped = database_connector.load_value("cl_max_flapped")
 C_L_max_clean = database_connector.load_value("cl_max_clean")
