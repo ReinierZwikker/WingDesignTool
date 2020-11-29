@@ -24,7 +24,8 @@ G = database_connector.load_wingbox_value("shear_modulus_pa")
 t1 = 0.003  # database_connector.load_wingbox_value("...") left and right spar
 t2 = 0.003  # database_connector.load_wingbox_value("...") skin
 t3 = 0.003  # database_connector.load_wingbox_value("...") mid spar
-engine_pos = 10 # database_connector.load_value("...")
+engine_pos = database_connector.load_value("engine_spanwise_location")
+
 
 wingbox_points = database_connector.load_wingbox_value("wingbox_points")
 
@@ -39,17 +40,23 @@ Area_first = 0.5 * (b_one + b_three) * (wingbox_points[1][0] - wingbox_points[0]
 Area_second = 0.5 * (b_two + b_three) * (wingbox_points[2][0] - wingbox_points[1][0])
 Area_single = 0.5 * (b_one + b_two) * (wingbox_points[2][0] - wingbox_points[0][0])
 
-with open("./data.pickle", 'rb') as file:
-    data = pickle.load(file)
+try:
+    with open("./data.pickle", 'rb') as file:
+        data = pickle.load(file)
+except FileNotFoundError:
+    with open("../InertialLoadingCalculator/data.pickle", 'rb') as file:
+        data = pickle.load(file)
+
 
 y_span_lst = data[0]
-torsion_lst =  data[7]
+torsion_lst = data[7]
 step = y_span_lst[1] - y_span_lst[0]
     
 torsion = sp.interpolate.interp1d(y_span_lst, torsion_lst, kind="cubic", fill_value="extrapolate")
 
+
 # Matrix of the shear flow and change of angle. 1st variable is q1 second is q2 third is dThetha/dy.
-def rate_twist(y):
+def dtheta_multi(y):
     chord = chord_function(y)
     matrix = np.array([[2 * Area_first * chord * chord, 2 * Area_second * chord * chord, 0],
                        [(((((b_one + a_one + a_two) * chord) / t1) + (b_three * chord / t3)) / (2 * Area_first * chord * chord * G)),
@@ -71,8 +78,15 @@ def dtheta_single(y):
     return torsion(y)/(G*single_cell_stiffness(y))
 
 
+def rate_of_twist(y):
+    if y <= engine_pos:
+        return dtheta_multi(y)
+    else:
+        return dtheta_single(y)
+
+
 def twist_lst_deg():
-    twist_integral = Integration(rate_twist, database_connector.load_value("wing_span")/2, 0, flip_sign=True)
+    twist_integral = Integration(rate_of_twist, database_connector.load_value("wing_span") / 2, 0, flip_sign=True)
     twist_lst = []
     for i in y_span_lst:
         twist_lst.append(twist_integral.integrate(i, -1*step))
@@ -89,7 +103,7 @@ def twist_lst_deg():
 
 
 def stiffness(y):
-    return torsion(y) / (rate_twist(y) * G)
+    return torsion(y) / (dtheta_multi(y) * G)
 
 
 def stiffness_lst():
@@ -106,7 +120,7 @@ print(stiffness_lst())
 print(twist_angle_deg())
 print(min(twist_lst_deg()))
 
-plt.plot(y_span_lst,twist_lst_deg())
+plt.plot(y_span_lst, twist_lst_deg())
 plt.show()
 """
 
