@@ -24,6 +24,7 @@ G = database_connector.load_wingbox_value("shear_modulus_pa")
 t1 = 0.003  # database_connector.load_wingbox_value("...") left and right spar
 t2 = 0.003  # database_connector.load_wingbox_value("...") skin
 t3 = 0.003  # database_connector.load_wingbox_value("...") mid spar
+engine_pos = 10 # database_connector.load_value("...")
 
 wingbox_points = database_connector.load_wingbox_value("wingbox_points")
 
@@ -38,7 +39,7 @@ Area_first = 0.5 * (b_one + b_three) * (wingbox_points[1][0] - wingbox_points[0]
 Area_second = 0.5 * (b_two + b_three) * (wingbox_points[2][0] - wingbox_points[1][0])
 Area_single = 0.5 * (b_one + b_two) * (wingbox_points[2][0] - wingbox_points[0][0])
 
-with open("../InertialLoadingCalculator/data.pickle", 'rb') as file:
+with open("./data.pickle", 'rb') as file:
     data = pickle.load(file)
 
 y_span_lst = data[0]
@@ -63,8 +64,11 @@ def rate_twist(y):
 def single_cell_stiffness(y):
     chord = chord_function(y)
     line_int = ((a_one+c_one+a_two+c_two)*chord)/t2 + ((b_one+b_two)*chord)/t1
+    return (4*((Area_second*chord*chord)**2))/line_int
 
-    return
+
+def dtheta_single(y):
+    return torsion(y)/(G*single_cell_stiffness(y))
 
 
 def twist_lst_deg():
@@ -75,13 +79,13 @@ def twist_lst_deg():
     return [x*180/pi for x in twist_lst]
 
 
-def twist_angle_rad():
-    estimate, error = sp.integrate.quad(rate_twist, 0, database_connector.load_value("wing_span")/2)
-    return estimate
+#def twist_angle_rad():
+    #estimate, error = sp.integrate.quad(rate_twist, 0, database_connector.load_value("wing_span")/2)
+    #return estimate
 
 
-def twist_angle_deg():
-    return twist_angle_rad() * 180 / pi
+#def twist_angle_deg():
+    #return twist_angle_rad() * 180 / pi
 
 
 def stiffness(y):
@@ -91,15 +95,23 @@ def stiffness(y):
 def stiffness_lst():
     lst = []
     for i in y_span_lst:
-        lst.append(stiffness(i))
+        if i <= engine_pos:
+            lst.append(stiffness(i))
+        if i > engine_pos:
+            lst.append(single_cell_stiffness(i))
     return lst
 
-
+"""
 print(stiffness_lst())
 print(twist_angle_deg())
 print(min(twist_lst_deg()))
 
 plt.plot(y_span_lst,twist_lst_deg())
 plt.show()
+"""
 
-print(Area_single)
+print(stiffness_lst())
+print(dtheta_single(11))
+
+plt.plot(y_span_lst, stiffness_lst())
+plt.show()
