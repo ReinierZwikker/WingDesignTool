@@ -38,7 +38,7 @@ moment_arm_thrust = 1.5 * radius_engine
 global_length_step = 0.1  # [m]
 
 # Define the flight conditions
-test_velocity = 296.0  # m/s
+test_velocity = 236.32  # m/s
 test_density = 0.38035  # kg/m^2
 lift_coef_function = aerodynamic_data.lift_coef_function_10
 drag_induced_function = aerodynamic_data.drag_induced_function_10
@@ -220,4 +220,4 @@ def plot_inertial_loading(z_force_data, x_force_data, x_shear_force_data, x_mome
 
 
 # UNCOMMENT THIS TO PLOT INERTIAL LOADING:
-# plot_inertial_loading(*calculate_inertial_loading())
+plot_inertial_loading(*calculate_inertial_loading())

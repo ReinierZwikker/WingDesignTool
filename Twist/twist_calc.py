@@ -124,8 +124,10 @@ plt.plot(y_span_lst, twist_lst_deg())
 plt.show()
 """
 
-print(stiffness_lst())
-print(dtheta_single(11))
-
-plt.plot(y_span_lst, stiffness_lst())
+plt.plot(y_span_lst, twist_lst_deg())
+plt.title("Twist Distribution")
+plt.ylabel("Angle of Twist(deg)")
+plt.xlabel("Spanwise location on a wing(m)")
+#plt.ylim(0, 0.075)
 plt.show()
+
