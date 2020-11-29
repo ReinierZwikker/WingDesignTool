@@ -21,7 +21,7 @@ except ModuleNotFoundError:
 
 database_connector = DatabaseConnector()
 
-h = 0 #database_connector.load_value("operating_altitude_m") #height in m
+h = database_connector.load_value("operating_altitude_m") #database_connector.load_value("operating_altitude_m") #height in m
 
 # ISA Calculator
 def ISA_T_P_d(h):
@@ -71,7 +71,7 @@ V_C_TRUE = V_C_cruise_altitude     #.load_value("cruise_mach") * np.sqrt(1.4 * 2
 S = database_connector.load_value("surface_area")
 
 rho_0 = 1.225 #sea
-w = mlw #weight
+w = 0.75*mtow #weight
 W = (w/9.81)/0.454 #weight in lb for n_max
 
 #constraints
