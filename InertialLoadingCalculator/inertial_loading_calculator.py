@@ -38,8 +38,8 @@ moment_arm_thrust = 1.5 * radius_engine
 global_length_step = 0.1  # [m]
 
 # Define the flight conditions
-test_velocity = 60  # m/s
-test_density = 1.255  # kg/m^2
+test_velocity = 230  # m/s
+test_density = 0.3  # kg/m^2
 lift_coef_function = aerodynamic_data.lift_coef_function_10
 drag_induced_function = aerodynamic_data.drag_induced_function_10
 moment_coef_function = aerodynamic_data.moment_coef_function_10
@@ -65,27 +65,24 @@ cd_0 = database_connector.load_value("cd0")
 
 include_fuel_tanks = True
 include_engine = True
-fuel_tank_level = 1  # level of the fuel tanks from 0 to 1
 
 
 # Define the lift and drag distribution
-def lift_distribution(y, length_step, density, velocity):
+def lift_distribution(y, density, velocity):
     return lift_coef_function(y) * 0.5 * density * (velocity ** 2) * aerodynamic_data.chord_function(y)
 
 
-def drag_distribution(y, length_step, density, velocity):
+def drag_distribution(y, density, velocity):
     return (drag_induced_function(y) + cd_0) * 0.5 * density * (velocity ** 2) * aerodynamic_data.chord_function(y)
 
 
-def pitching_moment_function(y, density, velocity, length_step):
-    #0.5 rho V^2 S c
-    # print(aerodynamic_data.moment_coef_function_10(y))
+def pitching_moment_function(y, density, velocity):
     return -moment_coef_function(y) * 0.5 * density * (velocity**2) * aerodynamic_data.chord_function(y) * aerodynamic_data.chord_function(y)
 
 
 # Calculate the final force distribution
-def z_final_force_distribution(y, length_step, density, velocity):
-    value = lift_distribution(y, length_step, density, velocity) - weight_wing / surface_area * aerodynamic_data.chord_function(y)
+def z_final_force_distribution(y, length_step, density, velocity, fuel_tank_level):
+    value = lift_distribution(y, density, velocity) - weight_wing / surface_area * aerodynamic_data.chord_function(y)
     if ((fuel_tank_start < y < fuel_tank_engine_stop) or (fuel_tank_engine_start < y < fuel_tank_stop)) and include_fuel_tanks:
         value -= (weight_fuel / fuel_tank_length) * fuel_tank_level
     if spanwise_location_engine - length_step / 2 < y < spanwise_location_engine + length_step / 2 and include_engine:
@@ -94,8 +91,8 @@ def z_final_force_distribution(y, length_step, density, velocity):
 
 
 # TODO Add contribution due to thrust
-def x_final_force_distribution(y, length_step, density, velocity):
-    return drag_distribution(y, length_step, density, velocity)
+def x_final_force_distribution(y, density, velocity):
+    return drag_distribution(y, density, velocity)
 
 
 # Adding the point load of the engine after integrating
@@ -132,7 +129,7 @@ z_shear_integral = Integration(x_final_force_distribution, min(spanwise_location
 z_moment_integral = Integration(z_shear_integral.get_value, min(spanwise_locations_list), max(spanwise_locations_list), flip_sign=True)
 
 
-def calculate_inertial_loading(length_step):
+def calculate_inertial_loading(length_step, fuel_tank_level, density, velocity, verbose=False):
     # Data list for the results
     z_force_data = []
     x_shear_force_data = []
@@ -147,25 +144,27 @@ def calculate_inertial_loading(length_step):
     # Time keeping
     start_time_1 = time.time()
 
-    print("Calculating shear and moment.\nIntegrating... (this can take a while)")
+    if verbose:
+        print("Calculating shear and moment.\nIntegrating... (this can take a while)")
 
     # For every spanwise location, first integrate to shear then integrate to moment
     for spanwise_location in spanwise_locations_list:
-        z_force_data.append(z_final_force_distribution(spanwise_location, length_step, test_density, test_velocity))
-        x_force_data.append(x_final_force_distribution(spanwise_location, length_step, test_density, test_velocity))
+        z_force_data.append(z_final_force_distribution(spanwise_location, length_step, density, velocity, fuel_tank_level))
+        x_force_data.append(x_final_force_distribution(spanwise_location, density, velocity))
 
-        x_shear_force_data.append(x_shear_integral.integrate(spanwise_location, length_step, length_step, test_density, test_velocity))
-        x_moment_data.append(x_moment_integral.integrate(spanwise_location, length_step, length_step, test_density, test_velocity))
+        x_shear_force_data.append(x_shear_integral.integrate(spanwise_location, length_step, length_step, density, velocity, fuel_tank_level))
+        x_moment_data.append(x_moment_integral.integrate(spanwise_location, length_step, length_step, density, velocity, fuel_tank_level))
 
-        z_shear_force_data.append(z_shear_integral.integrate(spanwise_location, length_step, length_step, test_density, test_velocity))
-        z_moment_data.append(z_moment_integral.integrate(spanwise_location, global_length_step, length_step, test_density, test_velocity))
+        z_shear_force_data.append(z_shear_integral.integrate(spanwise_location, length_step, density, velocity))
+        z_moment_data.append(z_moment_integral.integrate(spanwise_location, length_step, length_step, density, velocity))
 
         y_torsion_data.append(
-            pitching_moment_function(spanwise_location, test_density, test_velocity, length_step) + add_engine_moment(spanwise_location, length_step, moment_arm_engine) - add_thrust_moment(spanwise_location, length_step, moment_arm_thrust))
+            pitching_moment_function(spanwise_location, density, velocity) + add_engine_moment(spanwise_location, length_step, moment_arm_engine) - add_thrust_moment(spanwise_location, length_step, moment_arm_thrust))
 
-    # More time keeping & printing
-    print(f"Total integration time: {(time.time() - start_time_1) / 60:.3f} min")
-    print(f"LUT lengths: {len(x_shear_integral.LUT)}, {len(x_moment_integral.LUT)}, {len(z_shear_integral.LUT)}, {len(z_moment_integral.LUT)}")
+    if verbose:
+        # More time keeping & printing
+        print(f"Total integration time: {(time.time() - start_time_1) / 60:.3f} min")
+        print(f"LUT lengths: {len(x_shear_integral.LUT)}, {len(x_moment_integral.LUT)}, {len(z_shear_integral.LUT)}, {len(z_moment_integral.LUT)}")
 
     # Saving results
     with open('./data.pickle', 'wb') as file:
@@ -220,4 +219,4 @@ def plot_inertial_loading(z_force_data, x_force_data, x_shear_force_data, x_mome
 
 
 # UNCOMMENT THIS TO PLOT INERTIAL LOADING:
-# plot_inertial_loading(*calculate_inertial_loading(global_length_step))
+# plot_inertial_loading(*calculate_inertial_loading(global_length_step, 1, test_density, test_velocity))
