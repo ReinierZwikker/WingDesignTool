@@ -62,6 +62,7 @@ T, p, rho  = ISA_T_P_d(h)
 
 
 #constants
+oew = database_connector.load_value("eow")
 mtow = database_connector.load_value("mtow")
 C_L_max_flapped = database_connector.load_value("cl_max_flapped")
 C_L_max_clean = database_connector.load_value("cl_max_clean")
@@ -69,7 +70,7 @@ V_C_TRUE = V_C_cruise_altitude     #.load_value("cruise_mach") * np.sqrt(1.4 * 2
 S = database_connector.load_value("surface_area")
 
 rho_0 = 1.225 #sea
-w = mtow #weight
+w = oew #weight
 W = (w/9.81)/0.454 #weight in lb for n_max
 
 #constraints
@@ -145,7 +146,12 @@ plt.plot(x8, y8, '--', label='V_C')
 plt.plot(x9, y9, '--', label='V_D')
 plt.legend(loc='upper left', frameon=False)
 
-
+#print values
+print("V_S0 =", V_S0)
+print("V_S1 =", V_S1)
+print("V_A =", V_A)
+print("V_C =", V_C)
+print("V_D =", V_D)
 
 # GUST DIAGRAM PART
 
@@ -200,16 +206,6 @@ plt.plot([0, 1.15 * VD_plot_max], [1, 1], '--', color="r")
 
 plt.ylabel('load factor')  # label on x-axis
 plt.xlabel('EAS')  # label on y-axis
-
-
-
-#print values
-print("V_S0 =", V_S0)
-print("V_S1 =", V_S1)
-print("V_A =", V_A)
-print("V_C =", V_C)
-print("V_D =", V_D)
-
 
 #show plot
 plt.show()
