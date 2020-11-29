@@ -35,7 +35,7 @@ radius_engine = database_connector.load_value("d_engine")/2
 moment_arm_engine = (0.25 + 0.2) * aerodynamic_data.chord_function(spanwise_location_engine)
 moment_arm_thrust = 1.5 * radius_engine
 
-global_length_step = 0.01  # [m]
+global_length_step = 0.1  # [m]
 
 # Define the flight conditions
 test_velocity = 296.0  # m/s
@@ -115,7 +115,6 @@ def add_thrust_moment(y, length_step, moment_arm):
 
 # Spanwise locations to move through for graphs
 spanwise_locations_list = np.arange(radius_fuselage, wing_span, global_length_step)
-# spanwise_locations_list = np.arange(0, 10, global_length_step)
 
 """
 Sign-convention:
@@ -126,107 +125,99 @@ counterclockwise
 """
 
 # Setting up the integrals
-# x_shear_integral = Integration(z_final_force_distribution, min(spanwise_locations_list), max(spanwise_locations_list))
-# x_moment_integral = Integration(x_shear_integral.get_value, min(spanwise_locations_list), max(spanwise_locations_list))
-
 x_shear_integral = Integration(z_final_force_distribution, min(spanwise_locations_list), max(spanwise_locations_list), flip_sign=True)
 x_moment_integral = Integration(x_shear_integral.get_value, min(spanwise_locations_list), max(spanwise_locations_list), flip_sign=True)
 
 z_shear_integral = Integration(x_final_force_distribution, min(spanwise_locations_list), max(spanwise_locations_list), flip_sign=True)
 z_moment_integral = Integration(z_shear_integral.get_value, min(spanwise_locations_list), max(spanwise_locations_list), flip_sign=True)
 
-# Data list for the results
-z_force_data = []
-x_shear_force_data = []
-x_moment_data = []
 
-x_force_data = []
-z_shear_force_data = []
-z_moment_data = []
+def calculate_inertial_loading():
+    # Data list for the results
+    z_force_data = []
+    x_shear_force_data = []
+    x_moment_data = []
 
-y_torsion_data = []
+    x_force_data = []
+    z_shear_force_data = []
+    z_moment_data = []
 
-# Time keeping
-start_time_1 = time.time()
+    y_torsion_data = []
 
-print("Calculating shear and moment.\nIntegrating... (this can take a while)")
+    # Time keeping
+    start_time_1 = time.time()
 
-# For every spanwise location, first integrate to shear then integrate to moment
-for spanwise_location in spanwise_locations_list:
-    z_force_data.append(z_final_force_distribution(spanwise_location, global_length_step, test_density, test_velocity))
-    x_force_data.append(x_final_force_distribution(spanwise_location, global_length_step, test_density, test_velocity))
+    print("Calculating shear and moment.\nIntegrating... (this can take a while)")
 
-    x_shear_force_data.append(x_shear_integral.integrate(spanwise_location, global_length_step, global_length_step, test_density, test_velocity))
-    x_moment_data.append(x_moment_integral.integrate(spanwise_location, global_length_step, global_length_step, test_density, test_velocity))
+    # For every spanwise location, first integrate to shear then integrate to moment
+    for spanwise_location in spanwise_locations_list:
+        z_force_data.append(z_final_force_distribution(spanwise_location, global_length_step, test_density, test_velocity))
+        x_force_data.append(x_final_force_distribution(spanwise_location, global_length_step, test_density, test_velocity))
 
-    z_shear_force_data.append(z_shear_integral.integrate(spanwise_location, global_length_step, global_length_step, test_density, test_velocity))
-    z_moment_data.append(z_moment_integral.integrate(spanwise_location, global_length_step, global_length_step, test_density, test_velocity))
+        x_shear_force_data.append(x_shear_integral.integrate(spanwise_location, global_length_step, global_length_step, test_density, test_velocity))
+        x_moment_data.append(x_moment_integral.integrate(spanwise_location, global_length_step, global_length_step, test_density, test_velocity))
 
-    y_torsion_data.append(
-        pitching_moment_function(spanwise_location, test_density, test_velocity, global_length_step) + add_engine_moment(spanwise_location, global_length_step,
-                                                                                                                         moment_arm_engine) - add_thrust_moment(
-            spanwise_location, global_length_step, moment_arm_thrust))
+        z_shear_force_data.append(z_shear_integral.integrate(spanwise_location, global_length_step, global_length_step, test_density, test_velocity))
+        z_moment_data.append(z_moment_integral.integrate(spanwise_location, global_length_step, global_length_step, test_density, test_velocity))
 
+        y_torsion_data.append(
+            pitching_moment_function(spanwise_location, test_density, test_velocity, global_length_step) + add_engine_moment(spanwise_location, global_length_step, moment_arm_engine) - add_thrust_moment(spanwise_location, global_length_step, moment_arm_thrust))
 
-# lift = 0
-# for spanwise_location in spanwise_locations_list_10:
-#     z_force_data_10.append(z_final_force_distribution(spanwise_location, global_length_step/10, test_density, test_velocity))
-#
-# for spanwise_location in spanwise_locations_list_100:
-#     z_force_data_100.append(z_final_force_distribution(spanwise_location, global_length_step/100, test_density, test_velocity))
-#
-# for spanwise_location in spanwise_locations_list_1000:
-#     lift += z_final_force_distribution(spanwise_location, global_length_step, test_density, test_velocity)
-#     z_force_data_1000.append(z_final_force_distribution(spanwise_location, global_length_step/1000, test_density, test_velocity))
-# print(2*lift/1000)
+    # More time keeping & printing
+    print(f"total time: {(time.time() - start_time_1) / 60:.3f} min")
+    print(f"LUT lengths: {len(x_shear_integral.LUT)}, {len(x_moment_integral.LUT)}, {len(z_shear_integral.LUT)}, {len(z_moment_integral.LUT)}")
+
+    # Saving results
+    with open('./data.pickle', 'wb') as file:
+        pickle.dump((spanwise_locations_list, z_force_data, x_shear_force_data, x_moment_data, x_force_data, z_shear_force_data, z_moment_data,
+                     y_torsion_data), file)
+
+    return z_force_data, x_force_data, x_shear_force_data, x_moment_data, z_shear_force_data, z_moment_data, y_torsion_data
 
 
-# More time keeping & printing
-print(f"total time: {(time.time() - start_time_1) / 60:.3f} min")
-print(f"LUT lengths: {len(x_shear_integral.LUT)}, {len(x_moment_integral.LUT)}, {len(z_shear_integral.LUT)}, {len(z_moment_integral.LUT)}")
+def plot_inertial_loading(z_force_data, x_force_data, x_shear_force_data, x_moment_data, z_shear_force_data, z_moment_data, y_torsion_data):
+    fig, axs = plt.subplots(4, 2)
 
-fig, axs = plt.subplots(4, 2)
+    fig.suptitle(f"Inertial Loading for V={test_velocity} [m/s] at rho={test_density} [kg/m3] using steps of {global_length_step} [m]", fontsize=20)
+    # Make plots for the x direction
+    fig.subplots_adjust(left=0.07, bottom=0.07, right=0.97, top=0.90, wspace=0.10, hspace=0.30)
+    axs[0, 0].set_title("z: Lift and Weight")
+    axs[0, 0].plot(spanwise_locations_list, [x/1000 for x in z_force_data], label="Force")
+    axs[0, 0].set_ylabel("Applied Force in z (kN)")
 
-fig.suptitle(f"Inertial Loading for V={test_velocity} [m/s] at rho={test_density} [kg/m3] using steps of {global_length_step} [m]", fontsize=20)
-# Make plots for the x direction
-fig.subplots_adjust(left=0.07, bottom=0.07, right=0.97, top=0.90, wspace=0.10, hspace=0.30)
-axs[0, 0].set_title("z: Lift and Weight")
-axs[0, 0].plot(spanwise_locations_list, [x/1000 for x in z_force_data], label="Force")
-axs[0, 0].set_ylabel("Applied Force in z (kN)")
+    axs[1, 0].set_title("x: Shear due to Lift and Weight")
+    axs[1, 0].plot(spanwise_locations_list, [x/1000 for x in x_shear_force_data], label="Shear")
+    axs[1, 0].set_ylabel("Shear force in x (kN)")
 
-axs[1, 0].set_title("x: Shear due to Lift and Weight")
-axs[1, 0].plot(spanwise_locations_list, [x/1000 for x in x_shear_force_data], label="Shear")
-axs[1, 0].set_ylabel("Shear force in x (kN)")
+    axs[2, 0].set_title("x: Moment due to Lift and Weight")
+    axs[2, 0].plot(spanwise_locations_list, [x/1000 for x in x_moment_data], label="Moment")
+    axs[2, 0].set_ylabel("Moment in x (kNm)")
 
-axs[2, 0].set_title("x: Moment due to Lift and Weight")
-axs[2, 0].plot(spanwise_locations_list, [x/1000 for x in x_moment_data], label="Moment")
-axs[2, 0].set_ylabel("Moment in x (kNm)")
+    # Make plots for the z direction
+    axs[0, 1].set_title("x: Drag and Thrust")
+    axs[0, 1].plot(spanwise_locations_list, [x/1000 for x in x_force_data], label="Force")
+    axs[0, 1].set_ylabel("Applied Force in x (kN)")
 
-# Make plots for the z direction
-axs[0, 1].set_title("x: Drag and Thrust")
-axs[0, 1].plot(spanwise_locations_list, [x/1000 for x in x_force_data], label="Force")
-axs[0, 1].set_ylabel("Applied Force in x (kN)")
+    axs[1, 1].set_title("z: Shear due to Drag and Thrust")
+    axs[1, 1].plot(spanwise_locations_list, [x/1000 for x in z_shear_force_data], label="Shear")
+    axs[1, 1].set_ylabel("Shear force in z (kN)")
 
-axs[1, 1].set_title("z: Shear due to Drag and Thrust")
-axs[1, 1].plot(spanwise_locations_list, [x/1000 for x in z_shear_force_data], label="Shear")
-axs[1, 1].set_ylabel("Shear force in z (kN)")
+    axs[2, 1].set_title("z: Moment due to Drag and Thrust")
+    axs[2, 1].plot(spanwise_locations_list, [x/1000 for x in z_moment_data], label="Moment")
+    axs[2, 1].set_ylabel("Moment in z (kNm)")
+    axs[2, 1].set_xlabel("Wing location (m)")
 
-axs[2, 1].set_title("z: Moment due to Drag and Thrust")
-axs[2, 1].plot(spanwise_locations_list, [x/1000 for x in z_moment_data], label="Moment")
-axs[2, 1].set_ylabel("Moment in z (kNm)")
-axs[2, 1].set_xlabel("Wing location (m)")
+    # Make plots for the u direction (torsion)
+    axs[3, 0].set_title("u: Torsion")
+    axs[3, 0].plot(spanwise_locations_list, [x/1000 for x in y_torsion_data], label="Torsion")
+    axs[3, 0].set_ylabel("Torsion in y (kNm)")
+    axs[3, 0].set_xlabel("Wing location (m)")
 
-# Make plots for the u direction (torsion)
-axs[3, 0].set_title("u: Torsion")
-axs[3, 0].plot(spanwise_locations_list, [x/1000 for x in y_torsion_data], label="Torsion")
-axs[3, 0].set_ylabel("Torsion in y (kNm)")
-axs[3, 0].set_xlabel("Wing location (m)")
+    axs[3, 1].set_visible(False)
 
-axs[3, 1].set_visible(False)
+    # show and pop plots
+    plt.show()
 
-# show and pop plots
-plt.show()
 
-# Saving results
-with open('./data.pickle', 'wb') as file:
-    pickle.dump((spanwise_locations_list, z_force_data, x_shear_force_data, x_moment_data, x_force_data, z_shear_force_data, z_moment_data, y_torsion_data), file)
+# UNCOMMENT THIS TO PLOT INERTIAL LOADING:
+# plot_inertial_loading(*calculate_inertial_loading())
