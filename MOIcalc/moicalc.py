@@ -100,6 +100,8 @@ def len_t_angl_area(AC, t1, t2, t3, t4, t5):
     F_SP_AREA = F_SP_LEN * F_SP_T
     F_SP_ANGL = 0
 
+    
+
     list_LEN.append(F_SP_LEN)
     list_T.append(F_SP_T)
     list_AREA.append(F_SP_AREA)
@@ -312,6 +314,7 @@ def mspar(list, AC, F_SP, B_SP, T_PL, B_PL, M_SP):  # with respect to AC
     return M_SP_centroid_A
 
 
+
 def centroid_w_mspar(M_SPcentroid, lists_x_y, F_SP, B_SP, T_PL, B_PL, M_SP):
     list_AREA = [F_SP.AREA, B_SP.AREA, T_PL.AREA, B_PL.AREA]
     list_AREA.append(M_SPcentroid[2])
@@ -336,7 +339,7 @@ def centroid_w_mspar(M_SPcentroid, lists_x_y, F_SP, B_SP, T_PL, B_PL, M_SP):
 # ---------------------------------------------------------
 # MOI CALCULATIONS: 
 
-def moi(centroid, centroids, M_SPcentroid, F_SP, B_SP, T_PL, B_PL, M_SP, b):  # Alvaro
+def moi(centroid, centroids, M_SPcentroid, F_SP, B_SP, T_PL, B_PL, M_SP, b, AC):  # Alvaro
 
     t1 = F_SP.T
     t3 = B_SP.T
@@ -359,20 +362,20 @@ def moi(centroid, centroids, M_SPcentroid, F_SP, B_SP, T_PL, B_PL, M_SP, b):  # 
     X = centroid[0]
     Y = centroid[1]
 
-    x1 = abs(X - centroids[0][0])
-    y1 = abs(Y - centroids[1][0])
+    x1 = (abs(X - centroids[0][0]))* AC
+    y1 = (abs(Y - centroids[1][0]))* AC
 
-    x2 = abs(X - centroids[0][2])
-    y2 = abs(Y - centroids[1][2])
+    x2 = abs(X - centroids[0][2]) * AC
+    y2 = abs(Y - centroids[1][2]) * AC
 
-    x3 = abs(X - centroids[0][1])
-    y3 = abs(Y - centroids[1][1])
+    x3 = abs(X - centroids[0][1]) * AC
+    y3 = abs(Y - centroids[1][1]) * AC
 
-    x4 = abs(X - centroids[0][3])
-    y4 = abs(Y - centroids[1][3])
+    x4 = abs(X - centroids[0][3]) * AC
+    y4 = abs(Y - centroids[1][3]) * AC
 
-    x5 = abs(X - M_SPcentroid[0])
-    y5 = abs(X - M_SPcentroid[1])
+    x5 = abs(X - M_SPcentroid[0]) * AC
+    y5 = abs(X - M_SPcentroid[1]) * AC
 
     # CODE 1 to calculate Ixx
 
@@ -545,7 +548,7 @@ def main(b, t1, t2, t3, t4, t5, Ns, As):  # ns - number of stringers #area of st
     else:
         new_centroid = two_spar_centroid_wingbox
 
-    moment_of_inertia1 = moi(new_centroid, two_spar_centroids, middle_spar, F_SP, B_SP, T_PL, B_PL, M_SP, b)
+    moment_of_inertia1 = moi(new_centroid, two_spar_centroids, middle_spar, F_SP, B_SP, T_PL, B_PL, M_SP, b, AC)
 
     values = spar_cntr_dist_TBPL(new_centroid, AC)
 
@@ -584,6 +587,8 @@ def __main_w_c(b):  # For plotting
     B_PL = Part(out[0][3], out[1][3], out[2][3], out[3][3])
     M_SP = Part(0, out[1][4], 0, out[3][4])
 
+    
+
     two_spar_centroids = centroids_of_shapes(AC, F_SP, B_SP, T_PL, B_PL, M_SP)
 
     two_spar_centroid_wingbox = centroid_nomspar(two_spar_centroids, F_SP, B_SP, T_PL, B_PL, M_SP)
@@ -593,13 +598,15 @@ def __main_w_c(b):  # For plotting
     M_SP = Part(middle_spar[3], out[1][4], middle_spar[2], out[3][4])
 
     three_spar_centroid = centroid_w_mspar(middle_spar, two_spar_centroids, F_SP, B_SP, T_PL, B_PL, M_SP)
+    
 
     if b <= 10:
         new_centroid = three_spar_centroid
     else:
         new_centroid = two_spar_centroid_wingbox
 
-    moment_of_inertia1 = moi(new_centroid, two_spar_centroids, middle_spar, F_SP, B_SP, T_PL, B_PL, M_SP, b)
+    moment_of_inertia1 = moi(new_centroid, two_spar_centroids, middle_spar, F_SP, B_SP, T_PL, B_PL, M_SP, b, AC)
+    
 
     values = spar_cntr_dist_TBPL(new_centroid, AC)
 
@@ -609,7 +616,7 @@ def __main_w_c(b):  # For plotting
     moment_of_inertia = [a + b for a, b in zip(moment_of_inertia1, moment_of_inertia2)]
 
     return moment_of_inertia
-
+print(__main_w_c(0))
 
 def __plot(__main_w_c):
     # plot moment of inertia:
@@ -618,7 +625,7 @@ def __plot(__main_w_c):
     plt.title("Ixx")
     plt.ylabel("Moment of inertia (m^4)")
     plt.xlabel("Spanwise location on a wing (m)")
-    plt.ylim(0, 0.009)
+    plt.ylim(0, 0.05)
     yy = []
     xx = []
     span = np.arange(0, 26.7890672, 0.01)
@@ -638,7 +645,7 @@ def __plot(__main_w_c):
     plt.show()
     return
 
-__plot(__main_w_c)
+#__plot(__main_w_c)
 
 # ***********************************************
 # POLAR MOMENT OF INERTIA
@@ -701,7 +708,7 @@ def ixx(b):
     else:
         new_centroid = two_spar_centroid_wingbox
 
-    moment_of_inertia1 = moi(new_centroid, two_spar_centroids, middle_spar, F_SP, B_SP, T_PL, B_PL, M_SP, b)
+    moment_of_inertia1 = moi(new_centroid, two_spar_centroids, middle_spar, F_SP, B_SP, T_PL, B_PL, M_SP, b, AC)
     values = spar_cntr_dist_TBPL(new_centroid, AC)
     moment_of_inertia2 = moi_stringers(b, values, Ns, As)
     moment_of_inertia = [a + b for a, b in zip(moment_of_inertia1, moment_of_inertia2)]
