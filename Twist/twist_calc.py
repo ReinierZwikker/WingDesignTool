@@ -21,9 +21,9 @@ except ModuleNotFoundError:
 database_connector = DatabaseConnector()
 
 G = database_connector.load_wingbox_value("shear_modulus_pa")
-t1 = 0.01  # database_connector.load_wingbox_value("...") left and right spar
-t2 = 0.01  # database_connector.load_wingbox_value("...") skin
-t3 = 0.01  # database_connector.load_wingbox_value("...") mid spar
+t1 = 0.035  # database_connector.load_wingbox_value("...") left and right spar
+t2 = 0.035  # database_connector.load_wingbox_value("...") skin
+t3 = 0.035  # database_connector.load_wingbox_value("...") mid spar
 engine_pos = database_connector.load_value("engine_spanwise_location")
 
 
@@ -123,11 +123,12 @@ print(min(twist_lst_deg()))
 plt.plot(y_span_lst, twist_lst_deg())
 plt.show()
 """
-
+print(min(twist_lst_deg()))
 plt.plot(y_span_lst, twist_lst_deg())
 plt.title("Twist Distribution")
 plt.ylabel("Angle of Twist(deg)")
 plt.xlabel("Spanwise location on a wing(m)")
+plt.grid()
 #plt.ylim(0, 0.075)
 plt.show()
 

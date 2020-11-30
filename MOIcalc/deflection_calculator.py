@@ -60,6 +60,8 @@ for spanwise_location in spanwise_locations_list:
     deflection_derivative_data.append(deflection_derivative_integral.integrate(spanwise_location, -global_step_length))
     deflection_data.append(deflection_integral.integrate(spanwise_location, -global_step_length, -global_step_length))
 
+
+print(f"Deflection is {max(deflection_data)} meters, requirement is {wing_span*0.30} meters")
 #plt.figure(figsize=(20, 5))
 plt.axis('equal')
 plt.minorticks_on()

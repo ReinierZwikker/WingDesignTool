@@ -38,8 +38,8 @@ moment_arm_thrust = 1.5 * radius_engine
 global_length_step = 0.1  # [m]
 
 # Define the flight conditions
-test_velocity = 296  # m/s
-test_density = 0.38035  # kg/m^2
+test_velocity = 236.32  # m/s
+test_density = 1.225  # kg/m^2
 lift_coef_function = aerodynamic_data.lift_coef_function_10
 drag_induced_function = aerodynamic_data.drag_induced_function_10
 moment_coef_function = aerodynamic_data.moment_coef_function_10
@@ -63,11 +63,11 @@ fuel_tank_length = (fuel_tank_engine_stop - fuel_tank_start) + (fuel_tank_stop -
 thickness_to_chord_ratio = database_connector.load_value("thickness_to_chord_ratio")
 cd_0 = database_connector.load_value("cd0")
 
-include_fuel_tanks = True
+include_fuel_tanks = False
 include_engine = True
 fuel_tank_level = 1  # level of the fuel tanks from 0 to 1
 
-load_factor = 1
+load_factor = 4.3
 
 # Define the lift and drag distribution
 def lift_distribution(y, length_step, density, velocity):
@@ -224,4 +224,5 @@ def plot_inertial_loading(z_force_data, x_force_data, x_shear_force_data, x_mome
 
 
 # UNCOMMENT THIS TO PLOT INERTIAL LOADING:
+print(min(calculate_inertial_loading(global_length_step)[6]))
 plot_inertial_loading(*calculate_inertial_loading(global_length_step))
