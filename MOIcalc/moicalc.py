@@ -670,11 +670,11 @@ def ixx(b):
     CHANGE THESE VALUES!
     """
 
-    t1 = 0.02   # spar LE
-    t2 = 0.02   # spar TE
-    t3 = 0.01   # top plate
-    t4 = 0.01   # bottom plate
-    t5 = 0.02  # spar middle
+    t1 = 0.05   # spar LE
+    t2 = 0.05   # spar TE
+    t3 = 0.03   # top plate
+    t4 = 0.03   # bottom plate
+    t5 = 0.05  # spar middle
     As = 0.001  # Area of single stringer
     if b < 10:
         Ns = 20     # N of stringers per plate
