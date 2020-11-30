@@ -32,8 +32,8 @@ C_L_max_clean = database_connector.load_value("cl_max_clean")
 V_C_TRUE = V_C_cruise_altitude     #.load_value("cruise_mach") * np.sqrt(1.4 * 287 * T)
 S = database_connector.load_value("surface_area")
 
-h = 0 #.5 * database_connector.load_value("operating_altitude_m") #database_connector.load_value("operating_altitude_m") #height in m
-w = mtow #oew #+ (0.5 * fuel_weight) # weight
+h =  database_connector.load_value("operating_altitude_m") #database_connector.load_value("operating_altitude_m") #height in m
+w = oew + (0.5 * fuel_weight) # weight
 
 rho_0 = 1.225 #sea
 W = (w/9.81)/0.454 #weight in lb for n_max
@@ -212,7 +212,7 @@ plt.plot([0, 1.15 * VD_plot_max], [1, 1], '--', color="r")
 
 
 plt.ylabel('load factor')  # label on x-axis
-plt.xlabel('EAS')  # label on y-axis
+plt.xlabel('Equivalent Airspeed [m/s]')  # label on y-axis
 
 #show plot
 plt.show()
