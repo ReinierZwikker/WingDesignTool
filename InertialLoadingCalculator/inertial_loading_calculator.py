@@ -38,8 +38,8 @@ moment_arm_thrust = 1.5 * radius_engine
 global_length_step = 0.1  # [m]
 
 # Define the flight conditions
-test_velocity = 236.32  # m/s
-test_density = 1.225  # kg/m^2
+test_velocity = 296  # m/s
+test_density = 0.38035  # kg/m^2
 lift_coef_function = aerodynamic_data.lift_coef_function_10
 drag_induced_function = aerodynamic_data.drag_induced_function_10
 moment_coef_function = aerodynamic_data.moment_coef_function_10
@@ -67,7 +67,7 @@ include_fuel_tanks = True
 include_engine = True
 fuel_tank_level = 1  # level of the fuel tanks from 0 to 1
 
-load_factor = 4.3
+load_factor = 1
 
 # Define the lift and drag distribution
 def lift_distribution(y, length_step, density, velocity):
@@ -81,7 +81,7 @@ def drag_distribution(y, length_step, density, velocity):
 def pitching_moment_function(y, density, velocity, length_step):
     #0.5 rho V^2 S c
     # print(aerodynamic_data.moment_coef_function_10(y))
-    return load_factor * -moment_coef_function(y) * 0.5 * density * (velocity**2) * aerodynamic_data.chord_function(y) * \
+    return load_factor * moment_coef_function(y) * 0.5 * density * (velocity**2) * aerodynamic_data.chord_function(y) * \
            aerodynamic_data.chord_function(y)
 
 
