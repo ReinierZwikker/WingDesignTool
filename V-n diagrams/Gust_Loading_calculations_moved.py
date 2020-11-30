@@ -204,7 +204,8 @@ def V_D(V_C):  # design dive speed
 # Iterations infos
 H_interval = (9, max(107, 12.5 * mean_geometric_chord))
 V_C_cruise_altitude = V_C(ISA_T_P_d(database_connector.load_value("operating_altitude_m"))[0])
-W_list = [OEW, MLW, MTOW]  # List of weights constituting limit conditions
+W_list = [OEW, MLW, MTOW]  # List of weights constituting limit conditions7
+rho_altitude = ISA_T_P_d(operating_altitude)[2]
 
 # REAL PROGRAM (Iterator to find the max load at the maximum conditions)
 
@@ -248,7 +249,7 @@ for H in range(H_interval[0], H_interval[1] + 1, 1):  # gust gradient iterator
                 Delta_n = dn_s(H, WS, a, ISA_values[2], V, H / V, Uds, g_0)
 
                 if Delta_n > list_H_h_W_V_Deltan[4]:
-                    list_H_h_W_V_Deltan = [H, h, X, V, Delta_n]
+                    list_H_h_W_V_Deltan = [H, h, X, V, Delta_n, V * sqrt(rho_altitude / rho_0)]
                     lspc = [H, WS, a, ISA_values[2], V, H / V, Uds, g_0, VD, VC]
 
 print(list_H_h_W_V_Deltan)
@@ -353,7 +354,7 @@ Uref_plot = U_ref(H_plot)
 Uds_plot = U_ds(Uref_plot, F_g, H_plot)
 VS1_plot = V_S1(W_plot, ISA_values[2], rho_0, S, C_L_max_clean)
 
-VC_plot_max = int(V_C_cruise_altitude) * sqrt(ISA_values[2] / rho_0)  # EAS
+VC_plot_max = int(V_C_cruise_altitude) * sqrt(rho_altitude / rho_0)  # EAS
 a_VC = Cl_alpha(Cl_alpha_0, VC_plot_max, ISA_values[0])
 dn_VC = (dn_s(H_plot, WS_plot, a_VC, ISA_values[2], VC_plot_max, H_plot / VC_plot_max, Uds_plot, g_0))
 
