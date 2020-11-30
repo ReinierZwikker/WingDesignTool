@@ -1,7 +1,6 @@
 {
-    "length": 26.7890672,
+    "length": 26.79,
     "height": 0.2,
-    "width": 23,
     "quarter_chord_sweep": 32.34,
     "dihedral_angle": 2,
     "stringers_top": [
@@ -47,5 +46,51 @@
     "sheet_thickness": 0.1,
     "stringer_thickness": 0.1,
     "rib_thickness": 0.1,
-    "stiffener_thickness": 0.1
+    "stiffener_thickness": 0.1,
+    "shear_modulus_gpa": 26,
+    "shear_modulus_pa": 26000000000,
+    "wingbox_points": [
+        [
+            0.15,
+            0.0659
+        ],
+        [
+            0.37216,
+            0.06436956444444444
+        ],
+        [
+            0.6,
+            0.0628
+        ],
+        [
+            0.6,
+            -0.027
+        ],
+        [
+            0.37216,
+            -0.033987093333333336
+        ],
+        [
+            0.15,
+            -0.0408
+        ]
+    ],
+    "wingbox_corner_points": [
+        [
+            0.15,
+            0.0659
+        ],
+        [
+            0.6,
+            0.0628
+        ],
+        [
+            0.6,
+            -0.027
+        ],
+        [
+            0.15,
+            -0.0408
+        ]
+    ]
 }
