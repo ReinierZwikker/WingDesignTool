@@ -657,18 +657,18 @@ def ixx(b):
     CHANGE THESE VALUES!
     """
 
-    t1 = 0.10   # spar LE
-    t2 = 0.10   # spar TE
+    t1 = 0.02   # spar LE
+    t2 = 0.02   # spar TE
     t3 = 0.01   # top plate
     t4 = 0.01   # bottom plate
-    t5 = 0.10   # spar middle
+    t5 = 0.02  # spar middle
     As = 0.001  # Area of single stringer
-    if b < 15:
-        Ns = 50     # N of stringers per plate
+    if b < 10:
+        Ns = 20     # N of stringers per plate
     elif b < 20:
-        Ns = 40
+        Ns = 20
     else:
-        Ns = 30
+        Ns = 20
 
     # stringer_mass = (Ns * 2) * wing_span * As + 4 * 10 * As
 

@@ -60,13 +60,16 @@ for spanwise_location in spanwise_locations_list:
     deflection_derivative_data.append(deflection_derivative_integral.integrate(spanwise_location, -global_step_length))
     deflection_data.append(deflection_integral.integrate(spanwise_location, -global_step_length, -global_step_length))
 
-plt.figure(figsize=(20, 5))
+#plt.figure(figsize=(20, 5))
 plt.axis('equal')
 plt.minorticks_on()
 plt.grid('minor')
 plt.plot([spanwise_locations_list[0], spanwise_locations_list[-1]], [wing_span*0.30, wing_span*0.30], '--r')
 plt.plot(spanwise_locations_list, deflection_data)
-
+plt.title("Bending Deflection")
+plt.ylabel("Vertical Deflection(m)")
+plt.xlabel("Spanwise location on a wing(m)")
+plt.xlim(0,27)
 plt.show()
 
 
