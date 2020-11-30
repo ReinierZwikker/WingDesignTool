@@ -360,9 +360,9 @@ dn_VC = (dn_s(H_plot, WS_plot, a_VC, ISA_values[2], VC_plot_max * sqrt(rho_0 / r
 
 VD_plot_max = int(V_D(VC_plot_max))
 a_VD = Cl_alpha(Cl_alpha_0, VD_plot_max, ISA_values[0])
-dn_VD = (dn_s(H_plot, WS_plot, a_VD, ISA_values[2], VD_plot_max, H_plot / VD_plot_max, 0.5 * Uds_plot, g_0))
+dn_VD = (dn_s(H_plot, WS_plot, a_VD, ISA_values[2], VD_plot_max * sqrt(rho_0 / rho_altitude), H_plot / VD_plot_max / sqrt(rho_0 / rho_altitude), 0.5 * Uds_plot, g_0))
 
-VB_plot_max = int(V_B(WS_plot, ISA_values[2], mean_geometric_chord, Cl_alpha_0, g_0, rho_0, Uref_plot, VC_plot_max,
+VB_plot_max = int(V_B(WS_plot, ISA_values[2], mean_geometric_chord, Cl_alpha(Cl_alpha_0, 75, ISA_values[0]), g_0, rho_0, Uref_plot, VC_plot_max,
                       VS1_plot))
 a_VB = Cl_alpha(Cl_alpha_0, VB_plot_max, ISA_values[0])
 dn_VB = (dn_s(H_plot, WS_plot, a_VB, ISA_values[2], VB_plot_max, H_plot / VB_plot_max, Uds_plot, g_0))

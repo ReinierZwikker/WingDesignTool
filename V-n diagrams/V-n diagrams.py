@@ -6,7 +6,7 @@ import numpy as np
 
 try:
     from Database.database_functions import DatabaseConnector
-    from Gust_Loading_calculations_moved import W_list, U_ref, WoS, U_ds, F_g, rho_0, V_S1, V_C_cruise_altitude
+    from Gust_Loading_calculations_moved import W_list, U_ref, WoS, U_ds, F_g, rho_0, V_S1, V_C_cruise_altitude, rho_altitude
 except ModuleNotFoundError:
     import sys
     from os import path
@@ -16,13 +16,28 @@ except ModuleNotFoundError:
 
     sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
     from Database.database_functions import DatabaseConnector
-    from Gust_Loading_calculations_moved import W_list, U_ref, WoS, U_ds, F_g, rho_0, V_S1, V_C_cruise_altitude
+    from Gust_Loading_calculations_moved import W_list, U_ref, WoS, U_ds, F_g, rho_0, V_S1, V_C_cruise_altitude, rho_altitude
 
 
 
 database_connector = DatabaseConnector()
 
-h = database_connector.load_value("operating_altitude_m") #database_connector.load_value("operating_altitude_m") #height in m
+#constants
+mlw = database_connector.load_value("mlw_n")
+fuel_weight = database_connector.load_value("fuel_max")
+oew = database_connector.load_value("oew")
+mtow = database_connector.load_value("mtow")
+C_L_max_flapped = database_connector.load_value("cl_max_flapped")
+C_L_max_clean = database_connector.load_value("cl_max_clean")
+V_C_TRUE = V_C_cruise_altitude     #.load_value("cruise_mach") * np.sqrt(1.4 * 287 * T)
+S = database_connector.load_value("surface_area")
+
+h = 0 #.5 * database_connector.load_value("operating_altitude_m") #database_connector.load_value("operating_altitude_m") #height in m
+w = mtow #oew #+ (0.5 * fuel_weight) # weight
+
+rho_0 = 1.225 #sea
+W = (w/9.81)/0.454 #weight in lb for n_max
+
 
 # ISA Calculator
 def ISA_T_P_d(h):
@@ -62,19 +77,6 @@ def ISA_T_P_d(h):
 T, p, rho  = ISA_T_P_d(h)
 
 
-#constants
-mlw = database_connector.load_value("mlw_n")
-fuel_weight = database_connector.load_value("fuel_max")
-oew = database_connector.load_value("oew")
-mtow = database_connector.load_value("mtow")
-C_L_max_flapped = database_connector.load_value("cl_max_flapped")
-C_L_max_clean = database_connector.load_value("cl_max_clean")
-V_C_TRUE = V_C_cruise_altitude     #.load_value("cruise_mach") * np.sqrt(1.4 * 287 * T)
-S = database_connector.load_value("surface_area")
-
-rho_0 = 1.225 #sea
-w = oew + (0.5*fuel_weight) #weight
-W = (w/9.81)/0.454 #weight in lb for n_max
 
 #constraints
 n_max = 2.1 + ((24000)/(W + 10000)) #max load factor
@@ -88,7 +90,7 @@ else:
 V_S0 = (np.sqrt((2*w)/(C_L_max_flapped*rho*S)))*np.sqrt(rho/rho_0) #stall speed with flaps extended.(should always be accompanied by a specification of which configuration the flaps are in (e.g. landing, take-off, etc.) EAS.
 V_S1 = (np.sqrt((2*w)/(C_L_max_clean*rho*S)))*np.sqrt(rho/rho_0) #stall speed with flaps retracted EAS.
 V_A = V_S1*(np.sqrt(n_max)) #manoeuvring speed
-V_C = V_C_TRUE*np.sqrt(rho/rho_0) #design cruising speed EAS
+V_C = V_C_TRUE*np.sqrt(rho_altitude/rho_0) #design cruising speed EAS
 V_D = V_C/0.85 #design dive speed
 #V_F = #design flap speed
 V_EAS_0A = np.arange(0, V_A, 0.1)
@@ -171,18 +173,18 @@ Uds_plot = U_ds(Uref_plot, F_g, H_plot)
 from Gust_Loading_calculations_moved import V_S1, V_C, Cl_alpha, Cl_alpha_0, dn_s, g_0, V_D, V_B, mean_geometric_chord  #leave this here
 VS1_plot = V_S1(W_plot, ISA_values[2], rho_0, S, C_L_max_clean)
 
-VC_plot_max = int(V_C_cruise_altitude) * np.sqrt(rho/rho_0)  # EAS
+VC_plot_max = int(V_C_cruise_altitude) * sqrt(rho_altitude / rho_0)  # EAS
 a_VC = Cl_alpha(Cl_alpha_0, VC_plot_max, ISA_values[0])
-dn_VC = (dn_s(H_plot, WS_plot, a_VC, ISA_values[2], VC_plot_max, H_plot / VC_plot_max, Uds_plot, g_0))
+dn_VC = (dn_s(H_plot, WS_plot, a_VC, ISA_values[2], VC_plot_max * sqrt(rho_0 / rho_altitude), H_plot / VC_plot_max / sqrt(rho_0 / rho_altitude), Uds_plot, g_0))
 
 VD_plot_max = int(V_D(VC_plot_max))
 a_VD = Cl_alpha(Cl_alpha_0, VD_plot_max, ISA_values[0])
-dn_VD = (dn_s(H_plot, WS_plot, a_VD, ISA_values[2], VD_plot_max, H_plot / VD_plot_max, 0.5 * Uds_plot, g_0))
+dn_VD = (dn_s(H_plot, WS_plot, a_VD, ISA_values[2], VD_plot_max * sqrt(rho_0 / rho_altitude), H_plot / VD_plot_max / sqrt(rho_0 / rho_altitude), 0.5 * Uds_plot, g_0))
 
-VB_plot_max = int(V_B(WS_plot, ISA_values[2], mean_geometric_chord, Cl_alpha_0, g_0, rho_0, Uref_plot, VC_plot_max,
-                      VS1_plot)) * np.sqrt(rho/rho_0)
+VB_plot_max = int(V_B(WS_plot, ISA_values[2], mean_geometric_chord, Cl_alpha(Cl_alpha_0, 75, ISA_values[0]), g_0, rho_0, Uref_plot, VC_plot_max,
+                      VS1_plot))
 a_VB = Cl_alpha(Cl_alpha_0, VB_plot_max, ISA_values[0])
-dn_VB = (dn_s(H_plot, WS_plot, a_VB, ISA_values[2], VB_plot_max, H_plot / VB_plot_max, Uds_plot, g_0))
+dn_VB = (dn_s(H_plot, WS_plot, a_VB, ISA_values[2], VB_plot_max, H_plot / VB_plot_max, Uds_plot, g_0)
 
 # gust lines
 plt.plot([0, VB_plot_max], [1, 1 + dn_VB], 0.6, color="r")  # x-coor,ycoor,width,color

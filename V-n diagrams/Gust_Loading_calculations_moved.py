@@ -356,16 +356,16 @@ VS1_plot = V_S1(W_plot, ISA_values[2], rho_0, S, C_L_max_clean)
 
 VC_plot_max = int(V_C_cruise_altitude) * sqrt(rho_altitude / rho_0)  # EAS
 a_VC = Cl_alpha(Cl_alpha_0, VC_plot_max, ISA_values[0])
-dn_VC = (dn_s(H_plot, WS_plot, a_VC, ISA_values[2], VC_plot_max, H_plot / VC_plot_max, Uds_plot, g_0))
+dn_VC = (dn_s(H_plot, WS_plot, a_VC, ISA_values[2], VC_plot_max * sqrt(rho_0 / rho_altitude), H_plot / VC_plot_max / sqrt(rho_0 / rho_altitude), Uds_plot, g_0))
 
 VD_plot_max = int(V_D(VC_plot_max))
 a_VD = Cl_alpha(Cl_alpha_0, VD_plot_max, ISA_values[0])
-dn_VD = (dn_s(H_plot, WS_plot, a_VD, ISA_values[2], VD_plot_max, H_plot / VD_plot_max, 0.5 * Uds_plot, g_0))
+dn_VD = (dn_s(H_plot, WS_plot, a_VD, ISA_values[2], VD_plot_max * sqrt(rho_0 / rho_altitude), H_plot / VD_plot_max / sqrt(rho_0 / rho_altitude), 0.5 * Uds_plot, g_0))
 
-VB_plot_max = int(V_B(WS_plot, ISA_values[2], mean_geometric_chord, Cl_alpha_0, g_0, rho_0, Uref_plot, VC_plot_max,
+VB_plot_max = int(V_B(WS_plot, ISA_values[2], mean_geometric_chord, Cl_alpha(Cl_alpha_0, 75, ISA_values[0]), g_0, rho_0, Uref_plot, VC_plot_max,
                       VS1_plot))
 a_VB = Cl_alpha(Cl_alpha_0, VB_plot_max, ISA_values[0])
-dn_VB = (dn_s(H_plot, WS_plot, a_VB, ISA_values[2], VB_plot_max, H_plot / VB_plot_max, Uds_plot, g_0))
+dn_VB = (dn_s(H_plot, WS_plot, a_VB, ISA_values[2], VB_plot_max, H_plot / VB_plot_max, Uds_plot, g_0
 
 # gust lines
 plt.plot([0, VB_plot_max], [1, 1 + dn_VB], 0.6, color="r")  # x-coor,ycoor,width,color
