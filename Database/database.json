@@ -104,5 +104,8 @@
     "rolling_moment_coef_10": -2.31966e-16,
     "cd0": 0.01898,
     "engine_max_thrust": 214000,
-    "comments": "Wing Surface Area is excluding Yehudi\n"
+    "wing_box_centroid_x": 0.37216,
+    "wing_box_centroid_z": 0.01492,
+    "comments1": "Centroid location at y: multiply by chord at y\n",
+    "comments2": "Wing Surface Area is excluding Yehudi\n"
 }

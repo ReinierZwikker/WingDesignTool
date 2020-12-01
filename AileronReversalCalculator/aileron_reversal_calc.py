@@ -18,12 +18,31 @@ database_connector = DatabaseConnector()
 #   dCL/dXi (XFOIL)
 #   dCM0/dXi (XFOIL)
 #   density & velocity (cruise & sea level)
-#   surface area (database)
-#   chord @ aileron (chord function)
+#   surface area (database)    check
+#   chord @ aileron (chord function)    check
 #   K = GJ
 #   e = distance c/4 and shear center (geometry)
-#   G
-#   J
+#   G = shear modulus    check
+#   J = polar moment (calculate)
+
+inboard_aileron_start = database_connector.load_value("inboard_aileron_start")
+inboard_aileron_end = database_connector.load_value("inboard_aileron_end")
+#choose midpoint of the aileron
+chord_inboard_aileron = aerodynamic_data.chord_function(inboard_aileron_start + (inboard_aileron_end-inboard_aileron_start)/2)
+
+outboard_aileron_start = database_connector.load_value("outboard_aileron_start")
+outboard_aileron_end = database_connector.load_value("outboard_aileron_end")
+#choose midpoint of the aileron
+chord_outboard_aileron = aerodynamic_data.chord_function(outboard_aileron_start + (outboard_aileron_end-outboard_aileron_start)/2)
+
+wing_surface_area = database_connector.load_value("surface_area")
+
+#material: AL6061-T6
+shear_modulus = 26 * 10**9  #Pa (Source: http://asm.matweb.com/search/SpecificMaterial.asp?bassnum=MA6061T6)
+
+#For exact location multiply by the chord length
+wing_box_centroid_x = database_connector.load_value("wing_box_centroid_x")
+wing_box_centroid_z = database_connector.load_value("wing_box_centroid_z")
 
 
 
