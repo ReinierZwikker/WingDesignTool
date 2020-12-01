@@ -49,6 +49,8 @@
     "stiffener_thickness": 0.1,
     "shear_modulus_gpa": 26,
     "shear_modulus_pa": 26000000000,
+    "youngs_modulus_pa" : 68900000000,
+    "youngs_modulus_gpa" : 68.9,
     "wingbox_points": [
         [
             0.15,
