@@ -10,7 +10,6 @@ except ModuleNotFoundError:
     import Importer.xflr5 as aerodynamic_data
 
 database_connector = DatabaseConnector()
-
 # assumptions:
 #   shear centre coincides with centroid
 #   two-dimensional flow
@@ -50,6 +49,11 @@ height_wing_box = 1.
 area_stringer = 1.
 area_spar = 1.
 area_ribs = 1.
+
+
+
+inboard_aileron_amount_of_stringers = ''
+outboard_aileron_amount_of_stringers = ''
 
 def get_polar_moment_of_inertia():
     return 1
