@@ -45,5 +45,20 @@ shear_modulus = 26 * 10**9  #Pa (Source: http://asm.matweb.com/search/SpecificMa
 wing_box_centroid_x = database_connector.load_value("wing_box_centroid_x")
 wing_box_centroid_z = database_connector.load_value("wing_box_centroid_z")
 
+width_wing_box = 1.
+height_wing_box = 1.
+area_stringer = 1.
+area_spar = 1.
+area_ribs = 1.
+
 def get_polar_moment_of_inertia():
+    return 1
+
+def get_centroid_wing_box():
+    #wrt to leading edge,[x,z]
+    centroid_wing_box_only = [width_wing_box/2, height_wing_box/2]
+    return 1
+
+def get_distance_e(chord_length):
+    #distance wrt leading edge
     return 1
