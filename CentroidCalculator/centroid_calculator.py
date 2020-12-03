@@ -31,7 +31,6 @@ length_bottom_plate = (math.sqrt((right_top_corner_wingbox[0]-left_top_corner_wi
 height_middle_spar = height_front_spar - math.sqrt((length_bottom_plate/2)**2 - (length_top_plate/2)**2)
 #area_wingbox = length_top_plate * height_front_spar - (length_top_plate * (height_front_spar - height_back_spar))/2
 
-
 plate_thickness = database_connector.load_wingbox_value("plate_thickness")
 spar_thickness = database_connector.load_wingbox_value("spar_thickness")
 
@@ -52,15 +51,65 @@ z_front_spar = (left_top_corner_wingbox[1] + left_bottom_corner_wingbox[1]) * ch
 z_middle_spar = height_middle_spar / 2 + z_bottom_plate
 z_back_spar = (right_top_corner_wingbox[1]+right_bottom_corner_wingbox[1]) * chord_length / 2
 
+## Reinforcements: stringers
+area_top_stringer = database_connector.load_wingbox_value("top_stringer_area")
+area_bottom_stringer = database_connector.load_wingbox_value("bottom_stringer_area")
+def get_amount_of_stringers(spanwise_location, top):
+    amount_of_stringers = 0
+    if top:
+        if spanwise_location < database_connector.load_wingbox_value('top_stringer_lim_point_1'):
+            amount_of_stringers += database_connector.load_wingbox_value('top_number_of_stringers_1')
+        elif spanwise_location < database_connector.load_wingbox_value('top_stringer_lim_point_2'):
+            amount_of_stringers += database_connector.load_wingbox_value('top_number_of_stringers_2')
+        else:
+            amount_of_stringers += database_connector.load_wingbox_value('top_number_of_stringers_3')
+    if not top:
+        if spanwise_location < database_connector.load_wingbox_value('bottom_stringer_lim_point_1'):
+            amount_of_stringers += database_connector.load_wingbox_value('bottom_number_of_stringers_1')
+        elif spanwise_location < database_connector.load_wingbox_value('bottom_stringer_lim_point_2'):
+            amount_of_stringers += database_connector.load_wingbox_value('bottom_number_of_stringers_2')
+        else:
+            amount_of_stringers += database_connector.load_wingbox_value('bottom_number_of_stringers_3')
+    if spanwise_location < 10:
+        amount_of_stringers += 4
+    else:
+        amount_of_stringers += 2
+    return amount_of_stringers
 
 
-top_stringer_area = database_connector.load_wingbox_value("top_stringer_area")
+## get x-coordinates stringers
+def get_x_coordinates_stringer(spanwise_location):
+    x_coordinates_stringers_top = []
+    x_coordinates_stringers_bottom = []
+    number_stringers_top = get_amount_of_stringers(spanwise_location,"top")
+    number_stringers_bottom = get_amount_of_stringers(spanwise_location,"bottom")
+
+    spacing_stringers_top = length_top_plate / number_stringers_top
+    spacing_stringers_bottom = length_bottom_plate / number_stringers_bottom
+
+    for number_stringer in range(1,number_stringers_top+1):
+        x_coordinate_current_stringer = left_top_corner_wingbox[0] + number_stringer * spacing_stringers_top
+        x_coordinates_stringers_top.append(x_coordinate_current_stringer)
+        #print(number_stringer)
+    for number_stringer in range(1,number_stringers_bottom+1):
+        x_coordinate_current_stringer = left_bottom_corner_wingbox[0] + number_stringer * spacing_stringers_bottom
+        x_coordinates_stringers_bottom.append(x_coordinate_current_stringer)
+        #print(number_stringer)
+    return x_coordinates_stringers_top, x_coordinates_stringers_bottom
+
+def get_z_coordinates_stringer(spanwise_location):
+    z_coordinates_stringers_top = []
+    z_coordinates_stringers_bottom = []
+
+
+    return z_coordinates_stringers_top,z_coordinates_stringers_bottom
+
 
 def calculate_x_coordinate_centroid(x_lst,area_lst):
     AX_lst = []
     for index in range(len(x_lst)):
         AX_lst.append(x_lst[index] * area_lst[index])
-        #element +=1
+        #print(index)
 
     sum_area = sum(area_lst)
     sum_AX = sum(AX_lst)
@@ -79,9 +128,23 @@ area_lst = [area_top_plate,area_bottom_plate,area_front_spar,area_middle_spar,ar
 x_coordinates_lst = [x_top_bottom_plate,x_top_bottom_plate,x_front_spar,x_middle_spar,x_back_spar]
 z_coordinates_lst = [z_top_plate,z_bottom_plate,z_front_spar,z_middle_spar,z_back_spar]
 
-#coordinates centroid (wrt LE-chord intersection)
-x_centroid = calculate_x_coordinate_centroid(x_coordinates_lst,area_lst)
-z_centroid = calculate_z_coordinate_centroid(z_coordinates_lst,area_lst)
-print([x_centroid,z_centroid])
+#coordinates centroid without ribs and stringers (wrt LE-chord intersection)
+x_centroid_no_reinforcements = calculate_x_coordinate_centroid(x_coordinates_lst[0:5],area_lst[0:5])
+z_centroid_no_reinforcements = calculate_z_coordinate_centroid(z_coordinates_lst[0:5],area_lst[0:5])
+print("\nThe centroid w.r.t. the LE-chord without any ribs or stringers equals [x,z]: ")
+print([x_centroid_no_reinforcements,z_centroid_no_reinforcements])
+
+#coordinates centroid with only stringers
+x_coordinates_stringers_top, x_coordinates_stringers_bottom = get_x_coordinates_stringer(spanwise_location)
+x_coordinates_lst = x_coordinates_lst + x_coordinates_stringers_top + x_coordinates_stringers_bottom
+for add_area in range(len(x_coordinates_stringers_top)):
+    area_lst.append(area_top_stringer)
+for add_area in range(len(x_coordinates_stringers_bottom)):
+    area_lst.append(area_bottom_stringer)
+x_centroid_stringers_only = calculate_x_coordinate_centroid(x_coordinates_lst,area_lst)
+z_centroid_stringers_only = calculate_z_coordinate_centroid(z_coordinates_lst,area_lst)
+print("\nThe centroid w.r.t. the LE-chord with stringers [x,y]: ")
+print([x_centroid_stringers_only,z_centroid_stringers_only])
 
 
+#print(x_coordinates_lst)
