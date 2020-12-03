@@ -10,9 +10,17 @@ except ModuleNotFoundError:
 
 database_connector = DatabaseConnector()
 
-I = 0 # Moment of inertia per stringer
+pois = database_connector.load_wingbox_value("poisson_ratio")
 E = database_connector.load_wingbox_value("stringer_modulus")
-K = 4 #May vary per section in the wingbox
-def crit_stress_stringer(L): #L is the wingbox section length
-    sigma = (K * (pi ** 2) * E * I) / (L**2)
+kc = 0 #Might vay per section
+t = database_connector.load_wingbox_value("plate_thickness")
+
+
+def plate_crit_force(b): # b is the stringer spacing
+    Fcr = (((pi**2)*kc*E) / (12*(1-(pois**2)))) * ((t/b)**2)
+    return Fcr
+
+
+def plate_crit_stress(b): # b is the stringer spacing
+    sigma = plate_crit_force(b) / (t*b)
     return sigma
