@@ -7,8 +7,8 @@ class DatabaseConnector:
 
     def __init__(self):
         self.__database_folder = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
-        self.__database_file = self.__database_folder + '/database.json'
-        self.__wingbox_file = self.__database_folder + '/wingbox.json'
+        self.__database_file = self.__database_folder + '\\database.json'
+        self.__wingbox_file = self.__database_folder + '\\wingbox.json'
         with open(self.__database_file) as database:
             self.__database_dict = json.load(database)
         with open(self.__wingbox_file) as wingbox:
@@ -30,11 +30,14 @@ class DatabaseConnector:
         try:
             return self.__wingbox_dict[name.lower().replace(" ", "_")]
         except KeyError:
-            print("This value does not exist!")
+            print("This value does not exist! Did you use capital letters?")
             return None
 
     def save_value(self, name, value):
-        self.__database_dict[name] = value
+        self.__database_dict[name.lower().replace(" ", "_")] = value
+
+    def save_wingbox_value(self, name, value):
+        self.__wingbox_dict[name.lower().replace(" ", "_")] = value
 
     def commit_to_database(self):
         with open(self.__database_file + str(2), "w") as databackup:
@@ -42,11 +45,17 @@ class DatabaseConnector:
         with open(self.__database_file, "w") as database:
             json.dump(self.__database_dict, database, indent=4)
 
+    def commit_to_wingbox_definition(self):
+        with open(self.__wingbox_file + str(2), "w") as databackup:
+            json.dump(self.__wingbox_dict, databackup)
+        with open(self.__wingbox_file, "w") as wingbox:
+            json.dump(self.__wingbox_dict, wingbox, indent=4)
+
     def preview_database(self):
         for element in self.__database_dict:
             print(f"{element}: {self.__database_dict[element]}")
 
-    def cleanup_database(self):
+    def _cleanup_database(self):
         if input("Are you sure you want to clean up the database? (Y/n)") == "Y":
             for element in self.__database_dict:
                 self.__database_dict[element.lower()] = self.__database_dict.pop(element)

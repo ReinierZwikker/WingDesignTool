@@ -38,8 +38,8 @@ moment_arm_thrust = 1.5 * radius_engine
 global_length_step = 0.1  # [m]
 
 # Define the flight conditions
-test_velocity = 236  # m/s
-test_density = 0.3  # kg/m^2
+test_velocity = 236.32  # m/s
+test_density = 1.225  # kg/m^2
 lift_coef_function = aerodynamic_data.lift_coef_function_10
 drag_induced_function = aerodynamic_data.drag_induced_function_10
 moment_coef_function = aerodynamic_data.moment_coef_function_10
@@ -63,24 +63,26 @@ fuel_tank_length = (fuel_tank_engine_stop - fuel_tank_start) + (fuel_tank_stop -
 thickness_to_chord_ratio = database_connector.load_value("thickness_to_chord_ratio")
 cd_0 = database_connector.load_value("cd0")
 
-include_fuel_tanks = True
+include_fuel_tanks = False
 include_engine = True
 fuel_tank_level = 1  # level of the fuel tanks from 0 to 1
 
+load_factor = 4.3
 
 # Define the lift and drag distribution
 def lift_distribution(y, length_step, density, velocity):
-    return lift_coef_function(y) * 0.5 * density * (velocity ** 2) * aerodynamic_data.chord_function(y)
+    return load_factor * lift_coef_function(y) * 0.5 * density * (velocity ** 2) * aerodynamic_data.chord_function(y)
 
 
 def drag_distribution(y, length_step, density, velocity):
-    return (drag_induced_function(y) + cd_0) * 0.5 * density * (velocity ** 2) * aerodynamic_data.chord_function(y)
+    return load_factor * (drag_induced_function(y) + cd_0) * 0.5 * density * (velocity ** 2) * aerodynamic_data.chord_function(y)
 
 
 def pitching_moment_function(y, density, velocity, length_step):
     #0.5 rho V^2 S c
     # print(aerodynamic_data.moment_coef_function_10(y))
-    return -moment_coef_function(y) * 0.5 * density * (velocity**2) * aerodynamic_data.chord_function(y) * aerodynamic_data.chord_function(y)
+    return load_factor * moment_coef_function(y) * 0.5 * density * (velocity**2) * aerodynamic_data.chord_function(y) * \
+           aerodynamic_data.chord_function(y)
 
 
 # Calculate the final force distribution
@@ -135,7 +137,7 @@ z_shear_integral = Integration(x_final_force_distribution, min(spanwise_location
 z_moment_integral = Integration(z_shear_integral.get_value, min(spanwise_locations_list), max(spanwise_locations_list), flip_sign=True)
 
 
-def calculate_inertial_loading():
+def calculate_inertial_loading(length_step):
     # Data list for the results
     z_force_data = []
     x_shear_force_data = []
@@ -155,21 +157,21 @@ def calculate_inertial_loading():
 
     # For every spanwise location, first integrate to shear then integrate to moment
     for spanwise_location in spanwise_locations_list:
-        z_force_data.append(z_final_force_distribution(spanwise_location, global_length_step, test_density, test_velocity))
-        x_force_data.append(x_final_force_distribution(spanwise_location, global_length_step, test_density, test_velocity))
-        x_force_data_without_thrust.append(x_final_force_distribution(spanwise_location, global_length_step, test_density, test_velocity, include_thrust=False))
+        z_force_data.append(z_final_force_distribution(spanwise_location, length_step, test_density, test_velocity))
+        x_force_data.append(x_final_force_distribution(spanwise_location, length_step, test_density, test_velocity))
+        x_force_data_without_thrust.append(x_final_force_distribution(spanwise_location, length_step, test_density, test_velocity, include_thrust=False))
 
-        x_shear_force_data.append(x_shear_integral.integrate(spanwise_location, global_length_step, global_length_step, test_density, test_velocity))
-        x_moment_data.append(x_moment_integral.integrate(spanwise_location, global_length_step, global_length_step, test_density, test_velocity))
+        x_shear_force_data.append(x_shear_integral.integrate(spanwise_location, length_step, length_step, test_density, test_velocity))
+        x_moment_data.append(x_moment_integral.integrate(spanwise_location, length_step, length_step, test_density, test_velocity))
 
-        z_shear_force_data.append(z_shear_integral.integrate(spanwise_location, global_length_step, global_length_step, test_density, test_velocity))
-        z_moment_data.append(z_moment_integral.integrate(spanwise_location, global_length_step, global_length_step, test_density, test_velocity))
+        z_shear_force_data.append(z_shear_integral.integrate(spanwise_location, length_step, length_step, test_density, test_velocity))
+        z_moment_data.append(z_moment_integral.integrate(spanwise_location, global_length_step, length_step, test_density, test_velocity))
 
         y_torsion_data.append(
-            pitching_moment_function(spanwise_location, test_density, test_velocity, global_length_step) + add_engine_moment(spanwise_location, global_length_step, moment_arm_engine) - add_thrust_moment(spanwise_location, global_length_step, moment_arm_thrust))
+            pitching_moment_function(spanwise_location, test_density, test_velocity, length_step) + add_engine_moment(spanwise_location, length_step, moment_arm_engine) - add_thrust_moment(spanwise_location, length_step, moment_arm_thrust))
 
     # More time keeping & printing
-    print(f"total time: {(time.time() - start_time_1) / 60:.3f} min")
+    print(f"Total integration time: {(time.time() - start_time_1) / 60:.3f} min")
     print(f"LUT lengths: {len(x_shear_integral.LUT)}, {len(x_moment_integral.LUT)}, {len(z_shear_integral.LUT)}, {len(z_moment_integral.LUT)}")
 
     # Saving results
@@ -183,7 +185,9 @@ def calculate_inertial_loading():
 def plot_inertial_loading(z_force_data, x_force_data, x_force_data_without_thrust, x_shear_force_data, x_moment_data, z_shear_force_data, z_moment_data, y_torsion_data):
     fig, axs = plt.subplots(4, 2)
 
-    fig.suptitle(f"Inertial Loading for V={test_velocity} [m/s] at rho={test_density} [kg/m3] using steps of {global_length_step} [m]", fontsize=20)
+    fig.suptitle(f"Inertial Loading for V={test_velocity} [m/s] at rho={test_density} [kg/m3] using steps of "
+                 f"{spanwise_locations_list[1] - spanwise_locations_list[0]:0.3f} [m]",
+                 fontsize=20)
     # Make plots for the x direction
     fig.subplots_adjust(left=0.07, bottom=0.07, right=0.97, top=0.90, wspace=0.10, hspace=0.30)
     axs[0, 0].set_title("z: Lift and Weight")
@@ -228,4 +232,5 @@ def plot_inertial_loading(z_force_data, x_force_data, x_force_data_without_thrus
 
 
 # UNCOMMENT THIS TO PLOT INERTIAL LOADING:
-plot_inertial_loading(*calculate_inertial_loading())
+print(min(calculate_inertial_loading(global_length_step)[6]))
+plot_inertial_loading(*calculate_inertial_loading(global_length_step))
