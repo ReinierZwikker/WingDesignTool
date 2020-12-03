@@ -34,9 +34,12 @@ E_Modulus = 68.9E9
 # first interval is (0 to y)
 # second interval (0 to 26)
 
-
-with open("../InertialLoadingCalculator/data.pickle", 'rb') as file:
-    data = pickle.load(file)
+try:
+    with open("../InertialLoadingCalculator/data.pickle", 'rb') as file:
+        data = pickle.load(file)
+except FileNotFoundError:
+    with open("./data.pickle", 'rb') as file:
+        data = pickle.load(file)
 
 spanwise_locations_list = data[0]
 x_moment_data = data[3]
@@ -57,13 +60,16 @@ for spanwise_location in spanwise_locations_list:
     deflection_derivative_data.append(deflection_derivative_integral.integrate(spanwise_location, -global_step_length))
     deflection_data.append(deflection_integral.integrate(spanwise_location, -global_step_length, -global_step_length))
 
-plt.figure(figsize=(20, 5))
+#plt.figure(figsize=(20, 5))
 plt.axis('equal')
 plt.minorticks_on()
 plt.grid('minor')
 plt.plot([spanwise_locations_list[0], spanwise_locations_list[-1]], [wing_span*0.30, wing_span*0.30], '--r')
 plt.plot(spanwise_locations_list, deflection_data)
-
+plt.title("Bending Deflection")
+plt.ylabel("Vertical Deflection(m)")
+plt.xlabel("Spanwise location on a wing(m)")
+plt.xlim(0,27)
 plt.show()
 
 
