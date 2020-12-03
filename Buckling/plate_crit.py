@@ -11,8 +11,8 @@ except ModuleNotFoundError:
 database_connector = DatabaseConnector()
 
 pois = database_connector.load_wingbox_value("poisson_ratio")
-E = database_connector.load_wingbox_value("stringer_modulus")
-kc = 0 #Might vay per section
+E = database_connector.load_wingbox_value("youngs_modulus_pa")
+kc = 0 #Might vay per section. Kc needs to be determined manually per section
 t = database_connector.load_wingbox_value("plate_thickness")
 
 
