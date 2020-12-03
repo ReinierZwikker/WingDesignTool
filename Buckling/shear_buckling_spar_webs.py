@@ -3,11 +3,14 @@
 
 try:
     from Database.database_functions import DatabaseConnector
+    from twist_calc import dtheta_multi
 except ModuleNotFoundError:
     import sys
     from os import path
     sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
     from Database.database_functions import DatabaseConnector
+    from twist_calc import dtheta_multi
+
 
 database_connector = DatabaseConnector()
 
