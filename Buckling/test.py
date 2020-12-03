@@ -15,20 +15,15 @@ except ModuleNotFoundError:
     from Integrator import Integration
 
 
-try:
-    with open("../InertialLoadingCalculator/data.pickle", 'rb') as file:
-        data = pickle.load(file)
-except FileNotFoundError:
-    with open("./data.pickle", 'rb') as file:
-        data = pickle.load(file)
+# try:
+#     with open("../InertialLoadingCalculator/data.pickle", 'rb') as file:
+#         data = pickle.load(file)
+# except FileNotFoundError:
+#     with open("./data.pickle", 'rb') as file:
+#         data = pickle.load(file)
 
 
 database_connector = DatabaseConnector()
-
-#carlo added
-Ixx = database_connector.load_wingbox_value("")
-Izz = database_connector.load_wingbox_value("")
-
 
 def normal_stress_stringer(moment_lift, moment_drag, z_location, x_location):
     sigma_stringer = (moment_lift*z_location)/Ixx + (moment_drag*x_location)/Izz
