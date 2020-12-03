@@ -23,14 +23,14 @@ class DatabaseConnector:
         try:
             return self.__database_dict[name.lower().replace(" ", "_")]
         except KeyError:
-            print("This value does not exist!")
+            print(f"There is no value called {name}! Did you use capital letters?")
             return None
 
     def load_wingbox_value(self, name):
         try:
             return self.__wingbox_dict[name.lower().replace(" ", "_")]
         except KeyError:
-            print("This value does not exist! Did you use capital letters?")
+            print(f"There is no value called {name}! Did you use capital letters?")
             return None
 
     def save_value(self, name, value):
