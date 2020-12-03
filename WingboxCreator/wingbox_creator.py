@@ -88,3 +88,5 @@ wingbox_definition = {'length': halfspan,
 # Saving the dict to a file
 with open(wingbox_file_destination, "w") as wingbox_database:
     json.dump(wingbox_definition, wingbox_database, indent=4)
+
+print(wingbox_corner_points)
