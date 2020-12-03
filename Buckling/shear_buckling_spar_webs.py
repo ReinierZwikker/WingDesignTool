@@ -7,6 +7,6 @@ except ModuleNotFoundError:
     from Database.database_functions import DatabaseConnector
 
 
-# impoerting form wingbox database
+# importing form wing-box database
 t_spar = DatabaseConnector.load_wingbox_value("spar_thickness")
 
