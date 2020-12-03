@@ -65,7 +65,7 @@ def dtheta_multi(y):
                         (((((c_one + c_two) * chord / t2) + (b_two * chord / t1) + (b_three * chord / t3)) / (2 * Area_second * chord * chord * G))), -1]])
     solution_vector = np.array([torsion(y), 0, 0])
     q1, q2, dtheta = np.linalg.solve(matrix, solution_vector)
-    return dtheta
+    return q1, q2, dtheta
 
 
 def single_cell_stiffness(y):
@@ -80,7 +80,7 @@ def dtheta_single(y):
 
 def rate_of_twist(y):
     if y <= engine_pos:
-        return dtheta_multi(y)
+        return dtheta_multi(y)[2]
     else:
         return dtheta_single(y)
 
@@ -103,7 +103,7 @@ def twist_lst_deg():
 
 
 def stiffness(y):
-    return torsion(y) / (dtheta_multi(y) * G)
+    return torsion(y) / (dtheta_multi(y)[2] * G)
 
 
 def stiffness_lst():
