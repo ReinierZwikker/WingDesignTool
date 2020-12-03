@@ -41,13 +41,13 @@ mos_list = []
 
 #normal stress stringers due to bending
 def string_stress_normal(bl):
-    M_y = 5*(60-bl)
-    M_x = 4*(60-bl)
+    M_y =
+    M_x =
     I_yy = database_connector.load_wingbox_value("")
     I_xx = database_connector.load_wingbox_value("")
     I_xy = 0
-    x = 0 #not #max distance to centroid
-    y = 3 #not #max distance to centroid
+    x = #max distance to centroid
+    y = #max distance to centroid
     sigma = ((((M_x*I_yy)-(M_y*I_xy))*y)+(((M_y*I_xx)-(M_x*I_xy))*x))/((I_xx*I_yy)-(I_xy)**2)
     return sigma
 
