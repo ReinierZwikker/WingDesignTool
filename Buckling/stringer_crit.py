@@ -1,4 +1,6 @@
 from math import *
+import matplotlib.pyplot as plt
+import numpy as np
 
 try:
     from Database.database_functions import DatabaseConnector
@@ -18,3 +20,4 @@ K = 4 #May vary per section in the wingbox. Needs to be determined manually per 
 def crit_stress_stringer(L): #L is the wingbox section length, thus rib spacing
     sigma = (K * (pi ** 2) * E * I) / (L**2)
     return sigma
+
