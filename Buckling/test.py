@@ -21,7 +21,6 @@ Ixx = database_connector.load_wingbox_value("")
 Izz = database_connector.load_wingbox_value("")
 
 
-
 def normal_stress_stringer(moment_lift, moment_drag, z_location, x_location):
     sigma_stringer = (moment_lift*z_location)/Ixx + (moment_drag*x_location)/Izz
 
@@ -33,7 +32,7 @@ i = 0 #location bl
 
 #lists
 bl_list = []
-string_stress_nomral_list = []
+string_stress_normal_list = []
 mos_list = []
 
 #normal stress stringers due to bending
@@ -55,7 +54,7 @@ def margin_of_safety(applied_stress):
 
 while i <= hb:
     applied_stress = string_stress_normal(i)
-    string_stress_nomral_list.append(applied_stress)
+    string_stress_normal_list.append(applied_stress)
     mos = margin_of_safety(applied_stress)
     mos_list.append(mos)
     bl_list.append(i)
