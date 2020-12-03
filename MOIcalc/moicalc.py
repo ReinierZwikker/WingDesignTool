@@ -599,6 +599,8 @@ def __main_w_c(b):  # For plotting
 
     three_spar_centroid = centroid_w_mspar(middle_spar, two_spar_centroids, F_SP, B_SP, T_PL, B_PL, M_SP)
     
+    print(two_spar_centroid_wingbox)
+    print(three_spar_centroid)
 
     if b <= 10:
         new_centroid = three_spar_centroid
@@ -606,6 +608,7 @@ def __main_w_c(b):  # For plotting
         new_centroid = two_spar_centroid_wingbox
 
     moment_of_inertia1 = moi(new_centroid, two_spar_centroids, middle_spar, F_SP, B_SP, T_PL, B_PL, M_SP, b, AC)
+    
     
 
     values = spar_cntr_dist_TBPL(new_centroid, AC)
@@ -625,7 +628,7 @@ def __plot(__main_w_c):
     plt.title("Ixx")
     plt.ylabel("Moment of inertia (m^4)")
     plt.xlabel("Spanwise location on a wing (m)")
-    plt.ylim(0, 0.05)
+    plt.ylim(0, 0.07)
     yy = []
     xx = []
     span = np.arange(0, 26.7890672, 0.01)
@@ -640,7 +643,7 @@ def __plot(__main_w_c):
     plt.title("Izz")
     plt.ylabel("Moment of inertia (m^4)")
     plt.xlabel("Spanwise location on a wing (m)")
-    plt.ylim(0, 0.4)
+    plt.ylim(0, 0.6)
     plt.plot(span, yy)
     plt.show()
     return
