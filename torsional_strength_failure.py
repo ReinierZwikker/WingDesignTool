@@ -21,7 +21,7 @@ database_connector = DatabaseConnector()
 hb = database_connector.load_value("halfspan")
 
 #normal stress stringers due to bending
-def string_stress_normal(x, y, b):
+def string_stress_normal(x, y, bl):
     M_y =
     M_x =
     I_yy =
@@ -54,7 +54,7 @@ plt.xlabel('span')
 plt.ylabel('margin of safety')
 
 #for line 0 to A
-plt.plot(V_EAS_0A, n_0A, 'c')
+plt.plot(bl, mos, 'c')
 
 #show plot
 plt.show()
