@@ -1,3 +1,6 @@
+
+
+
 try:
     from Database.database_functions import DatabaseConnector
 except ModuleNotFoundError:
@@ -6,7 +9,9 @@ except ModuleNotFoundError:
     sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
     from Database.database_functions import DatabaseConnector
 
+database_connector = DatabaseConnector()
+
 
 # importing form wing-box database
-t_spar = DatabaseConnector.load_wingbox_value("spar_thickness")
+t_spar = database_connector.load_wingbox_value("spar_thickness")
 
