@@ -38,8 +38,8 @@ moment_arm_thrust = 1.5 * radius_engine
 global_length_step = 0.1  # [m]
 
 # Define the flight conditions
-test_velocity = 60  # m/s
-test_density = 1.255  # kg/m^2
+test_velocity = 236  # m/s
+test_density = 0.3  # kg/m^2
 lift_coef_function = aerodynamic_data.lift_coef_function_10
 drag_induced_function = aerodynamic_data.drag_induced_function_10
 moment_coef_function = aerodynamic_data.moment_coef_function_10
@@ -94,8 +94,11 @@ def z_final_force_distribution(y, length_step, density, velocity):
 
 
 # TODO Add contribution due to thrust
-def x_final_force_distribution(y, length_step, density, velocity):
-    return drag_distribution(y, length_step, density, velocity)
+def x_final_force_distribution(y, length_step, density, velocity, include_thrust=include_engine):
+    value = drag_distribution(y, length_step, density, velocity)
+    if spanwise_location_engine - length_step / 2 < y < spanwise_location_engine + length_step / 2 and include_thrust:
+        value -= engine_thrust
+    return value
 
 
 # Adding the point load of the engine after integrating
@@ -139,6 +142,7 @@ def calculate_inertial_loading():
     x_moment_data = []
 
     x_force_data = []
+    x_force_data_without_thrust = []
     z_shear_force_data = []
     z_moment_data = []
 
@@ -153,6 +157,7 @@ def calculate_inertial_loading():
     for spanwise_location in spanwise_locations_list:
         z_force_data.append(z_final_force_distribution(spanwise_location, global_length_step, test_density, test_velocity))
         x_force_data.append(x_final_force_distribution(spanwise_location, global_length_step, test_density, test_velocity))
+        x_force_data_without_thrust.append(x_final_force_distribution(spanwise_location, global_length_step, test_density, test_velocity, include_thrust=False))
 
         x_shear_force_data.append(x_shear_integral.integrate(spanwise_location, global_length_step, global_length_step, test_density, test_velocity))
         x_moment_data.append(x_moment_integral.integrate(spanwise_location, global_length_step, global_length_step, test_density, test_velocity))
@@ -172,10 +177,10 @@ def calculate_inertial_loading():
         pickle.dump((spanwise_locations_list, z_force_data, x_shear_force_data, x_moment_data, x_force_data, z_shear_force_data, z_moment_data,
                      y_torsion_data), file)
 
-    return z_force_data, x_force_data, x_shear_force_data, x_moment_data, z_shear_force_data, z_moment_data, y_torsion_data
+    return z_force_data, x_force_data, x_force_data_without_thrust, x_shear_force_data, x_moment_data, z_shear_force_data, z_moment_data, y_torsion_data
 
 
-def plot_inertial_loading(z_force_data, x_force_data, x_shear_force_data, x_moment_data, z_shear_force_data, z_moment_data, y_torsion_data):
+def plot_inertial_loading(z_force_data, x_force_data, x_force_data_without_thrust, x_shear_force_data, x_moment_data, z_shear_force_data, z_moment_data, y_torsion_data):
     fig, axs = plt.subplots(4, 2)
 
     fig.suptitle(f"Inertial Loading for V={test_velocity} [m/s] at rho={test_density} [kg/m3] using steps of {global_length_step} [m]", fontsize=20)
@@ -194,18 +199,22 @@ def plot_inertial_loading(z_force_data, x_force_data, x_shear_force_data, x_mome
     axs[2, 0].set_ylabel("Moment in x (kNm)")
 
     # Make plots for the z direction
-    axs[0, 1].set_title("x: Drag and Thrust")
-    axs[0, 1].plot(spanwise_locations_list, [x/1000 for x in x_force_data], label="Force")
+    axs[0, 1].set_title("x: Drag without Thrust")
+    axs[0, 1].plot(spanwise_locations_list, [x/1000 for x in x_force_data_without_thrust], label="Force")
     axs[0, 1].set_ylabel("Applied Force in x (kN)")
 
-    axs[1, 1].set_title("z: Shear due to Drag and Thrust")
-    axs[1, 1].plot(spanwise_locations_list, [x/1000 for x in z_shear_force_data], label="Shear")
-    axs[1, 1].set_ylabel("Shear force in z (kN)")
+    axs[1, 1].set_title("x: Drag and Thrust")
+    axs[1, 1].plot(spanwise_locations_list, [x/1000 for x in x_force_data], label="Force")
+    axs[1, 1].set_ylabel("Applied Force in x (kN)")
 
-    axs[2, 1].set_title("z: Moment due to Drag and Thrust")
-    axs[2, 1].plot(spanwise_locations_list, [x/1000 for x in z_moment_data], label="Moment")
-    axs[2, 1].set_ylabel("Moment in z (kNm)")
-    axs[2, 1].set_xlabel("Wing location (m)")
+    axs[2, 1].set_title("z: Shear due to Drag and Thrust")
+    axs[2, 1].plot(spanwise_locations_list, [x/1000 for x in z_shear_force_data], label="Shear")
+    axs[2, 1].set_ylabel("Shear force in z (kN)")
+
+    axs[3, 1].set_title("z: Moment due to Drag and Thrust")
+    axs[3, 1].plot(spanwise_locations_list, [x/1000 for x in z_moment_data], label="Moment")
+    axs[3, 1].set_ylabel("Moment in z (kNm)")
+    axs[3, 1].set_xlabel("Wing location (m)")
 
     # Make plots for the u direction (torsion)
     axs[3, 0].set_title("u: Torsion")
@@ -213,11 +222,10 @@ def plot_inertial_loading(z_force_data, x_force_data, x_shear_force_data, x_mome
     axs[3, 0].set_ylabel("Torsion in y (kNm)")
     axs[3, 0].set_xlabel("Wing location (m)")
 
-    axs[3, 1].set_visible(False)
 
     # show and pop plots
     plt.show()
 
 
 # UNCOMMENT THIS TO PLOT INERTIAL LOADING:
-# plot_inertial_loading(*calculate_inertial_loading())
+plot_inertial_loading(*calculate_inertial_loading())
