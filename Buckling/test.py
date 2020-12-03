@@ -14,6 +14,15 @@ except ModuleNotFoundError:
     from Database.database_functions import DatabaseConnector
     from Integrator import Integration
 
+
+try:
+    with open("../InertialLoadingCalculator/data.pickle", 'rb') as file:
+        data = pickle.load(file)
+except FileNotFoundError:
+    with open("./data.pickle", 'rb') as file:
+        data = pickle.load(file)
+
+
 database_connector = DatabaseConnector()
 
 #carlo added
