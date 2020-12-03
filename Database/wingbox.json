@@ -9,6 +9,7 @@
     "shear_modulus_pa": 26000000000,
     "youngs_modulus_pa" : 68900000000,
     "youngs_modulus_gpa" : 68.9,
+    "ultimate_strength": 310000000,
     "poisson_ratio" : 0.33,
     "wingbox_points": [
         [
