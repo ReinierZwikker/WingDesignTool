@@ -16,6 +16,16 @@ except ModuleNotFoundError:
 
 database_connector = DatabaseConnector()
 
+#carlo added
+Ixx = database_connector.load_wingbox_value("")
+Izz = database_connector.load_wingbox_value("")
+
+
+
+def normal_stress_stringer(moment_lift, moment_drag, z_location, x_location):
+    sigma_stringer = (moment_lift*z_location)/Ixx + (moment_drag*x_location)/Izz
+
+
 #constants
 hb = database_connector.load_value("wing_span")/2
 length_steps = 0.5
