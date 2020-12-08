@@ -17,6 +17,13 @@ database_connector = DatabaseConnector()
 
 
 def get_centroid(spanwise_location, verbose=False):
+    """
+    Calculates the X and Z component of the centroid.
+
+    :param spanwise_location: The location of the cross-section along the span for which the centroid is calculated
+    :param verbose: Print values while calculating
+    :return: The centroid of the cross-section as a list of [X, Z]
+    """
     chord_length = aerodynamic_data.chord_function(spanwise_location)
 
     # wing box configuration
@@ -115,8 +122,9 @@ def get_centroid(spanwise_location, verbose=False):
     # coordinates centroid without ribs and stringers (wrt LE-chord intersection)
     x_centroid_no_reinforcements = calculate_x_coordinate_centroid(x_coordinates_lst[0:5], area_lst[0:5])
     z_centroid_no_reinforcements = calculate_z_coordinate_centroid(z_coordinates_lst[0:5], area_lst[0:5])
-    print("\nThe centroid w.r.t. the LE-chord without any ribs or stringers equals [x,z]: ")
-    print([x_centroid_no_reinforcements, z_centroid_no_reinforcements])
+    if verbose:
+        print("\nThe centroid w.r.t. the LE-chord without any ribs or stringers equals [x,z]: ")
+        print([x_centroid_no_reinforcements, z_centroid_no_reinforcements])
 
     # coordinates centroid with only stringers
     x_coordinates_stringers_top, x_coordinates_stringers_bottom = get_x_coordinates_stringer(spanwise_location)

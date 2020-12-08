@@ -2,7 +2,7 @@ import numpy as np
 
 try:
     from Database.database_functions import DatabaseConnector
-    # from CentroidCalculator.centroid_calculator import
+    from CentroidCalculator.centroid_calculator import get_centroid
     import Importer.xflr5 as aerodynamic_data
 except ModuleNotFoundError:
     import sys
@@ -10,7 +10,7 @@ except ModuleNotFoundError:
 
     sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
     from Database.database_functions import DatabaseConnector
-    # from CentroidCalculator.centroid_calculator import
+    from CentroidCalculator.centroid_calculator import get_centroid
     import Importer.xflr5 as aerodynamic_data
 
 database_connector = DatabaseConnector()
@@ -50,7 +50,7 @@ def get_polar_moment_of_inertia(spanwise_location):
 
     # Local coord system: x from LE to TE, y upwards
 
-    centroid = [0.5, 0.5]
+    centroid = get_centroid(spanwise_location)
 
     top_stringer_area = database_connector.load_wingbox_value('top_stringer_area')
     bottom_stringer_area = database_connector.load_wingbox_value('bottom_stringer_area')
