@@ -3,14 +3,11 @@ import numpy as np
 
 try:
     from Integrator import Integration
-    #from InertialLoadingCalculator.inertial_loading_calculator import ...
     from Database.database_functions import DatabaseConnector
 except ModuleNotFoundError:
     import sys
     from os import path
-
     sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
-    #from InertialLoadingCalculator.inertial_loading_calculator import ...
     from Database.database_functions import DatabaseConnector
     from Integrator import Integration
 
