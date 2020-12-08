@@ -46,10 +46,3 @@ def string_stress_normal(bl):
     z = #max distance to centroid
     sigma = ((((M_x*I_zz)-(M_z*I_xz))*z)+(((M_z*I_xx)-(M_x*I_xz))*x))/((I_xx*I_yy)-(I_xz)**2)
     return sigma
-
-while i <= hb:
-    applied_stress = string_stress_normal(i)
-    string_stress_normal_list.append(applied_stress)
-    mos = margin_of_safety(applied_stress)
-    mos_list.append(mos)
-    i += step
