@@ -90,7 +90,24 @@ def get_centroid(spanwise_location, verbose=False):
         z_coordinates_stringers_top = []
         z_coordinates_stringers_bottom = []
 
-        return z_coordinates_stringers_top, z_coordinates_stringers_bottom
+        number_stringers_top = get_amount_of_stringers(spanwise_location, "top")
+        number_stringers_bottom = get_amount_of_stringers(spanwise_location, "bottom")
+
+        spacing_stringers_top = length_top_plate / number_stringers_top
+        spacing_stringers_bottom = length_bottom_plate / number_stringers_bottom
+
+        #top
+        sin_angle_top = (left_top_corner_wingbox[1] - right_top_corner_wingbox[1])/(length_top_plate)
+        for number_stringer in range(1, number_stringers_top + 1):
+            z_coordinate_current_top_stringer = number_stringer * sin_angle_top * spacing_stringers_top
+            z_coordinates_stringers_top.append(z_coordinate_current_top_stringer)
+        #bottom
+        sin_angle_bottom = (-left_bottom_corner_wingbox[1] - right_top_corner_wingbox[1]) / length_bottom_plate
+        for number_stringer in range(1, number_stringers_bottom + 1):
+            z_coordinate_current_bottom_stringer = -number_stringer * sin_angle_bottom * spacing_stringers_bottom
+            z_coordinates_stringers_bottom.append(z_coordinate_current_bottom_stringer)
+
+        return z_coordinates_stringers_top,z_coordinates_stringers_bottom
 
     def calculate_x_coordinate_centroid(x_lst, area_lst):
         AX_lst = []
@@ -123,7 +140,9 @@ def get_centroid(spanwise_location, verbose=False):
 
     # coordinates centroid with only stringers
     x_coordinates_stringers_top, x_coordinates_stringers_bottom = get_x_coordinates_stringer(spanwise_location)
+    z_coordinates_stringers_top, z_coordinates_stringers_bottom = get_z_coordinates_stringer(spanwise_location)
     x_coordinates_lst = x_coordinates_lst + x_coordinates_stringers_top + x_coordinates_stringers_bottom
+    z_coordinates_lst = z_coordinates_lst + z_coordinates_stringers_top + z_coordinates_stringers_bottom
     for add_area in range(len(x_coordinates_stringers_top)):
         area_lst.append(area_top_stringer)
     for add_area in range(len(x_coordinates_stringers_bottom)):
@@ -133,4 +152,11 @@ def get_centroid(spanwise_location, verbose=False):
     if verbose:
         print("\nThe centroid w.r.t. the LE-chord with stringers [x,y]: ")
         print([x_centroid_stringers_only, z_centroid_stringers_only])
+        # print(x_coordinates_lst)
+        # print(len(x_coordinates_lst))
+        # print(z_coordinates_lst)
+        # print(len(z_coordinates_lst))
+        # print(len(area_lst))
     return [x_centroid_stringers_only, z_centroid_stringers_only]
+
+get_centroid(1.0,verbose=True)
