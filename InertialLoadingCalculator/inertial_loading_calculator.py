@@ -154,7 +154,7 @@ def calculate_inertial_loading(length_step):
     # Time keeping
     start_time_1 = time.time()
 
-    print("Calculating shear and moment.\nIntegrating... (this can take a while)")
+    print("Calculating shear and moment./nIntegrating... (this can take a while)")
 
     # For every spanwise location, first integrate to shear then integrate to moment
     for spanwise_location in spanwise_locations_list:
