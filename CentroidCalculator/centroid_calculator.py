@@ -101,7 +101,11 @@ def get_z_coordinates_stringer(spanwise_location):
     z_coordinates_stringers_top = []
     z_coordinates_stringers_bottom = []
 
+    number_stringers_top = get_amount_of_stringers(spanwise_location, "top")
+    number_stringers_bottom = get_amount_of_stringers(spanwise_location, "bottom")
 
+    spacing_stringers_top = length_top_plate / number_stringers_top
+    spacing_stringers_bottom = length_bottom_plate / num
     return z_coordinates_stringers_top,z_coordinates_stringers_bottom
 
 
