@@ -69,30 +69,30 @@ spar_pos = [0.15, 0.60]
 
 wingbox_corner_points = get_wingbox_corner_points(wingbox_creator_folder + file_name, spar_pos)
 
-
 # Saving all definitions of the wingbox to a dict
 wingbox_definition = {'length': halfspan,
-                      'height': 0.2,
                       'wingbox_corner_points': wingbox_corner_points,  # as a function of chord and total height?
                       'quarter_chord_sweep': quarter_chord_sweep,
                       'dihedral_angle': dihedral_angle,
-                      'stringers_top': [0.1, 0.2, 0.5, 0.7, 0.9],
-                      # Stringer location from LE to TE as fraction of wingbox width
-                      'stringers_bottom': [0.1, 0.2, 0.5, 0.7, 0.9],
-                      # Stringer location from LE to TE as fraction of wingbox width
-                      'stringers_leading': [0.2, 0.5, 0.7],
-                      # Stringer location from bottom to top as fraction of wingbox height
-                      'stringers_trailing': [0.2, 0.5, 0.7],
-                      # Stringer location from bottom to top as fraction of wingbox height
-                      'ribs': [0.1, 0.2, 0.5, 0.7, 0.9],  # Rib location from root to tip as fraction of wingbox length
-                      'stiffeners': [0.1, 0.2, 0.3, 0.5, 0.6, 0.7, 0.9],
-                      # Stiffener location from root to tip as fraction of wingbox length
-                      'sheet_thickness': 0.1,
-                      'stringer_thickness': 0.1,
+                      'top_stringer_lim_point_1': 12,
+                      'top_number_of_stringers_1': 35,
+                      'top_stringer_lim_point_2': 20,
+                      'top_number_of_stringers_2': 25,
+                      'top_number_of_stringers_3': 20,
+                      'top_stringer_area': 0.0015,
+                      'bottom_stringer_lim_point_1': 12,
+                      'bottom_number_of_stringers_1': 35,
+                      'bottom_stringer_lim_point_2': 20,
+                      'bottom_number_of_stringers_2': 25,
+                      'bottom_number_of_stringers_3': 20,
+                      'bottom_stringer_area': 0.0015,
+                      'spar_thickness': 0.035,
+                      'plate_thickness': 0.035,
                       'rib_thickness': 0.1,
-                      'stiffener_thickness': 0.1
                       }
 
 # Saving the dict to a file
 with open(wingbox_file_destination, "w") as wingbox_database:
     json.dump(wingbox_definition, wingbox_database, indent=4)
+
+print(wingbox_corner_points)
