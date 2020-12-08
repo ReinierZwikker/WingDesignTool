@@ -1,6 +1,6 @@
 try:
     from Database.database_functions import DatabaseConnector
-    from CentroidCalculator.polar_moment_calculator import get_amount_of_stringers
+    from CentroidCalculator.centroid_funcs import get_amount_of_stringers
     import Importer.xflr5 as aerodynamic_data
 except ModuleNotFoundError:
     import sys
@@ -8,7 +8,7 @@ except ModuleNotFoundError:
 
     sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
     from Database.database_functions import DatabaseConnector
-    from CentroidCalculator.polar_moment_calculator import get_amount_of_stringers
+    from CentroidCalculator.centroid_funcs import get_amount_of_stringers
     import Importer.xflr5 as aerodynamic_data
 
 import math
