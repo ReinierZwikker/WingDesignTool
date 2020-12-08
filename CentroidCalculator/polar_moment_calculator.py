@@ -1,4 +1,5 @@
 import numpy as np
+import matplotlib.pyplot as plt
 
 try:
     from Database.database_functions import DatabaseConnector
@@ -102,4 +103,13 @@ def get_polar_moment_of_inertia(spanwise_location):
     return polar_moment_of_inertia
 
 
-print(get_polar_moment_of_inertia(26))
+def graph_polar_moment_of_inertia():
+    spanwise_location_list = np.arange(2.5, database_connector.load_value("wing_span") / 2, 0.1)
+    polar_moment_of_inertia_list = []
+    for spanwise_location in spanwise_location_list:
+        polar_moment_of_inertia_list.append(get_polar_moment_of_inertia(spanwise_location))
+    plt.plot(spanwise_location_list, polar_moment_of_inertia_list)
+    plt.show()
+
+
+graph_polar_moment_of_inertia()
