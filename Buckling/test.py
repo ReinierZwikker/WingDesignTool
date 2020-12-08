@@ -14,6 +14,7 @@ except ModuleNotFoundError:
     from Database.database_functions import DatabaseConnector
     from Integrator import Integration
 
+database_connector = DatabaseConnector()
 
 try:
     with open("../InertialLoadingCalculator/data.pickle", 'rb') as file:
@@ -22,8 +23,12 @@ except FileNotFoundError:
     with open("./data.pickle", 'rb') as file:
         data = pickle.load(file)
 
+y_lst = data[0]
+x_moment_lst = data[3]
+z_moment_lst = data[6]
 
-database_connector = DatabaseConnector()
+x_moment = sp.interpolate.interp1d(y_lst, x_moment_lst, kind="cubic", fill_value="extrapolate")
+z_moment = sp.interpolate.interp1d(y_lst, z_moment_lst, kind="cubic", fill_value="extrapolate")
 
 def normal_stress_stringer(moment_lift, moment_drag, z_location, x_location):
     sigma_stringer = (moment_lift*z_location)/Ixx + (moment_drag*x_location)/Izz
