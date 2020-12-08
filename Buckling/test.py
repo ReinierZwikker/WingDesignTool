@@ -6,12 +6,14 @@ import pickle
 try:
     from Integrator import Integration
     from Database.database_functions import DatabaseConnector
+    from MOIcalc.moicalc import inertia
 except ModuleNotFoundError:
     import sys
     from os import path
     sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
     from Database.database_functions import DatabaseConnector
     from Integrator import Integration
+    from MOIcalc.moicalc import inertia
 
 database_connector = DatabaseConnector()
 
@@ -25,30 +27,20 @@ except FileNotFoundError:
 y_lst = data[0]
 x_moment_lst = data[3]
 z_moment_lst = data[6]
+step = y_lst[1] - y_lst[0]
+b = database_connector.load_value("wing_span")/2
 
 x_moment = sp.interpolate.interp1d(y_lst, x_moment_lst, kind="cubic", fill_value="extrapolate")
 z_moment = sp.interpolate.interp1d(y_lst, z_moment_lst, kind="cubic", fill_value="extrapolate")
 
-def normal_stress_stringer(moment_lift, moment_drag, z_location, x_location):
-    sigma_stringer = (moment_lift*z_location)/Ixx + (moment_drag*x_location)/Izz
-
-
-#constants
-hb = database_connector.load_value("wing_span")/2
-length_steps = 0.5
-i = 0 #location bl
-
-#lists
-bl_list = []
-string_stress_normal_list = []
-mos_list = []
 
 #normal stress stringers due to bending
 def string_stress_normal(bl):
-    M_z = 
-    M_x = 
-    I_zz = database_connector.load_wingbox_value("")
-    I_xx = database_connector.load_wingbox_value("")
+    M_z = z_moment(y)
+    M_x = x_moment(y)
+    I = inertia(y)
+    I_zz = I[1]
+    I_xx = I[0]
     I_xz = 0
     x = #max distance to centroid
     z = #max distance to centroid
@@ -60,23 +52,4 @@ while i <= hb:
     string_stress_normal_list.append(applied_stress)
     mos = margin_of_safety(applied_stress)
     mos_list.append(mos)
-    bl_list.append(i)
-    i += length_steps
-
-#plotting-code
-#plot-settings
-#plt.ylim(-3, 3)
-fig = plt.figure()
-y_ticks = np.arange(0, 5, 0.5)
-x_ticks = np.arange(0, hb, 5)
-plt.xticks(x_ticks)
-plt.yticks(y_ticks)
-plt.xlabel('span location')
-plt.ylabel('margin of safety')
-
-#for line 0 to A
-plt.plot(bl_list, mos_list, 'c')
-
-#show plot
-plt.show()
-
+    i += step
