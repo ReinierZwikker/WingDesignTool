@@ -83,11 +83,11 @@ def get_centroid(spanwise_location, verbose=False):
         z_coordinates_stringers_top = []
         z_coordinates_stringers_bottom = []
 
-    number_stringers_top = get_amount_of_stringers(spanwise_location, "top")
-    number_stringers_bottom = get_amount_of_stringers(spanwise_location, "bottom")
+        number_stringers_top = get_amount_of_stringers(spanwise_location, "top")
+        number_stringers_bottom = get_amount_of_stringers(spanwise_location, "bottom")
 
-    spacing_stringers_top = length_top_plate / number_stringers_top
-    spacing_stringers_bottom = length_bottom_plate / num
+        spacing_stringers_top = length_top_plate / number_stringers_top
+        spacing_stringers_bottom = length_bottom_plate / num
         return z_coordinates_stringers_top,z_coordinates_stringers_bottom
 
     def calculate_x_coordinate_centroid(x_lst, area_lst):
@@ -123,6 +123,7 @@ def get_centroid(spanwise_location, verbose=False):
     x_coordinates_lst = x_coordinates_lst + x_coordinates_stringers_top + x_coordinates_stringers_bottom
     for add_area in range(len(x_coordinates_stringers_top)):
         area_lst.append(area_top_stringer)
+    for add_area in range(len(x_coordinates_stringers_bottom)):
     for add_area in range(len(x_coordinates_stringers_bottom)):
         area_lst.append(area_bottom_stringer)
     x_centroid_stringers_only = calculate_x_coordinate_centroid(x_coordinates_lst, area_lst)
