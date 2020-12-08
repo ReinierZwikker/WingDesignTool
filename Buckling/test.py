@@ -4,12 +4,14 @@ import numpy as np
 try:
     from Integrator import Integration
     from Database.database_functions import DatabaseConnector
+    from MOIcalc.moicalc import inertia
 except ModuleNotFoundError:
     import sys
     from os import path
     sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
     from Database.database_functions import DatabaseConnector
     from Integrator import Integration
+    from MOIcalc.moicalc import inertia
 
 database_connector = DatabaseConnector()
 
@@ -23,12 +25,14 @@ except FileNotFoundError:
 y_lst = data[0]
 x_moment_lst = data[3]
 z_moment_lst = data[6]
+step = y_lst[1] - y_lst[0]
 
 x_moment = sp.interpolate.interp1d(y_lst, x_moment_lst, kind="cubic", fill_value="extrapolate")
 z_moment = sp.interpolate.interp1d(y_lst, z_moment_lst, kind="cubic", fill_value="extrapolate")
 
 def normal_stress_stringer(moment_lift, moment_drag, z_location, x_location):
     sigma_stringer = (moment_lift*z_location)/Ixx + (moment_drag*x_location)/Izz
+    return
 
 
 #constants
@@ -42,11 +46,12 @@ string_stress_normal_list = []
 mos_list = []
 
 #normal stress stringers due to bending
-def string_stress_normal(bl):
-    M_z = 
-    M_x = 
-    I_zz = database_connector.load_wingbox_value("")
-    I_xx = database_connector.load_wingbox_value("")
+def string_stress_normal(y):
+    M_z = z_moment(y)
+    M_x = x_moment(y)
+    I = inertia(y)
+    I_zz = I[1]
+    I_xx = I[0]
     I_xz = 0
     x = #max distance to centroid
     z = #max distance to centroid
