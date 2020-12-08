@@ -663,25 +663,25 @@ def __plot(__main_w_c):
 wing_span = database_connector.load_value("wing_span") / 2
 
 
-def ixx(b):
+def inertia(b): #[0] is ixx, [1] is izz
     # t1, t2, t3, t4, t5 , Ns, As
 
     """
     CHANGE THESE VALUES!
     """
 
-    t1 = 0.035  # spar LE
-    t2 = 0.035   # spar TE
-    t3 = 0.035   # top plate
-    t4 = 0.035   # bottom plate
-    t5 = 0.035  # spar middle
-    As = 0.0015  # Area of single stringer
-    if b < 12:
-        Ns = 35     # N of stringers per plate
+    t1 = 0.03  # spar LE
+    t2 = 0.03   # spar TE
+    t3 = 0.045   # top plate
+    t4 = 0.045   # bottom plate
+    t5 = 0.03  # spar middle
+    As = 0.001 # Area of single stringer
+    if b < 10:
+        Ns = 15     # N of stringers per plate
     elif b < 20:
-        Ns = 25
+        Ns = 15
     else:
-        Ns = 20
+        Ns = 15
 
     # stringer_mass = (Ns * 2) * wing_span * As + 4 * 10 * As
 
@@ -712,7 +712,6 @@ def ixx(b):
     values = spar_cntr_dist_TBPL(new_centroid, AC)
     moment_of_inertia2 = moi_stringers(b, values, Ns, As)
     moment_of_inertia = [a + b for a, b in zip(moment_of_inertia1, moment_of_inertia2)]
-    moixx = moment_of_inertia[0]
 
-    return moixx
+    return moment_of_inertia
 

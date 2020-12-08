@@ -7,7 +7,7 @@ from scipy import interpolate
 try:
     from Database.database_functions import DatabaseConnector
     from Integrator import Integration
-    from MOIcalc.moicalc import ixx
+    from MOIcalc.moicalc import inertia
 except ModuleNotFoundError:
     import sys
     from os import path
@@ -15,7 +15,7 @@ except ModuleNotFoundError:
     sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
     from Database.database_functions import DatabaseConnector
     from Integrator import Integration
-    from MOIcalc.moicalc import ixx
+    from MOIcalc.moicalc import inertia
 
 
 database_connector = DatabaseConnector()
@@ -48,7 +48,7 @@ global_step_length = spanwise_locations_list[1] - spanwise_locations_list[0]
 
 
 def deflection_double_derivative(y):
-    return x_moment_func(y) / (E_Modulus * ixx(y))
+    return x_moment_func(y) / (E_Modulus * inertia(y)[0])
 
 
 deflection_derivative_integral = Integration(deflection_double_derivative, wing_span, radius_fuselage, flip_sign=True)
