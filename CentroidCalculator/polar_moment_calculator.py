@@ -19,6 +19,14 @@ except ModuleNotFoundError:
 database_connector = DatabaseConnector()
 
 
+# def get_polar_moment_of_inertia(spanwise_location):
+#     if spanwise_location < database_connector.load_wingbox_value('third_spar_end'):
+#         # Do multi-cell thingy
+#         return
+#     else:
+#         # Do single-cell calc
+#         encl
+
 def get_polar_moment_of_inertia(spanwise_location):
     """
     Calculates the polar moment of inertia of the wingbox around the centroid.
@@ -48,12 +56,21 @@ def get_polar_moment_of_inertia(spanwise_location):
     # Get all plate dimensions by rearranging corner points
     leading_spar_chord = [[wingbox_corner_points[0][0], wingbox_corner_points[0][1]], [wingbox_corner_points[3][0], wingbox_corner_points[3][1]]]
     trailing_spar_chord = [[wingbox_corner_points[1][0], wingbox_corner_points[1][1]], [wingbox_corner_points[2][0], wingbox_corner_points[2][1]]]
+    middle_spar_chord = [[(wingbox_corner_points[0][0] + wingbox_corner_points[1][0]) / 2,
+                          (wingbox_corner_points[0][1] + wingbox_corner_points[1][1]) / 2],
+                         [(wingbox_corner_points[2][0] + wingbox_corner_points[3][0]) / 2,
+                          (wingbox_corner_points[2][1] + wingbox_corner_points[3][1]) / 2]]
+    # print(leading_spar_chord, middle_spar_chord, trailing_spar_chord)
     leading_spar = [x * aerodynamic_data.chord_function(spanwise_location) for x in leading_spar_chord]
     trailing_spar = [x * aerodynamic_data.chord_function(spanwise_location) for x in trailing_spar_chord]
+    middle_spar = [x * aerodynamic_data.chord_function(spanwise_location) for x in middle_spar_chord]
     leading_spar_location = get_location(leading_spar)
     trailing_spar_location = get_location(trailing_spar)
+    middle_spar_location = get_location(middle_spar)
     leading_spar_length = get_length(leading_spar)
     trailing_spar_length = get_length(trailing_spar)
+    middle_spar_length = get_length(middle_spar)
+    middle_spar_end = database_connector.load_wingbox_value('third_spar_end')
     spar_thickness = database_connector.load_wingbox_value('spar_thickness')
 
     top_plate_chord = [[wingbox_corner_points[0][0], wingbox_corner_points[0][1]], [wingbox_corner_points[1][0], wingbox_corner_points[1][1]]]
@@ -66,15 +83,16 @@ def get_polar_moment_of_inertia(spanwise_location):
     bottom_plate_length = get_length(bottom_plate)
     plate_thickness = database_connector.load_wingbox_value('plate_thickness')
 
+
     # Get stringer locations along the top and bottom plate:
     stringer_top_locations = np.transpose([np.linspace(top_plate[0][0], top_plate[1][0], get_amount_of_stringers(spanwise_location, True)),
                                            np.linspace(top_plate[0][1], top_plate[1][1], get_amount_of_stringers(spanwise_location, True))])
     stringer_bottom_locations = np.transpose([np.linspace(bottom_plate[0][0], bottom_plate[1][0], get_amount_of_stringers(spanwise_location, False)),
                                               np.linspace(bottom_plate[0][1], bottom_plate[1][1], get_amount_of_stringers(spanwise_location, False))])
 
-    def ll_axis_term(Area, location):
+    def ll_axis_term(area, location):
         # parallel axis term
-        return Area * (location[0]**2+location[1]**2)
+        return area * (location[0]**2+location[1]**2)
 
     def p_moi_rect(height, width, location):
         # Standard formula and parallel axis term
@@ -82,7 +100,7 @@ def get_polar_moment_of_inertia(spanwise_location):
 
     def p_moi_point(area, location):
         # Treat as point area and neglect terms except for parallel axis term
-        return 0 + ll_axis_term(area, location)
+        return ll_axis_term(area, location)
 
     polar_moment_of_inertia = 0
 
@@ -91,6 +109,9 @@ def get_polar_moment_of_inertia(spanwise_location):
     polar_moment_of_inertia += p_moi_rect(trailing_spar_length, spar_thickness, trailing_spar_location)
     polar_moment_of_inertia += p_moi_rect(plate_thickness, top_plate_length, top_plate_location)
     polar_moment_of_inertia += p_moi_rect(plate_thickness, bottom_plate_length, bottom_plate_location)
+
+    if spanwise_location < middle_spar_end:
+        polar_moment_of_inertia += p_moi_rect(middle_spar_length, spar_thickness, middle_spar_location)
 
     # Due to top stringers
     for stringer_location in stringer_top_locations:

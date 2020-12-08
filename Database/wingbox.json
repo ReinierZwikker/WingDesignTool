@@ -32,7 +32,8 @@
     "bottom_number_of_stringers_2": 25,
     "bottom_number_of_stringers_3": 20,
     "bottom_stringer_area": 0.0010,
-    "spar_thickness": 0.035,
-    "plate_thickness": 0.035,
-    "rib_thickness": 0.01
+    "spar_thickness": 0.014,
+    "plate_thickness": 0.015,
+    "rib_thickness": 0.01,
+    "third_spar_end": 10
 }
