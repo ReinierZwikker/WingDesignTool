@@ -15,12 +15,12 @@ except ModuleNotFoundError:
     from Integrator import Integration
 
 
-# try:
-#     with open("../InertialLoadingCalculator/data.pickle", 'rb') as file:
-#         data = pickle.load(file)
-# except FileNotFoundError:
-#     with open("./data.pickle", 'rb') as file:
-#         data = pickle.load(file)
+try:
+    with open("../InertialLoadingCalculator/data.pickle", 'rb') as file:
+        data = pickle.load(file)
+except FileNotFoundError:
+    with open("./data.pickle", 'rb') as file:
+        data = pickle.load(file)
 
 
 database_connector = DatabaseConnector()
@@ -41,8 +41,8 @@ mos_list = []
 
 #normal stress stringers due to bending
 def string_stress_normal(bl):
-    M_z =
-    M_x =
+    M_z = 
+    M_x = 
     I_zz = database_connector.load_wingbox_value("")
     I_xx = database_connector.load_wingbox_value("")
     I_xz = 0
@@ -50,11 +50,6 @@ def string_stress_normal(bl):
     z = #max distance to centroid
     sigma = ((((M_x*I_zz)-(M_z*I_xz))*z)+(((M_z*I_xx)-(M_x*I_xz))*x))/((I_xx*I_yy)-(I_xz)**2)
     return sigma
-
-def margin_of_safety(applied_stress):
-    failure_stress = 310000000 #failurestress al6061-t6 in Pa(N/m**2)
-    mos = failure_stress/applied_stress
-    return mos
 
 while i <= hb:
     applied_stress = string_stress_normal(i)
