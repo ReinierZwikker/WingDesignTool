@@ -61,16 +61,17 @@ def get_wingbox_corner_points(airfoil_file, spar_lst):
     return wingbox_vertices
 
 
-# file position data
-file_name = "./NACA_2412_many_points_plot.txt"  # the number of points generated is 201
+def save_wingbox_definition():
+    # file position data
+    file_name = "./NACA_2412_many_points_plot.txt"  # the number of points generated is 201
 
-# spar position data
-spar_pos = [0.15, 0.60]
+    # spar position data
+    spar_pos = [0.15, 0.60]
 
-wingbox_corner_points = get_wingbox_corner_points(wingbox_creator_folder + file_name, spar_pos)
+    wingbox_corner_points = get_wingbox_corner_points(wingbox_creator_folder + file_name, spar_pos)
 
-# Saving all definitions of the wingbox to a dict
-wingbox_definition = {'length': halfspan,
+    # Saving all definitions of the wingbox to a dict
+    wingbox_definition = {'length': halfspan,
                       'wingbox_corner_points': wingbox_corner_points,  # as a function of chord and total height?
                       'quarter_chord_sweep': quarter_chord_sweep,
                       'dihedral_angle': dihedral_angle,
@@ -91,8 +92,8 @@ wingbox_definition = {'length': halfspan,
                       'rib_thickness': 0.1,
                       }
 
-# Saving the dict to a file
-with open(wingbox_file_destination, "w") as wingbox_database:
-    json.dump(wingbox_definition, wingbox_database, indent=4)
+    # Saving the dict to a file
+    with open(wingbox_file_destination, "w") as wingbox_database:
+        json.dump(wingbox_definition, wingbox_database, indent=4)
 
 print(wingbox_corner_points)
