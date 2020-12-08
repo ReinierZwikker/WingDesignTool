@@ -102,4 +102,4 @@ def get_polar_moment_of_inertia(spanwise_location):
     return polar_moment_of_inertia
 
 
-print(get_polar_moment_of_inertia(1))
+print(get_polar_moment_of_inertia(26))
