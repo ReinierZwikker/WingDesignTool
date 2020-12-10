@@ -121,7 +121,7 @@ def get_polar_moment_of_inertia(spanwise_location):
     for stringer_location in stringer_bottom_locations:
         polar_moment_of_inertia += p_moi_point(bottom_stringer_area, stringer_location)
 
-    return polar_moment_of_inertia
+    return polar_moment_of_inertia / 100
 
 
 def graph_function(func, title="", x_label="", y_label=""):
