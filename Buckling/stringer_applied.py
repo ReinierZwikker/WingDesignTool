@@ -51,7 +51,7 @@ def string_stress_normal(y):
     wingbox_point = [i * chord_function(y) for i in wingbox_points[1]]
     x = wingbox_point[0] - centroid[0]
     z = wingbox_point[1] - centroid[1]
-    sigma = ((((M_x*I_zz)-(M_z*I_xz))*z)+(((M_z*I_xx)-(M_x*I_xz))*x))/((I_xx*I_zz)-(I_xz)**2)
+    sigma = ((((M_x*I_zz)-(M_z*I_xz))*z)+(((M_z*I_xx)-(M_x*I_xz))*x))/(I_xx*I_zz)
     return sigma
 
 print(string_stress_normal(0))
