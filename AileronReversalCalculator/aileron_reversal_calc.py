@@ -34,6 +34,7 @@ def get_distance_e(chord_length,x_coordinate_wingbox):
     #distance wrt leading edge
     return 0.25 - x_coordinate_wingbox/chord_length
 
+
 def get_aileron_reversal_speed():
     #inboard
     inboard_aileron_start = database_connector.load_value("inboard_aileron_start")
@@ -74,6 +75,7 @@ def get_aileron_reversal_speed():
     print(reversal_speed_outboard_sea_level)
 
     return reversal_speed_inboard_cruise,reversal_speed_inboard_sea_level,reversal_speed_outboard_sea_level
+
 
 def get_aileron_effectiveness():
     # inboard
