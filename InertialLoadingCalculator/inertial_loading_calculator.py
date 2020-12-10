@@ -125,7 +125,7 @@ spanwise_locations_list = np.arange(radius_fuselage, wing_span, global_length_st
 Sign-convention:
 x: towards nose
 y: towards tip
-z: upwards
+z: upwards perpendicular to the aircraft
 counterclockwise
 """
 
