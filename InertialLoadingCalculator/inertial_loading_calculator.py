@@ -63,7 +63,7 @@ fuel_tank_length = (fuel_tank_engine_stop - fuel_tank_start) + (fuel_tank_stop -
 thickness_to_chord_ratio = database_connector.load_value("thickness_to_chord_ratio")
 cd_0 = database_connector.load_value("cd0")
 
-include_fuel_tanks = False
+include_fuel_tanks = True
 include_engine = True
 fuel_tank_level = 1  # level of the fuel tanks from 0 to 1
 
