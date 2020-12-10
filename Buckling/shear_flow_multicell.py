@@ -1,5 +1,9 @@
 """This program calculates the shear flow in the section of the wingbox with two cells"""
 
+import numpy as np
+import pickle
+import scipy as sp
+
 try:
     from Database.database_functions import DatabaseConnector
     from CentroidCalculator.centroid_funcs import get_amount_of_stringers
@@ -15,38 +19,81 @@ except ModuleNotFoundError:
 
 database_connector = DatabaseConnector()
 
-# RELEVANT DATA IMPORT
 
-t_top_skin = database_connector.load_wingbox_value("plate_thickness")
-t_bottom_skin = database_connector.load_wingbox_value("plate_thickness")
-t_le_flange = database_connector.load_wingbox_value("spar_thickness")
-t_te_flange = database_connector.load_wingbox_value("spar_thickness")
-t_mid_flange = database_connector.load_wingbox_value("spar_thickness")
-
-G = database_connector.load_wingbox_value("shear_modulus_pa")
-
-wingbox_points = database_connector.load_wingbox_value("wingbox_points")
+def delta_q():
 
 
-# PROCESSING OF RELEVANT DATA
-# the 6 points are numbered from 1 to 6 from top left to bottom left in clockwise direction
+def shearflow_doublecell(spanwise_location):
+    # importing the torque data
+    try:
+        with open("./data.pickle", 'rb') as file:
+            data = pickle.load(file)
+    except FileNotFoundError:
+        with open("../InertialLoadingCalculator/data.pickle", 'rb') as file:
+            data = pickle.load(file)
+    y_span_lst = data[0]
+    torsion_lst = data[7]
+    torsion = sp.interpolate.interp1d(y_span_lst, torsion_lst, kind="cubic", fill_value="extrapolate")
+    torque_y = torsion(spanwise_location)
 
+    # importing data
+    G = database_connector.load_wingbox_value("shear_modulus_pa")
 
+    t_12 = database_connector.load_wingbox_value("plate_thickness")
+    t_23 = database_connector.load_wingbox_value("plate_thickness")
+    t_34 = database_connector.load_wingbox_value("spar_thickness")
+    t_45 = database_connector.load_wingbox_value("plate_thickness")
+    t_56 = database_connector.load_wingbox_value("plate_thickness")
+    t_61 = database_connector.load_wingbox_value("spar_thickness")
+    t_25 = database_connector.load_wingbox_value("spar_thickness")
 
+    wingbox_points = database_connector.load_wingbox_value("wingbox_points")
 
-# SHEAR DUE TO TORQUE
+    area_top_stringer = database_connector.load_wingbox_value("top_stringer_area")
+    area_bottom_stringer = database_connector.load_wingbox_value("bottom_stringer_area")
 
+    # PROCESSING OF RELEVANT DATA
+    # the 6 points are numbered from 1 to 6 from top left to bottom left in clockwise direction
+    coordinates_1 = wingbox_points[0]
+    coordinates_2 = wingbox_points[1]
+    coordinates_3 = wingbox_points[2]
+    coordinates_4 = wingbox_points[3]
+    coordinates_5 = wingbox_points[4]
+    coordinates_6 = wingbox_points[5]
 
-# def dtheta_multi(y):
-#     chord = chord_function(y)
-#     matrix = np.array([[2 * Area_first * chord * chord, 2 * Area_second * chord * chord, 0],
-#                        [(((((a_one + a_two) * chord) / t2) + (b_one * chord / t1) + (b_three * chord / t3)) / (2 * Area_first * chord * chord * G)),
-#                         -1 * ((b_three * chord / t3) / (2 * Area_first * chord * chord * G)), -1],
-#                        [-1 * ((b_three * chord / t3) / (2 * Area_second * chord * chord * G)),
-#                         (((((c_one + c_two) * chord / t2) + (b_two * chord / t1) + (b_three * chord / t3)) / (2 * Area_second * chord * chord * G))), -1]])
-#     solution_vector = np.array([torsion(y), 0, 0])
-#     q1, q2, dtheta = np.linalg.solve(matrix, solution_vector)
-#     return q1, q2, dtheta
+    chord_length = aerodynamic_data.chord_function(spanwise_location)
+
+    length_12 = abs(coordinates_1[0] - coordinates_2[0]) * chord_length
+    length_23 = abs(coordinates_2[0] - coordinates_3[0]) * chord_length
+    length_34 = abs(coordinates_3[1] - coordinates_4[1]) * chord_length
+    length_45 = abs(coordinates_4[0] - coordinates_5[0]) * chord_length
+    length_56 = abs(coordinates_5[0] - coordinates_6[0]) * chord_length
+    length_61 = abs(coordinates_6[1] - coordinates_1[1]) * chord_length
+    length_25 = abs(coordinates_2[1] - coordinates_5[1]) * chord_length
+
+    encl_area_1256 = (length_25 + length_61) * length_12 / 2
+    encl_area_2345 = (length_25 + length_34) * length_23 / 2
+
+    # SHEAR DUE TO TORQUE
+    matrix_t = np.array([[2 * encl_area_1256, 2 * encl_area_2345, 0],
+                         [1 / (2 * encl_area_1256 * G) * (1 / t_12 + 1 / t_61 + 1 / t_25 + 1 / t_56),
+                          1 / (2 * encl_area_1256 * G) * (- 1 / t_25), -1],
+                         [1 / (2 * encl_area_2345 * G) * (- 1 / t_25),
+                          1 / (2 * encl_area_2345 * G) * (1 / t_23 + 1 / t_34 + 1 / t_45 + 1 / t_25), -1]])
+    solution_vector_t = np.array([0, 0, torque_y])
+    q_t_1256, q_t_2345, dtheta_t = np.linalg.solve(matrix_t, solution_vector_t)
+
+    # SHEAR DUE TO VERTICAL FORCE
+    matrix_s = np.array([[2 * encl_area_1256, 2 * encl_area_2345, 0],
+                         [1 / (2 * encl_area_1256 * G) * (1 / t_12 + 1 / t_61 + 1 / t_25 + 1 / t_56),
+                          1 / (2 * encl_area_1256 * G) * (- 1 / t_25), -1],
+                         [1 / (2 * encl_area_2345 * G) * (- 1 / t_25),
+                          1 / (2 * encl_area_2345 * G) * (1 / t_23 + 1 / t_34 + 1 / t_45 + 1 / t_25), -1]])
+    solution_vector_s = np.array([0, 0, torque_y])
+    q_t_1256, q_t_2345, dtheta_t = np.linalg.solve(matrix_s, solution_vector_s)
+
+    return
+
 
 def get_centroid(spanwise_location, verbose=False):
     """
@@ -56,23 +103,6 @@ def get_centroid(spanwise_location, verbose=False):
     :param verbose: Print values while calculating
     :return: The centroid of the cross-section as a list of [X, Z]
     """
-    chord_length = aerodynamic_data.chord_function(spanwise_location)
-
-    # wing box configuration
-    wingbox_corner_points = database_connector.load_wingbox_value("wingbox_corner_points")
-    left_top_corner_wingbox = wingbox_corner_points[0]
-    left_bottom_corner_wingbox = wingbox_corner_points[3]
-    right_top_corner_wingbox = wingbox_corner_points[1]
-    right_bottom_corner_wingbox = wingbox_corner_points[2]
-
-    length_top_plate = (math.sqrt((right_top_corner_wingbox[0] - left_top_corner_wingbox[0]) ** 2 +
-                                  (left_top_corner_wingbox[1] - right_top_corner_wingbox[1]) ** 2)) * chord_length
-    height_front_spar = (left_top_corner_wingbox[1] - left_bottom_corner_wingbox[1]) * chord_length
-    height_back_spar = (right_top_corner_wingbox[1] - right_bottom_corner_wingbox[1]) * chord_length
-    length_bottom_plate = (math.sqrt((right_top_corner_wingbox[0] - left_top_corner_wingbox[0]) ** 2 +
-                                     (-left_bottom_corner_wingbox[1] + right_bottom_corner_wingbox[1]) ** 2)) * chord_length
-    height_middle_spar = height_front_spar - math.sqrt((length_bottom_plate / 2) ** 2 - (length_top_plate / 2) ** 2)
-    # area_wingbox = length_top_plate * height_front_spar - (length_top_plate * (height_front_spar - height_back_spar))/2
 
     plate_thickness = database_connector.load_wingbox_value("plate_thickness")
     spar_thickness = database_connector.load_wingbox_value("spar_thickness")
@@ -86,7 +116,8 @@ def get_centroid(spanwise_location, verbose=False):
     x_top_bottom_plate = (left_top_corner_wingbox[0] + right_top_corner_wingbox[0]) * chord_length / 2
     x_front_spar = left_top_corner_wingbox[0] * chord_length
     x_back_spar = right_top_corner_wingbox[0] * chord_length
-    x_middle_spar = (left_top_corner_wingbox[0] + (right_top_corner_wingbox[0] - left_top_corner_wingbox[0]) / 2) * chord_length
+    x_middle_spar = (left_top_corner_wingbox[0] + (
+            right_top_corner_wingbox[0] - left_top_corner_wingbox[0]) / 2) * chord_length
 
     z_top_plate = (left_top_corner_wingbox[1] + right_top_corner_wingbox[1]) * chord_length / 2
     z_bottom_plate = (left_bottom_corner_wingbox[1] + right_bottom_corner_wingbox[1]) * chord_length / 2
@@ -95,8 +126,6 @@ def get_centroid(spanwise_location, verbose=False):
     z_back_spar = (right_top_corner_wingbox[1] + right_bottom_corner_wingbox[1]) * chord_length / 2
 
     # Reinforcements: stringers
-    area_top_stringer = database_connector.load_wingbox_value("top_stringer_area")
-    area_bottom_stringer = database_connector.load_wingbox_value("bottom_stringer_area")
 
     def get_x_coordinates_stringer(spanwise_location):
         # get x-coordinates stringers
@@ -128,18 +157,18 @@ def get_centroid(spanwise_location, verbose=False):
         spacing_stringers_top = length_top_plate / number_stringers_top
         spacing_stringers_bottom = length_bottom_plate / number_stringers_bottom
 
-        #top
-        sin_angle_top = (left_top_corner_wingbox[1] - right_top_corner_wingbox[1])/(length_top_plate)
+        # top
+        sin_angle_top = (left_top_corner_wingbox[1] - right_top_corner_wingbox[1]) / (length_top_plate)
         for number_stringer in range(1, number_stringers_top + 1):
             z_coordinate_current_top_stringer = number_stringer * sin_angle_top * spacing_stringers_top
             z_coordinates_stringers_top.append(z_coordinate_current_top_stringer)
-        #bottom
+        # bottom
         sin_angle_bottom = (-left_bottom_corner_wingbox[1] - right_top_corner_wingbox[1]) / length_bottom_plate
         for number_stringer in range(1, number_stringers_bottom + 1):
             z_coordinate_current_bottom_stringer = -number_stringer * sin_angle_bottom * spacing_stringers_bottom
             z_coordinates_stringers_bottom.append(z_coordinate_current_bottom_stringer)
 
-        return z_coordinates_stringers_top,z_coordinates_stringers_bottom
+        return z_coordinates_stringers_top, z_coordinates_stringers_bottom
 
     def calculate_x_coordinate_centroid(x_lst, area_lst):
         AX_lst = []
