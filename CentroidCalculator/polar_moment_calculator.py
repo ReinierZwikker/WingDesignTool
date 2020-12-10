@@ -121,7 +121,7 @@ def get_polar_moment_of_inertia(spanwise_location):
     for stringer_location in stringer_bottom_locations:
         polar_moment_of_inertia += p_moi_point(bottom_stringer_area, stringer_location)
 
-    return polar_moment_of_inertia / 100
+    return polar_moment_of_inertia * 0.16
 
 
 def graph_function(func, title="", x_label="", y_label=""):
@@ -199,6 +199,6 @@ def get_torsional_constant(spanwise_location):
     return (4 * enclosed_area**2) / integral_equivalent
 
 
-# graph_function(get_polar_moment_of_inertia, title="Polar Moment of Inertia", x_label="Half span [m]", y_label="Inertia [m4]")
-# graph_function(get_torsional_constant, title="Polar Moment of Inertia", x_label="Half span [m]", y_label="Inertia [m4]")
-# plt.show()
+graph_function(get_polar_moment_of_inertia, title="Polar Moment of Inertia", x_label="Half span [m]", y_label="Inertia [m4]")
+graph_function(get_torsional_constant, title="Polar Moment of Inertia", x_label="Half span [m]", y_label="Inertia [m4]")
+plt.show()
