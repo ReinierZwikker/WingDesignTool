@@ -158,5 +158,3 @@ def get_centroid(spanwise_location, verbose=False):
         # print(len(z_coordinates_lst))
         # print(len(area_lst))
     return [x_centroid_stringers_only, z_centroid_stringers_only]
-
-# get_centroid(1.0,verbose=True)

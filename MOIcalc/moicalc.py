@@ -6,12 +6,14 @@ import math
 
 try:
     from Database.database_functions import DatabaseConnector
+    from CentroidCalculator.centroid_calculator import get_centroid
 except ModuleNotFoundError:
     import sys
     from os import path
 
     sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
     from Database.database_functions import DatabaseConnector
+    from CentroidCalculator.centroid_calculator import get_centroid
 
 database_connector = DatabaseConnector()
 
@@ -616,7 +618,7 @@ def __main_w_c(b):  # For plotting
     moment_of_inertia = [a + b for a, b in zip(moment_of_inertia1, moment_of_inertia2)]
 
     return moment_of_inertia
-print(__main_w_c(0))
+
 
 def __plot(__main_w_c):
     # plot moment of inertia:
@@ -703,10 +705,12 @@ def inertia(b): #[0] is ixx, [1] is izz
     M_SP = Part(middle_spar[3], out[1][4], middle_spar[2], out[3][4])
     three_spar_centroid = centroid_w_mspar(middle_spar, two_spar_centroids, F_SP, B_SP, T_PL, B_PL, M_SP)
 
-    if b <= 10:
-        new_centroid = three_spar_centroid
-    else:
-        new_centroid = two_spar_centroid_wingbox
+    #if b <= 10:
+    #    new_centroid = three_spar_centroid
+    #else:
+    #    new_centroid = two_spar_centroid_wingbox
+
+    new_centroid = [i / AC for i in get_centroid(b, verbose=False)]
 
     moment_of_inertia1 = moi(new_centroid, two_spar_centroids, middle_spar, F_SP, B_SP, T_PL, B_PL, M_SP, b, AC)
     values = spar_cntr_dist_TBPL(new_centroid, AC)
@@ -714,4 +718,3 @@ def inertia(b): #[0] is ixx, [1] is izz
     moment_of_inertia = [a + b for a, b in zip(moment_of_inertia1, moment_of_inertia2)]
 
     return moment_of_inertia
-
