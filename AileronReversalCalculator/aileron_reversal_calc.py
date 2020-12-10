@@ -52,8 +52,11 @@ def get_aileron_reversal_speed():
     # choose midpoint of the aileron
     spanwise_location_outboard = outboard_aileron_start + (outboard_aileron_end - outboard_aileron_start) / 2
     chord_length_outboard_aileron = aerodynamic_data.chord_function(spanwise_location_outboard)
+    print(chord_length_outboard_aileron)
+    print(chord_length_inboard_aileron)
 
-    wing_surface_area = database_connector.load_value("surface_area") /2
+
+    wing_surface_area = database_connector.load_value("surface_area")
 
     # material: AL6061-T6
     shear_modulus = 26 * 10 ** 9  # Pa (Source: http://asm.matweb.com/search/SpecificMaterial.asp?bassnum=MA6061T6)
@@ -104,7 +107,7 @@ def get_aileron_effectiveness(range_velocity_cruise,range_velocity_sealevel):
     chord_length_outboard_aileron = aerodynamic_data.chord_function(spanwise_location_outboard)
 
     #more variables
-    wing_surface_area = database_connector.load_value("surface_area")/2
+    wing_surface_area = database_connector.load_value("surface_area")
     # material: AL6061-T6
     shear_modulus = 26 * 10 ** 9  # Pa (Source: http://asm.matweb.com/search/SpecificMaterial.asp?bassnum=MA6061T6)
     torsional_stiffness_inboard = get_polar_moment_of_inertia(spanwise_location_inboard)
