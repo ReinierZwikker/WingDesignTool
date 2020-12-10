@@ -105,5 +105,11 @@
     "cd0": 0.01898,
     "engine_max_thrust": 214000,
     "density_cruise_level": 0.38035,
+    "dcl_dxi_inboard_sl": 4.8931416,
+    "dcl_dxi_outboard_sl": 4.5321721,
+    "dcl_dxi_inboard_cruise": 4.904600928,
+    "dcm_dxi_inboard_sl": -0.6703719,
+    "dcm_dxi_outboard_sl": -0.6818312,
+    "dcm_dxi_inboard_cruise": -0.670371856,
     "comments2": "Wing Surface Area is excluding Yehudi\n"
 }
