@@ -118,9 +118,9 @@ def x(centroid, list_coordinates, topstr, botstr, lenghts, slopes, distance, AC)
 
 
 
-centroid = [0.3721599432362377, 0.014923830822928986]
+#centroid = [0.3721599432362377, 0.014923830822928986]
 #print(z(centroid, list_coordinates, 5, 5, lenghts, slopes, distances(5,5,lenghts), 10.44 ))
-print(x(centroid, list_coordinates, 2, 5, lenghts, slopes, distances(2,5,lenghts), 10.44 ))
+#print(x(centroid, list_coordinates, 5, 5, lenghts, slopes, distances(5,5,lenghts), 10.44 ))
   
 
 
