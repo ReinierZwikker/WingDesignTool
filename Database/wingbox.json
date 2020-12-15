@@ -34,5 +34,6 @@
     "bottom_stringer_area": 0.0015,
     "spar_thickness": 0.03,
     "plate_thickness": 0.045,
-    "rib_thickness": 0.1
+    "rib_thickness": 0.1,
+    "third_spar_end": 10
 }
