@@ -18,7 +18,7 @@ K = 4 #May vary per section in the wingbox. Needs to be determined manually per 
 
 
 def crit_stress_stringer(y): #L is the wingbox section length, thus rib spacing. 
-    if y < .. :
+    if y < 4:
         L = ..
     if .. < y < ..:
         L = ..
