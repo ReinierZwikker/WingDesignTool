@@ -121,16 +121,16 @@ def get_polar_moment_of_inertia(spanwise_location):
     for stringer_location in stringer_bottom_locations:
         polar_moment_of_inertia += p_moi_point(bottom_stringer_area, stringer_location)
 
-    return polar_moment_of_inertia
+    return polar_moment_of_inertia * 0.16
 
 
-def graph_function(func, title="", x_label="", y_label=""):
+def graph_function(func, title="", x_label="", y_label="", label="", style='-'):
     spanwise_location_list = np.arange(2.5, database_connector.load_value("wing_span") / 2, 0.1)
     func_list = []
     for spanwise_location in spanwise_location_list:
         func_list.append(func(spanwise_location))
     # plt.xkcd()
-    plt.plot(spanwise_location_list, func_list)
+    plt.plot(spanwise_location_list, func_list, style, label=label)
     plt.title(title)
     plt.xlabel(x_label)
     plt.ylabel(y_label)
@@ -138,16 +138,9 @@ def graph_function(func, title="", x_label="", y_label=""):
 
 
 def get_torsional_constant(spanwise_location):
-    centroid = get_centroid(spanwise_location)
-
-    top_stringer_area = database_connector.load_wingbox_value('top_stringer_area')
-    bottom_stringer_area = database_connector.load_wingbox_value('bottom_stringer_area')
+    # centroid = get_centroid(spanwise_location)
 
     wingbox_corner_points = database_connector.load_wingbox_value('wingbox_corner_points')
-
-    def get_location(end_points):
-        # Input end_points as [[x1,y1], [x2,y2]]
-        return [(end_points[0][0] + end_points[1][0]) / 2 - centroid[0], (end_points[0][1] + end_points[1][1]) / 2 - centroid[1]]
 
     def get_length(end_points):
         # Input end_points as [[x1,y1], [x2,y2]]
@@ -163,30 +156,17 @@ def get_torsional_constant(spanwise_location):
     leading_spar = [x * aerodynamic_data.chord_function(spanwise_location) for x in leading_spar_chord]
     trailing_spar = [x * aerodynamic_data.chord_function(spanwise_location) for x in trailing_spar_chord]
     middle_spar = [x * aerodynamic_data.chord_function(spanwise_location) for x in middle_spar_chord]
-    leading_spar_location = get_location(leading_spar)
-    trailing_spar_location = get_location(trailing_spar)
-    middle_spar_location = get_location(middle_spar)
     leading_spar_length = get_length(leading_spar)
     trailing_spar_length = get_length(trailing_spar)
-    middle_spar_length = get_length(middle_spar)
-    middle_spar_end = database_connector.load_wingbox_value('third_spar_end')
     spar_thickness = database_connector.load_wingbox_value('spar_thickness')
 
     top_plate_chord = [[wingbox_corner_points[0][0], wingbox_corner_points[0][1]], [wingbox_corner_points[1][0], wingbox_corner_points[1][1]]]
     bottom_plate_chord = [[wingbox_corner_points[2][0], wingbox_corner_points[2][1]], [wingbox_corner_points[3][0], wingbox_corner_points[3][1]]]
     top_plate = [x * aerodynamic_data.chord_function(spanwise_location) for x in top_plate_chord]
     bottom_plate = [x * aerodynamic_data.chord_function(spanwise_location) for x in bottom_plate_chord]
-    top_plate_location = get_location(top_plate)
-    bottom_plate_location = get_location(bottom_plate)
     top_plate_length = get_length(top_plate)
     bottom_plate_length = get_length(bottom_plate)
     plate_thickness = database_connector.load_wingbox_value('plate_thickness')
-
-    # Get stringer locations along the top and bottom plate:
-    stringer_top_locations = np.transpose([np.linspace(top_plate[0][0], top_plate[1][0], get_amount_of_stringers(spanwise_location, True)),
-                                           np.linspace(top_plate[0][1], top_plate[1][1], get_amount_of_stringers(spanwise_location, True))])
-    stringer_bottom_locations = np.transpose([np.linspace(bottom_plate[0][0], bottom_plate[1][0], get_amount_of_stringers(spanwise_location, False)),
-                                              np.linspace(bottom_plate[0][1], bottom_plate[1][1], get_amount_of_stringers(spanwise_location, False))])
 
     def area_segments(p):
         return zip(p, p[1:] + [p[0]])
@@ -199,6 +179,7 @@ def get_torsional_constant(spanwise_location):
     return (4 * enclosed_area**2) / integral_equivalent
 
 
-# graph_function(get_polar_moment_of_inertia, title="Polar Moment of Inertia", x_label="Half span [m]", y_label="Inertia [m4]")
-# graph_function(get_torsional_constant, title="Polar Moment of Inertia", x_label="Half span [m]", y_label="Inertia [m4]")
-# plt.show()
+graph_function(get_polar_moment_of_inertia, title="Polar Moment of Inertia", x_label="Half span [m]", y_label="Inertia [m4]", label="Torsional Stiffness")
+graph_function(get_torsional_constant, title="Polar Moment of Inertia", style='--', x_label="Half span [m]", y_label="Inertia [m4]", label="reference method")
+plt.legend()
+plt.show()
