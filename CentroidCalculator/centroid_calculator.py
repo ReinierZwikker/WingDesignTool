@@ -28,17 +28,17 @@ def get_centroid(spanwise_location, verbose=False):
 
     # wing box configuration
     wingbox_corner_points = database_connector.load_wingbox_value("wingbox_corner_points")
-    left_top_corner_wingbox = wingbox_corner_points[0]
-    left_bottom_corner_wingbox = wingbox_corner_points[3]
-    right_top_corner_wingbox = wingbox_corner_points[1]
-    right_bottom_corner_wingbox = wingbox_corner_points[2]
+    left_top_corner_wingbox = wingbox_corner_points[0] * chord_length
+    left_bottom_corner_wingbox = wingbox_corner_points[3] * chord_length
+    right_top_corner_wingbox = wingbox_corner_points[1] * chord_length
+    right_bottom_corner_wingbox = wingbox_corner_points[2] * chord_length
 
     length_top_plate = (math.sqrt((right_top_corner_wingbox[0] - left_top_corner_wingbox[0]) ** 2 +
-                                  (left_top_corner_wingbox[1] - right_top_corner_wingbox[1]) ** 2)) * chord_length
-    height_front_spar = (left_top_corner_wingbox[1] - left_bottom_corner_wingbox[1]) * chord_length
-    height_back_spar = (right_top_corner_wingbox[1] - right_bottom_corner_wingbox[1]) * chord_length
+                                  (left_top_corner_wingbox[1] - right_top_corner_wingbox[1]) ** 2))
+    height_front_spar = (left_top_corner_wingbox[1] - left_bottom_corner_wingbox[1])
+    height_back_spar = (right_top_corner_wingbox[1] - right_bottom_corner_wingbox[1])
     length_bottom_plate = (math.sqrt((right_top_corner_wingbox[0] - left_top_corner_wingbox[0]) ** 2 +
-                                     (-left_bottom_corner_wingbox[1] + right_bottom_corner_wingbox[1]) ** 2)) * chord_length
+                                     (-left_bottom_corner_wingbox[1] + right_bottom_corner_wingbox[1]) ** 2))
     height_middle_spar = height_front_spar - math.sqrt((length_bottom_plate / 2) ** 2 - (length_top_plate / 2) ** 2)
     # area_wingbox = length_top_plate * height_front_spar - (length_top_plate * (height_front_spar - height_back_spar))/2
 
@@ -51,16 +51,16 @@ def get_centroid(spanwise_location, verbose=False):
     area_top_plate = plate_thickness * length_top_plate
     area_bottom_plate = plate_thickness * length_bottom_plate
 
-    x_top_bottom_plate = (left_top_corner_wingbox[0] + right_top_corner_wingbox[0]) * chord_length / 2
-    x_front_spar = left_top_corner_wingbox[0] * chord_length
-    x_back_spar = right_top_corner_wingbox[0] * chord_length
-    x_middle_spar = (left_top_corner_wingbox[0] + (right_top_corner_wingbox[0] - left_top_corner_wingbox[0]) / 2) * chord_length
+    x_top_bottom_plate = (left_top_corner_wingbox[0] + right_top_corner_wingbox[0]) * 1 / 2
+    x_front_spar = left_top_corner_wingbox[0]
+    x_back_spar = right_top_corner_wingbox[0]
+    x_middle_spar = (left_top_corner_wingbox[0] + (right_top_corner_wingbox[0] - left_top_corner_wingbox[0]) / 2)
 
-    z_top_plate = (left_top_corner_wingbox[1] + right_top_corner_wingbox[1]) * chord_length / 2
-    z_bottom_plate = (left_bottom_corner_wingbox[1] + right_bottom_corner_wingbox[1]) * chord_length / 2
-    z_front_spar = (left_top_corner_wingbox[1] + left_bottom_corner_wingbox[1]) * chord_length / 2
+    z_top_plate = (left_top_corner_wingbox[1] + right_top_corner_wingbox[1]) * 1 / 2
+    z_bottom_plate = (left_bottom_corner_wingbox[1] + right_bottom_corner_wingbox[1]) * 1 / 2
+    z_front_spar = (left_top_corner_wingbox[1] + left_bottom_corner_wingbox[1]) * 1 / 2
     z_middle_spar = height_middle_spar / 2 + z_bottom_plate
-    z_back_spar = (right_top_corner_wingbox[1] + right_bottom_corner_wingbox[1]) * chord_length / 2
+    z_back_spar = (right_top_corner_wingbox[1] + right_bottom_corner_wingbox[1]) * 1 / 2
 
     # Reinforcements: stringers
     area_top_stringer = database_connector.load_wingbox_value("top_stringer_area")
@@ -98,20 +98,19 @@ def get_centroid(spanwise_location, verbose=False):
 
         #top
         sin_angle_top = (left_top_corner_wingbox[1] - right_top_corner_wingbox[1])/(length_top_plate)
+
         for number_stringer in range(1, number_stringers_top + 1):
-            z_coordinate_current_top_stringer = number_stringer * sin_angle_top * spacing_stringers_top
+            z_coordinate_current_top_stringer = left_top_corner_wingbox[1] - number_stringer * sin_angle_top * spacing_stringers_top
             z_coordinates_stringers_top.append(z_coordinate_current_top_stringer)
         #bottom
         sin_angle_bottom = (-left_bottom_corner_wingbox[1] - right_top_corner_wingbox[1]) / length_bottom_plate
         for number_stringer in range(1, number_stringers_bottom + 1):
-            z_coordinate_current_bottom_stringer = number_stringer * sin_angle_bottom * spacing_stringers_bottom
+            z_coordinate_current_bottom_stringer = left_bottom_corner_wingbox[1] - number_stringer * sin_angle_bottom * spacing_stringers_bottom
             z_coordinates_stringers_bottom.append(z_coordinate_current_bottom_stringer)
-        #z axis points up
-        def convert_signs(lst):
-            return [-i for i in lst]
-        z_coordinates_stringers_bottom = convert_signs(z_coordinates_stringers_bottom)
-        print(z_coordinates_stringers_top)
-        print(z_coordinates_stringers_bottom)
+
+        # #z axis points up
+        # print(z_coordinates_stringers_top)
+        # print(z_coordinates_stringers_bottom)
         return z_coordinates_stringers_top,z_coordinates_stringers_bottom
 
     def calculate_x_coordinate_centroid(x_lst, area_lst):
@@ -135,7 +134,7 @@ def get_centroid(spanwise_location, verbose=False):
     def calculate_Ixz(x_lst,z_lst,area_lst):
         IXZ_AXZ_lst = []
         for element in range(len(x_lst)):
-            print(z_lst[element])
+            #print(z_lst[element])
             IXZ_AXZ_lst.append(x_lst[element] * z_lst[element] * area_lst[element])
             #print(element)
         I_XZ = sum(IXZ_AXZ_lst)
@@ -165,7 +164,7 @@ def get_centroid(spanwise_location, verbose=False):
     x_centroid_stringers_only = calculate_x_coordinate_centroid(x_coordinates_lst, area_lst)
     z_centroid_stringers_only = calculate_z_coordinate_centroid(z_coordinates_lst, area_lst)
     if verbose:
-        print("\nThe centroid w.r.t. the LE-chord with stringers [x,y]: ")
+        print("\nThe centroid w.r.t. the LE-chord with stringers [x,z]: ")
         print([x_centroid_stringers_only, z_centroid_stringers_only])
         # print(x_coordinates_lst)
         # print(len(x_coordinates_lst))
@@ -173,7 +172,7 @@ def get_centroid(spanwise_location, verbose=False):
         # print(len(z_coordinates_lst))
         # print(len(area_lst))
     I_XZ = calculate_Ixz(x_coordinates_lst,z_coordinates_lst,area_lst)
-    print(I_XZ)
+
     return [x_centroid_stringers_only, z_centroid_stringers_only, I_XZ]
 
-get_centroid(1.0,verbose=False)
+get_centroid(1.0,verbose=True)
