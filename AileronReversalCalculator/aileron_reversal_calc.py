@@ -167,19 +167,19 @@ def get_aileron_effectiveness(range_velocity_cruise,range_velocity_sealevel):
 def plot_aileron_effectiveness(velocity_cruise_lst, aileron_effectiveness_inboard_cruise_lst, velocity_sealevel_lst, aileron_effectiveness_inboard_sealevel_lst, aileron_effectiveness_outboard_sealevel_lst):
     fig, axs = plt.subplots(2, 2)
 
-    axs[0, 0].set_title("Aileron effectiveness for inboard at cruise level")
+    axs[0, 0].set_title("Aileron effectiveness for the inboard aileron at cruise level")
     axs[0, 0].plot(velocity_cruise_lst, aileron_effectiveness_inboard_cruise_lst, label="Aileron Effectiveness")
     axs[0, 0].set_xlabel("Velocity [m/s]")
     axs[0, 0].set_ylabel("Aileron effectiveness [-]")
 
     axs[0, 1].set_visible(False)
 
-    axs[1, 0].set_title("Aileron effectiveness for inboard at sea level")
+    axs[1, 0].set_title("Aileron effectiveness for the inboard aileron at sea level")
     axs[1, 0].plot(velocity_sealevel_lst,aileron_effectiveness_inboard_sealevel_lst, label="Aileron Effectiveness")
     axs[1, 0].set_xlabel("Velocity [m/s]")
     axs[1, 0].set_ylabel("Aileron effectiveness [-]")
 
-    axs[1, 1].set_title("Aileron effectiveness for outboard at sea level")
+    axs[1, 1].set_title("Aileron effectiveness for the outboard aileron at sea level")
     axs[1, 1].plot(velocity_sealevel_lst,aileron_effectiveness_outboard_sealevel_lst, label="Aileron Effectiveness")
     axs[1, 1].set_xlabel("Velocity [m/s]")
     axs[1, 1].set_ylabel("Aileron effectiveness [-]")
