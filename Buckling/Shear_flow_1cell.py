@@ -1,0 +1,136 @@
+from math import *
+
+try:
+    from Database.database_functions import DatabaseConnector
+except ModuleNotFoundError:
+    import sys
+    from os import path
+    sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
+    from Database.database_functions import DatabaseConnector
+
+database_connector = DatabaseConnector()
+
+#T_num_strg = #number of stringers top
+#B_num_strg = #number of stringers bottom
+#Area_strg = #Area of stringer 
+
+#def x(centroid, coordinates)
+
+#                        0                    1               2                   3   
+list_coordinates = [(0.15, 0.0627513), (0.6, 0.0627513), (0.6, -0.02702924), (0.15, -0.04083288)]
+#unit lenghts
+lenghts = [] 
+
+for i in range(4):
+    k = i + 1
+    if k >= 4:
+        k = 0
+    else:
+        pass
+
+    len = sqrt((list_coordinates[k][0]-list_coordinates[i][0])**2+(list_coordinates[k][1]-list_coordinates[i][1])**2)
+    lenghts.append(len)
+    i = i + 1 
+    #  0Top plate , 1LE spar , 2bottom plate , 3front spar (not adjusted for ac)
+
+#unit slopes
+
+slopes=[]
+for i in range(4):
+    k = i + 1
+    if k >= 4:
+        k = 0
+    else:
+        pass
+
+    if list_coordinates[k][0]==list_coordinates[i][0] or list_coordinates[k][1]==list_coordinates[i][1]:
+        slopes.append(0)
+        i = i+1
+    else:
+
+        slope = (list_coordinates[k][1]-list_coordinates[i][1])/(list_coordinates[k][0]-list_coordinates[i][0])
+        slopes.append(slope)
+        i = i+1
+
+print(lenghts)
+print(slopes)
+#______________________________________________________
+#distance between stringers
+def distances(topstr, botstr, lenghts):
+
+    numbers = [topstr, botstr]
+
+    disttop = (lenghts[0])/(numbers[0]-1)
+    distbot = (lenghts[2])/(numbers[1]-1)
+
+    distance = [] #top, bottom 
+    distance.append(disttop)
+    distance.append(distbot)
+
+    return distance #top, bottom (not adjusted for AC)
+
+#print(distances(5,5,lenghts, 10.44))
+#four stringers always locked 
+
+#def z
+def z(centroid, list_coordinates, topstr, botstr, lenghts, slopes, distance, AC):
+    #centroid = [x,z]
+    #xc = centroid[0]
+    yc = centroid[1]
+    z_list = []
+    #bottom
+
+    for i in range(botstr): #positive down
+        zb = (yc + (-list_coordinates[2][1]) + ( sin(atan(slopes[2]))*lenghts[2])) * AC #adjusted for AC
+
+        z_list.append(zb)
+
+        lenghts[2] = lenghts[2] - distance[1]
+    #top
+    for i in range(topstr): #positive down, thus values are negative
+        zt = (( list_coordinates[1][1]-  yc) + ( sin(atan(slopes[0]))*lenghts[0])) * AC *(-1) #adjusted for AC
+
+        z_list.append(zt)
+
+        lenghts[0] = lenghts[0] - distance[0]
+
+    return z_list #works
+
+def x(centroid, list_coordinates, topstr, botstr, lenghts, slopes, distance, AC):
+    xc = centroid[0]
+    x_list = []
+    c1 = list_coordinates[0][0] #0.15c
+    c2 = list_coordinates[1][0] #0.6c
+
+    #distances towards TE spar are positive   ---------> +
+
+
+
+    for i in range(botstr):
+        xb = (xc - c1 - cos(atan(slopes[2]))*(distance[1])* i )*AC*(-1)
+        x_list.append(xb)
+
+    for i in range(topstr):
+        xt = ( c2 - xc - cos(atan(slopes[0]))*(distance[0])* i )*AC
+        x_list.append(xt)
+
+    return x_list
+
+
+
+centroid = [0.3721599432362377, 0.014923830822928986]
+#print(z(centroid, list_coordinates, 5, 5, lenghts, slopes, distances(5,5,lenghts), 10.44 ))
+print(x(centroid, list_coordinates, 2, 5, lenghts, slopes, distances(2,5,lenghts), 10.44 ))
+  
+
+
+
+    
+
+
+
+
+
+
+
+#def x(centroid, coordinates)
