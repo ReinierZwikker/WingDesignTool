@@ -63,8 +63,10 @@ def get_aileron_reversal_speed():
     #more variables
     torsional_stiffness_inboard = get_polar_moment_of_inertia(spanwise_location_inboard)
     K_inboard = shear_modulus * torsional_stiffness_inboard
+    print(K_inboard)
     torsional_stiffness_outboard = get_polar_moment_of_inertia(spanwise_location_outboard)
     K_outboard = shear_modulus * torsional_stiffness_outboard
+    print(K_outboard)
     CL_alpha = database_connector.load_value("cl-alpha_curve")  #rad
     density_sea_level = 1.225   #kg/m3
     density_cruise_level = database_connector.load_value("density_cruise_level")
@@ -72,6 +74,10 @@ def get_aileron_reversal_speed():
     dCL_dXi_inboard_sealevel = database_connector.load_value("dcl_dxi_inboard_sl")
     dCL_dXi_outboard_sealevel = database_connector.load_value("dcl_dxi_outboard_sl")
     dCL_dXi_inboard_cruise = database_connector.load_value("dcl_dxi_inboard_cruise")
+
+    # dCL_dXi_inboard_sealevel = 0.8
+    # dCL_dXi_outboard_sealevel = 0.8
+    # dCL_dXi_inboard_cruise = 0.8
 
     dCM_dXi_inboard_sealevel = database_connector.load_value("dcm_dxi_inboard_sl")
     dCM_dXi_outboard_sealevel = database_connector.load_value("dcm_dxi_outboard_sl")
