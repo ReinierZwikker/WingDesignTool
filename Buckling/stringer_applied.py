@@ -39,7 +39,7 @@ x_moment = sp.interpolate.interp1d(y_lst, x_moment_lst, kind="cubic", fill_value
 z_moment = sp.interpolate.interp1d(y_lst, z_moment_lst, kind="cubic", fill_value="extrapolate")
 
 
-#normal stress stringers due to bending
+#normal stress stringers due to bending, compression
 def string_stress_normal(y):
     M_z = z_moment(y)
     M_x = x_moment(y)
@@ -54,4 +54,19 @@ def string_stress_normal(y):
     sigma = ((((M_x*I_zz)-(M_z*I_xz))*z)+(((M_z*I_xx)-(M_x*I_xz))*x))/((I_xx*I_zz)- I_xz**2)
     return sigma
 
-print(string_stress_normal(0))
+#normal stress stringers due to bending, tension
+def string_stress_tension(y):
+    M_z = z_moment(y)
+    M_x = x_moment(y)
+    I = inertia(y)
+    I_zz = I[1]
+    I_xx = I[0]
+    I_xz = 0
+    centroid = get_centroid(y)
+    wingbox_point = [i * chord_function(y) for i in wingbox_points[3]]
+    x = centroid[0] - wingbox_point[0]
+    z = centroid[1] - wingbox_point[1]
+    sigma = ((((M_x*I_zz)-(M_z*I_xz))*z)+(((M_z*I_xx)-(M_x*I_xz))*x))/((I_xx*I_zz)- I_xz**2)
+    return sigma
+
+print(string_stress_tension(0))
