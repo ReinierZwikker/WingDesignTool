@@ -54,13 +54,35 @@ def plot(mode='compression'):
 
             #add the same for plate and spars
             
-
     if mode == 'compression':
+        plt.figure()
+        plt.suptitle('Compressive margin of safety per component')
+
+        plt.subplot(131)
+        plt.title('Buckling stringer')
         plt.plot(y_lst, margin_stringer_crit)
+
+        plt.subplot(132)
+        plt.title('Strength stringer')
         plt.plot(y_lst, margin_stringer_strength)
+
+        plt.subplot(133)
+        plt.title('Combined stringer')
         plt.plot(y_lst, margin_stringer)
-        return
     
+        #add the same for plate and spars
+
     elif mode == 'tension':
+        plt.figure()
+        plt.suptitle('Tensional margin of safety per component')
+
+        plt.subplot(311)
+        plt.title("Stringer")
         plt.plot(y_lst, margin_stringer_strength)
-        return
+
+        #add the same for plate and spars
+    
+    plt.show()
+    return
+
+plot(mode='compression')

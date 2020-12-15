@@ -51,7 +51,7 @@ def string_stress_normal(y):
     wingbox_point = [i * chord_function(y) for i in wingbox_points[1]]
     x = wingbox_point[0] - centroid[0]
     z = wingbox_point[1] - centroid[1]
-    sigma = ((((M_x*I_zz)-(M_z*I_xz))*z)+(((M_z*I_xx)-(M_x*I_xz))*x))/((I_xx*I_zz)- I_xz**2)
+    sigma = ((((M_x*I_zz)-(M_z*I_xz))*z)+(((M_z*I_xx)-(M_x*I_xz))*x))/(((I_xx*I_zz)- I_xz**2)*10)
     return sigma
 
 #normal stress stringers due to bending, tension
@@ -66,7 +66,7 @@ def string_stress_tension(y):
     wingbox_point = [i * chord_function(y) for i in wingbox_points[3]]
     x = centroid[0] - wingbox_point[0]
     z = centroid[1] - wingbox_point[1]
-    sigma = ((((M_x*I_zz)-(M_z*I_xz))*z)+(((M_z*I_xx)-(M_x*I_xz))*x))/((I_xx*I_zz)- I_xz**2)
+    sigma = ((((M_x*I_zz)-(M_z*I_xz))*z)+(((M_z*I_xx)-(M_x*I_xz))*x))/(((I_xx*I_zz)- I_xz**2)*10)
     return sigma
 
-print(string_stress_tension(0))
+print(string_stress_normal(0))
