@@ -127,6 +127,14 @@ def get_centroid(spanwise_location, verbose=False):
         sum_AZ = sum(AZ_lst)
         return sum_AZ / sum_area
 
+    def calculate_Ixz(x_lst,z_lst,area_lst):
+        IXY_AXZ_lst = []
+        for element in range(len(x_lst)):
+            IXY_AXZ_lst.append(x_lst[element] * z_lst[element] * area_lst[element])
+        I_XY = sum(IXY_AXZ_lst)
+        return I_XY
+
+
     area_lst = [area_top_plate, area_bottom_plate, area_front_spar, area_middle_spar, area_back_spar]
     x_coordinates_lst = [x_top_bottom_plate, x_top_bottom_plate, x_front_spar, x_middle_spar, x_back_spar]
     z_coordinates_lst = [z_top_plate, z_bottom_plate, z_front_spar, z_middle_spar, z_back_spar]
@@ -157,6 +165,7 @@ def get_centroid(spanwise_location, verbose=False):
         # print(z_coordinates_lst)
         # print(len(z_coordinates_lst))
         # print(len(area_lst))
-    return [x_centroid_stringers_only, z_centroid_stringers_only]
+    I_XY = calculate_Ixz(x_coordinates_lst,z_coordinates_lst,area_lst)
+    return [x_centroid_stringers_only, z_centroid_stringers_only, I_XY]
 
 # get_centroid(1.0,verbose=True)
