@@ -104,9 +104,14 @@ def get_centroid(spanwise_location, verbose=False):
         #bottom
         sin_angle_bottom = (-left_bottom_corner_wingbox[1] - right_top_corner_wingbox[1]) / length_bottom_plate
         for number_stringer in range(1, number_stringers_bottom + 1):
-            z_coordinate_current_bottom_stringer = -number_stringer * sin_angle_bottom * spacing_stringers_bottom
+            z_coordinate_current_bottom_stringer = number_stringer * sin_angle_bottom * spacing_stringers_bottom
             z_coordinates_stringers_bottom.append(z_coordinate_current_bottom_stringer)
-
+        #z axis points up
+        def convert_signs(lst):
+            return [-i for i in lst]
+        z_coordinates_stringers_bottom = convert_signs(z_coordinates_stringers_bottom)
+        print(z_coordinates_stringers_top)
+        print(z_coordinates_stringers_bottom)
         return z_coordinates_stringers_top,z_coordinates_stringers_bottom
 
     def calculate_x_coordinate_centroid(x_lst, area_lst):
@@ -128,11 +133,13 @@ def get_centroid(spanwise_location, verbose=False):
         return sum_AZ / sum_area
 
     def calculate_Ixz(x_lst,z_lst,area_lst):
-        IXY_AXZ_lst = []
+        IXZ_AXZ_lst = []
         for element in range(len(x_lst)):
-            IXY_AXZ_lst.append(x_lst[element] * z_lst[element] * area_lst[element])
-        I_XY = sum(IXY_AXZ_lst)
-        return I_XY
+            print(z_lst[element])
+            IXZ_AXZ_lst.append(x_lst[element] * z_lst[element] * area_lst[element])
+            #print(element)
+        I_XZ = sum(IXZ_AXZ_lst)
+        return I_XZ
 
 
     area_lst = [area_top_plate, area_bottom_plate, area_front_spar, area_middle_spar, area_back_spar]
@@ -165,7 +172,8 @@ def get_centroid(spanwise_location, verbose=False):
         # print(z_coordinates_lst)
         # print(len(z_coordinates_lst))
         # print(len(area_lst))
-    I_XY = calculate_Ixz(x_coordinates_lst,z_coordinates_lst,area_lst)
-    return [x_centroid_stringers_only, z_centroid_stringers_only, I_XY]
+    I_XZ = calculate_Ixz(x_coordinates_lst,z_coordinates_lst,area_lst)
+    print(I_XZ)
+    return [x_centroid_stringers_only, z_centroid_stringers_only, I_XZ]
 
-# get_centroid(1.0,verbose=True)
+get_centroid(1.0,verbose=False)
