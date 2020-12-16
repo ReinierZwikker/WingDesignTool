@@ -6,12 +6,14 @@ from scipy import integrate, interpolate
 try:
     from Database.database_functions import DatabaseConnector
     from CentroidCalculator.centroid_calculator import get_centroid
+    import Importer.xflr5 as aerodynamic_data
 except ModuleNotFoundError:
     import sys
     from os import path
     sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
     from Database.database_functions import DatabaseConnector
     from CentroidCalculator.centroid_calculator import get_centroid
+    import Importer.xflr5 as aerodynamic_data
 
 
 database_connector = DatabaseConnector()
@@ -46,6 +48,14 @@ step = y_span_lst[1] - y_span_lst[0]
 x_shear = sp.interpolate.interp1d(y_span_lst, x_shear_lst, kind="cubic", fill_value="extrapolate")
 z_shear = sp.interpolate.interp1d(y_span_lst, z_shear_lst, kind="cubic", fill_value="extrapolate")
 torsion = sp.interpolate.interp1d(y_span_lst, torsion_lst, kind="cubic", fill_value="extrapolate")
+
+
+# Enclosed Area
+def area_segments(p):
+    return zip(p, p[1:] + [p[0]])
+
+enclosed_area = 0.5 * abs(sum(x0 * y1 - x1 * y0 for ((x0, y0), (x1, y1)) in area_segments([x * aerodynamic_data.chord_function(
+    spanwise_location) for x in wingbox_corner_points])))
 
 
 #def x(centroid, coordinates)
