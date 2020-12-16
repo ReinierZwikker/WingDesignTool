@@ -1,12 +1,20 @@
 from math import *
+import pickle
+import scipy as sp
+from scipy import integrate, interpolate
 
 try:
     from Database.database_functions import DatabaseConnector
+    from CentroidCalculator.centroid_calculator import get_centroid
+    import Importer.xflr5 as aerodynamic_data
 except ModuleNotFoundError:
     import sys
     from os import path
     sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
     from Database.database_functions import DatabaseConnector
+    from CentroidCalculator.centroid_calculator import get_centroid
+    import Importer.xflr5 as aerodynamic_data
+
 
 database_connector = DatabaseConnector()
 
@@ -14,10 +22,46 @@ database_connector = DatabaseConnector()
 #B_num_strg = #number of stringers bottom
 #Area_strg = #Area of stringer 
 
+
+# Import shearforce
+try:
+    with open("./data.pickle", 'rb') as file:
+        data = pickle.load(file)
+except FileNotFoundError:
+    with open("../InertialLoadingCalculator/data.pickle", 'rb') as file:
+        data = pickle.load(file)
+
+"""
+Sign-convention:
+x: towards nose
+y: towards tip
+z: upwards
+counterclockwise
+"""
+
+y_span_lst = data[0]
+x_shear_lst = data[3]
+z_shear_lst = data[5]
+torsion_lst = data[7]
+step = y_span_lst[1] - y_span_lst[0]
+
+x_shear = sp.interpolate.interp1d(y_span_lst, x_shear_lst, kind="cubic", fill_value="extrapolate")
+z_shear = sp.interpolate.interp1d(y_span_lst, z_shear_lst, kind="cubic", fill_value="extrapolate")
+torsion = sp.interpolate.interp1d(y_span_lst, torsion_lst, kind="cubic", fill_value="extrapolate")
+
+
+# Enclosed Area
+def area_segments(p):
+    return zip(p, p[1:] + [p[0]])
+
+enclosed_area = 0.5 * abs(sum(x0 * y1 - x1 * y0 for ((x0, y0), (x1, y1)) in area_segments([x * aerodynamic_data.chord_function(
+    spanwise_location) for x in wingbox_corner_points])))
+
+
 #def x(centroid, coordinates)
 
 #                        0                    1               2                   3   
-list_coordinates = [(0.15, 0.0627513), (0.6, 0.0627513), (0.6, -0.02702924), (0.15, -0.04083288)]
+list_coordinates = [(0.15, 0.06588533), (0.6, 0.0627513), (0.6, -0.02702924), (0.15, -0.04083288)]
 #unit lenghts
 lenghts = [] 
 
@@ -55,6 +99,23 @@ for i in range(4):
 print(lenghts)
 print(slopes)
 #______________________________________________________
+def AC_lenght(location):
+    # Wing properties: (from the sheet)
+
+    b = database_connector.load_value("wing_span")
+    t_c = database_connector.load_value("thickness_to_chord_ratio")
+    lambd = database_connector.load_value("taper_ratio")
+    Cr = database_connector.load_value("root_chord")
+    Ct = database_connector.load_value("tip_chord")
+
+    hb = b / 2  # half span
+
+    # trapezoid wing ->
+
+    tan_alpha_wing = (Cr - Ct) / (2 * hb)  # angle between b and side of a trapezoid
+    AC = Ct + (2 * tan_alpha_wing * (hb - location))
+    return AC
+
 #distance between stringers
 def distances(topstr, botstr, lenghts):
 
@@ -115,6 +176,72 @@ def x(centroid, list_coordinates, topstr, botstr, lenghts, slopes, distance, AC)
         x_list.append(xt)
 
     return x_list
+
+def area_append(A1 , A2, topstr, botstr): #A1 is corner tringer area #A2 is normal stringer area (do we need to wa)
+
+    area_list = [] 
+
+    area_list.append(A1)
+
+    for i in range(botstr-2):
+        area_list.append(A2)
+
+    area_list.append(A1)
+    area_list.append(A1)
+
+    for i in range(topstr-2):
+        area_list.append(A2)
+
+    area_list.append(A1)
+    return area_list
+
+
+def delta_q_and_qb(z, x, areas, b):
+    #Ixx = B*z^2 # Izz = b*x^2
+    z_pw2 = [i ** 2 for i in z]
+    x_pw2 = [i ** 2 for i in x]
+    Ixx= sum([a * b for a, b in zip(areas, z_pw2)])
+    Izz= sum([a * b for a, b in zip(areas, x_pw2)])
+
+    Bx = [a * b for a, b in zip(areas, x)]
+    Bz = [a * b for a, b in zip(areas, z)]
+
+    #Vx =  #drag and thrust 
+   # Vz =  #lift                     qb + ( - qs0)  +  (+qt )
+
+    delta_q_list = []
+
+    for i in len(areas):
+        eq_delta_q = - (Vx/Izz)*Bx[i] - (Vz/Ixx)*Bz[i]
+        delta_q_list.append(eq_delta_q)
+
+    qb_list = [0] # [ q12 , q23 , q34 , ..... last one being 0  ]
+
+    qb = 0
+    for i in delta_q_list:
+        qb = qb + i
+        qb_list.append(qb)
+
+    return qb_list
+
+
+def qso(list_coordinates, qb_list, ):
+    #Vx 
+    #Vz 
+
+    #qs0 is assumed to be ccw at first 
+    # ccw is taken as positive 
+    # 2Am*qs0 postitive 
+
+
+
+
+
+
+
+#print(area_append(0.002 , 0.001, 5, 5 ))
+
+
 
 
 
