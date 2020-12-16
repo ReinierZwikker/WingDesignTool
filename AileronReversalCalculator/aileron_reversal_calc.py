@@ -52,8 +52,8 @@ def get_aileron_reversal_speed():
     # choose midpoint of the aileron
     spanwise_location_outboard = outboard_aileron_start + (outboard_aileron_end - outboard_aileron_start) / 2
     chord_length_outboard_aileron = aerodynamic_data.chord_function(spanwise_location_outboard)
-    print(chord_length_outboard_aileron)
-    print(chord_length_inboard_aileron)
+    # print(chord_length_outboard_aileron)
+    # print(chord_length_inboard_aileron)
 
 
     wing_surface_area = database_connector.load_value("surface_area")
@@ -63,10 +63,10 @@ def get_aileron_reversal_speed():
     #more variables
     torsional_stiffness_inboard = get_polar_moment_of_inertia(spanwise_location_inboard)
     K_inboard = shear_modulus * torsional_stiffness_inboard
-    print(K_inboard)
+    print(K_inboard * 10**-6)
     torsional_stiffness_outboard = get_polar_moment_of_inertia(spanwise_location_outboard)
     K_outboard = shear_modulus * torsional_stiffness_outboard
-    print(K_outboard)
+    print(K_outboard * 10**-6)
     CL_alpha = database_connector.load_value("cl-alpha_curve")  #rad
     density_sea_level = 1.225   #kg/m3
     density_cruise_level = database_connector.load_value("density_cruise_level")
