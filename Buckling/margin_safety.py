@@ -22,7 +22,7 @@ except FileNotFoundError:
     with open("./data.pickle", 'rb') as file:
         data = pickle.load(file)
 
-y_lst = data[0]
+y_lst = data[0][:-60]
 strength = database_connector.load_wingbox_value("ultimate_strength")
 
 
@@ -42,6 +42,7 @@ def plot(mode='compression'):
     margin_stringer_crit = []
     margin_stringer_strength = []
     margin_stringer = []
+    tension_stress = []
     for y in y_lst:
         if mode == 'compression':
             margin_stringer_crit.append(margin_safety_crit(string_stress_normal(y), crit_stress_stringer(y)))
@@ -51,6 +52,7 @@ def plot(mode='compression'):
             #add the same for plate and spars
         if mode == 'tension':
             margin_stringer_strength.append(margin_safety_strength(string_stress_tension(y)))
+            tension_stress.append(string_stress_tension(y))
 
             #add the same for plate and spars
             
@@ -74,15 +76,26 @@ def plot(mode='compression'):
 
     elif mode == 'tension':
         plt.figure()
-        plt.suptitle('Tensional margin of safety per component')
+        plt.suptitle('Tensional strength of the wingbox')
 
-        plt.subplot(311)
-        plt.title("Stringer")
+
+        plt.subplot(211)
+        plt.title("Tensional stress")
+        plt.plot(y_lst, tension_stress, label='Applied stress')
+        plt.plot([y_lst[0], y_lst[-1]], [strength, strength], 'r', label='Ultimate strength')
+        plt.xlabel("Spanwise location on the wing (m)")
+        plt.ylabel("Tensional stress (Pa)")
+        plt.legend(loc='bottom left')
+
+        plt.subplot(212)
+        plt.title("Margin of safety")
         plt.plot(y_lst, margin_stringer_strength)
+        plt.xlabel('Spanwise location on the wing (m)')
+        plt.ylabel('Margin of safety')
+        
 
-        #add the same for plate and spars
     
     plt.show()
     return
 
-plot(mode='compression')
+plot(mode='tension')
