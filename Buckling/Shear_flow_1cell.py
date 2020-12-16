@@ -55,7 +55,7 @@ def area_segments(p):
     return zip(p, p[1:] + [p[0]])
 
 enclosed_area = 0.5 * abs(sum(x0 * y1 - x1 * y0 for ((x0, y0), (x1, y1)) in area_segments([x * aerodynamic_data.chord_function(
-    spanwise_location) for x in wingbox_corner_points])))
+    spanwise_location) for x in list_coordinates])))
 
 
 #def x(centroid, coordinates)
@@ -225,16 +225,38 @@ def delta_q_and_qb(z, x, areas, b):
     return qb_list
 
 
-def qso(list_coordinates, qb_list, ):
-    #Vx 
-    #Vz 
+def qso(list_coordinates, qb_list, slope_list , centroid, AC, b ):  #need shear Vx(b) and Vz(b) from other program
 
-    #qs0 is assumed to be ccw at first 
-    # ccw is taken as positive 
-    # 2Am*qs0 postitive 
+    #point A is where the sloped sides 0f tapezoid join
+    #since lengths are involved, adjusting for ac is needed 
 
+    point_a = [2.9853 , 0.04614] #unit chord
+    Am = #mean area at AC
+    #ccw positive
 
+    Vx = #Vx at b
+    #              >  both act on centroid 
+    Vz = #Vz at b
 
+    Mqrs = 
+
+    # cloclwise, Vz should be negative, ccw, Vx should be positive
+    q_so = (Vz*(point_a[0] - centroid[0])*AC + Vx * (point_a[1]-centroid[1])*AC + Mqrs ) / (Am*2)
+
+    return q_do
+
+def qt(Torque, Am):
+    T = #AC adjusted torque
+
+    #Am AC adjusted
+    q_t = T/2*Am
+    return q_t
+
+def shear_flow(qb , qt , qso):
+    qb_qso = [x+qso for x in qb]
+
+    q = [x+qt for x in qb_qso]
+    return q
 
 
 
