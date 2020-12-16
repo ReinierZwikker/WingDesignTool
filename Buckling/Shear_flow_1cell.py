@@ -1,18 +1,52 @@
 from math import *
+import pickle
+import scipy as sp
+from scipy import integrate, interpolate
 
 try:
     from Database.database_functions import DatabaseConnector
+    from CentroidCalculator.centroid_calculator import get_centroid
 except ModuleNotFoundError:
     import sys
     from os import path
     sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
     from Database.database_functions import DatabaseConnector
+    from CentroidCalculator.centroid_calculator import get_centroid
+
 
 database_connector = DatabaseConnector()
 
 #T_num_strg = #number of stringers top
 #B_num_strg = #number of stringers bottom
 #Area_strg = #Area of stringer 
+
+
+# Import shearforce
+try:
+    with open("./data.pickle", 'rb') as file:
+        data = pickle.load(file)
+except FileNotFoundError:
+    with open("../InertialLoadingCalculator/data.pickle", 'rb') as file:
+        data = pickle.load(file)
+
+"""
+Sign-convention:
+x: towards nose
+y: towards tip
+z: upwards
+counterclockwise
+"""
+
+y_span_lst = data[0]
+x_shear_lst = data[3]
+z_shear_lst = data[5]
+torsion_lst = data[7]
+step = y_span_lst[1] - y_span_lst[0]
+
+x_shear = sp.interpolate.interp1d(y_span_lst, x_shear_lst, kind="cubic", fill_value="extrapolate")
+z_shear = sp.interpolate.interp1d(y_span_lst, z_shear_lst, kind="cubic", fill_value="extrapolate")
+torsion = sp.interpolate.interp1d(y_span_lst, torsion_lst, kind="cubic", fill_value="extrapolate")
+
 
 #def x(centroid, coordinates)
 
