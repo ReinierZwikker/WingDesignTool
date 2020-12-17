@@ -217,7 +217,7 @@ def delta_q_and_qb(z, x, areas, b, x_shear, z_shear):
     Vx =   - x_shear
     Vz =  - z_shear  
 
-    print (Vx, Vz )            
+    print (Vx, Vz)            
     delta_q_list = []
 
     for i in range(len(areas)):
@@ -315,7 +315,7 @@ print(main_shear_flow_func(0))
 
 
 
-
+print(main_shear_flow_func(26))
 
 
 
