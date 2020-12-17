@@ -119,7 +119,7 @@ def AC_lenght(location):
 # spars 
 #3 spars 
 #2 spars 
-def get_t_avg( h1, h2, h3, t, lenghts, z_shear, AC, centroid, list_coordinates, slopes):
+def get_t_avg(t, lenghts, z_shear, AC, centroid, list_coordinates, slopes):
 
     # M_SP_LEN = (F_SP.LEN - (F_SP.LEN - B_SP.LEN) + ((x2 - x) * math.tan(B_PL.ANGL) * AC))
     x2 = list_coordinates[1][0]
@@ -153,7 +153,7 @@ def torque_shear_flow( AC, Torsion):
         three_spars = False
 
     if three_spars == True:
-        q_t = 3 # write shit here
+        
 
         try:
             with open("./data.pickle", 'rb') as file:
@@ -214,7 +214,49 @@ def get_tau_max(q_t , tau_avg, kv, t):
     return tau_max 
 
     
+def shear_stress_SPARS(b):
+    list_coordinates = [(0.15, 0.06588533), (0.6, 0.0627513), (0.6, -0.02702924), (0.15, -0.04083288)]
+    AC_lenght(b)
+    lenghts = get_lenghts(list_coordinates)
+    slopes = get_slopes(list_coordinates)
 
+
+    t_spar = 1 #MANUALLY TYPE IN
+    kv = insert #MANUALY TYPE IN
+
+    tau_average = get_t_avg( t_spar , lenghts, z_shear, AC, centroid(b), list_coordinates, slopes)
+    torque_shear = torque_shear_flow( AC, torsion(b))
+
+    tau_max_SPAR = get_tau_max(torque_shear , tau_average, kv, t_spar)
+    return tau_max_SPAR
+
+
+
+def get_t_avg_skin(t, lenghts, x_shear, AC):
+
+
+    h_top_skin = lenghts[0]*AC
+    h_bottom_skin = lenghts[2]*AC
+
+    tau_avg_skin = x_shear/ (t*h_front_spar + t*h_back_spar)
+    
+    return tau_avg_skin
+
+def shear_stress_SKIN(b):
+
+    list_coordinates = [(0.15, 0.06588533), (0.6, 0.0627513), (0.6, -0.02702924), (0.15, -0.04083288)]
+    AC_lenght(b)
+    lenghts = get_lenghts(list_coordinates)
+    slopes = get_slopes(list_coordinates)
+
+    t_skin = 1 #MANUALLY TYPE IN
+    
+    tau_avg_skin = get_t_avg_skin(t_skin, lenghts, x_shear(B), AC):
+    torque_shear = torque_shear_flow( AC, torsion(b))
+    tau_max_SPAR = get_tau_max(torque_shear , tau_average, kv, t_spar)
+
+
+    
 
 
 #list_coordinates = [(0.15, 0.06588533), (0.6, 0.0627513), (0.6, -0.02702924), (0.15, -0.04083288)]
