@@ -46,10 +46,10 @@ def shearflow_doublecell(spanwise_location):
                            [wingbox_corner_points[2][0], wingbox_corner_points[2][1]]]
     leading_spar = [x * aerodynamic_data.chord_function(spanwise_location) for x in leading_spar_chord]
     trailing_spar = [x * aerodynamic_data.chord_function(spanwise_location) for x in trailing_spar_chord]
-    leading_spar_location = get_location(leading_spar)
-    trailing_spar_location = get_location(trailing_spar)
-    leading_spar_length = get_length(leading_spar)
-    trailing_spar_length = get_length(trailing_spar)
+    # leading_spar_location = get_location(leading_spar)
+    # trailing_spar_location = get_location(trailing_spar)
+    # leading_spar_length = get_length(leading_spar)
+    # trailing_spar_length = get_length(trailing_spar)
     spar_thickness = database_connector.load_wingbox_value('spar_thickness')
 
     top_plate_chord = [[wingbox_corner_points[0][0], wingbox_corner_points[0][1]],
@@ -58,10 +58,10 @@ def shearflow_doublecell(spanwise_location):
                           [wingbox_corner_points[3][0], wingbox_corner_points[3][1]]]
     top_plate = [x * aerodynamic_data.chord_function(spanwise_location) for x in top_plate_chord]
     bottom_plate = [x * aerodynamic_data.chord_function(spanwise_location) for x in bottom_plate_chord]
-    top_plate_location = get_location(top_plate)
-    bottom_plate_location = get_location(bottom_plate)
-    top_plate_length = get_length(top_plate)
-    bottom_plate_length = get_length(bottom_plate)
+    # top_plate_location = get_location(top_plate)
+    # bottom_plate_location = get_location(bottom_plate)
+    # top_plate_length = get_length(top_plate)
+    # bottom_plate_length = get_length(bottom_plate)
     plate_thickness = database_connector.load_wingbox_value('plate_thickness')
 
     # Get stringer locations along the top and bottom plate:
@@ -116,8 +116,8 @@ def shearflow_doublecell(spanwise_location):
 
     area_top_stringer = database_connector.load_wingbox_value("top_stringer_area")
     area_bottom_stringer = database_connector.load_wingbox_value("bottom_stringer_area")
-    #
-    # # PROCESSING OF RELEVANT DATA
+
+    # PROCESSING OF RELEVANT DATA
     # the 6 points are numbered from 1 to 6 from top left to bottom left in clockwise direction
     wingbox_points = database_connector.load_wingbox_value("wingbox_points")
     distances_1 = (wingbox_points[0][0] - centroid[0], wingbox_points[0][1] - centroid[1])
@@ -140,43 +140,42 @@ def shearflow_doublecell(spanwise_location):
     encl_area_1256 = (length_25 + length_61) * length_12 / 2
     encl_area_2345 = (length_25 + length_34) * length_23 / 2
 
-    # Delta q_b calculations for each boom
+    # q_b calculations for each boom
     MoI_xx = area_top_stringer * (distances_1[1] ** 2 + distances_2[1] ** 2 + distances_3[1] ** 2) \
              + area_bottom_stringer * (distances_4[1] ** 2 + distances_5[1] ** 2 + distances_6[1] ** 2)
     MoI_yy = area_top_stringer * (distances_1[0] ** 2 + distances_2[0] ** 2 + distances_3[0] ** 2) \
              + area_bottom_stringer * (distances_4[0] ** 2 + distances_5[0] ** 2 + distances_6[0] ** 2)
 
-    Delta_q_1 = - h_force_y / MoI_yy * area_top_stringer * distances_1[0] \
-                - v_force_y / MoI_xx * area_top_stringer * distances_1[1]
-    Delta_q_2 = - h_force_y / MoI_yy * area_top_stringer * distances_2[0] \
-                - v_force_y / MoI_xx * area_top_stringer * distances_2[1]
-    Delta_q_3 = - h_force_y / MoI_yy * area_top_stringer * distances_3[0] \
-                - v_force_y / MoI_xx * area_top_stringer * distances_3[1]
-    Delta_q_4 = - h_force_y / MoI_yy * area_top_stringer * distances_4[0] \
-                - v_force_y / MoI_xx * area_top_stringer * distances_4[1]
-    Delta_q_5 = - h_force_y / MoI_yy * area_top_stringer * distances_5[0] \
-                - v_force_y / MoI_xx * area_top_stringer * distances_5[1]
-    Delta_q_6 = - h_force_y / MoI_yy * area_top_stringer * distances_6[0] \
-                - v_force_y / MoI_xx * area_top_stringer * distances_6[1]
-
-    # The integral term for Lorenzo
+    # The integral term for Lorezno
     def q_b(distance_from_centroid, area):
         return - (MoI_xx * h_force_y) / (MoI_xx * MoI_yy) * (area * distance_from_centroid[0]) - \
                (MoI_yy * v_force_y) / (MoI_xx * MoI_yy) * (area * distance_from_centroid[1])
 
-    integral_value_front = 0
+    # q_b for the first cell (two flanges)
+    q_b_16 = q_b(distances_1, area_top_stringer)
+
+    integral_value_front = q_b_16
+    q_b_lst_bottom_surface_fcell = []
     # Bottom stringers of front cell (Change as you see fit lorezno)
     for stringer_index in range(0, int(round(len(stringer_bottom_distance_from_centroid) / 2))):
         integral_value_front += (q_b(stringer_bottom_distance_from_centroid[stringer_index], area_bottom_stringer) *
-                                 get_length([stringer_bottom_locations[stringer_index], stringer_bottom_locations[stringer_index - 1]])) / (plate_thickness * G)
+                                 get_length([stringer_bottom_locations[stringer_index],
+                                             stringer_bottom_locations[stringer_index - 1]])) / (plate_thickness * G)
+        q_b_lst_bottom_surface_fcell.append(integral_value_front)
 
-    integral_value_aft = 0
+    # q_b for the second cell (two flanges)
+    q_b_25 = q_b(distances_2, area_top_stringer)
+    integral_value_aft = q_b_25
+    q_b_lst_bottom_surface_bcell = []
     # Bottom stringers of aft cell (Change as you see fit)
-    for stringer_index in range(int(round(len(stringer_bottom_distance_from_centroid) / 2)), int(round(len(stringer_bottom_distance_from_centroid)))):
+    for stringer_index in range(int(round(len(stringer_bottom_distance_from_centroid) / 2)),
+                                int(round(len(stringer_bottom_distance_from_centroid)))):
         integral_value_aft += (q_b(stringer_bottom_distance_from_centroid[stringer_index], area_bottom_stringer) *
-                               get_length([stringer_bottom_locations[stringer_index], stringer_bottom_locations[stringer_index - 1]])) / (plate_thickness * G)
+                               get_length([stringer_bottom_locations[stringer_index],
+                                           stringer_bottom_locations[stringer_index - 1]])) / (plate_thickness * G)
+        q_b_lst_bottom_surface_bcell.append(integral_value_front)
 
-    print(integral_value_front, integral_value_aft)
+    # print(integral_value_front, integral_value_aft)
 
     # Matrix
     matrix = np.array([[2 * encl_area_1256, 2 * encl_area_2345, 0],
@@ -189,11 +188,28 @@ def shearflow_doublecell(spanwise_location):
     solution_vector_t = np.array([0, 0, torque_y])
     q_t_1256, q_t_2345, dtheta_t = np.linalg.solve(matrix, solution_vector_t)
 
-    # SHEAR DUE TO VERTICAL FORCE #tbf
+    # SHEAR DUE TO VERTICAL and HORIZONTAL FORCE #tbf
     solution_vector_s = np.array([0, 0, 0])
-    q_t_1256, q_t_2345, dtheta_s = np.linalg.solve(matrix, solution_vector_s)
+    q_s_s0_1256, q_s_s0_2345, dtheta_s = np.linalg.solve(matrix, solution_vector_s)
+
+    # TOTAL SHEAR FORCE EVALUATION IN EACH SECTION
+    q_max_top_flange_value_position = [0, (0, 0)]
+    q_max_bottom_flange_value_position = [0, (0, 0)]
+
+    # top surface
+    for x in reinir_list:
+        q_tot = q_t_1256 + q_s_s0_1256 + q_b_from_reinir[x_smt]
+        if abs(q_tot) > q_max_top_flange_value_position[0]:
+            q_max_top_flange_value_position[0] = q_tot, q_max_top_flange_value_position[1] = (x, y_top_plate)
+
+    # bottom surface
+    for x in reinir_list:
+        q_tot = q_t_1256 + q_s_s0_1256 + q_b_from_reinir[x]
+        if abs(q_tot) > q_max_bottom_flange_value_position[0]:
+            q_max_bottom_flange_value_position[0] = q_tot, q_max_bottom_flange_value_position[1] = (x, y_bottom_plate)
+
+    # flanges
+    for x in reinir_list:
+        q_tot = q_t_1256 + q_s_s0_1256 + q_b_from_reinir[x]
 
     return
-
-
-shearflow_doublecell(8)
