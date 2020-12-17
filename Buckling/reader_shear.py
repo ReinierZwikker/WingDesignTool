@@ -118,11 +118,15 @@ def AC_lenght(location):
 # spars 
 #3 spars 
 #2 spars 
-def get_t_avg(Am , h1, h2, h3, t, AC, lenghts, z_shear,AC):
+def get_t_avg( h1, h2, h3, t, lenghts, z_shear, AC, centroid, list_coordinates, slopes):
+
+    # M_SP_LEN = (F_SP.LEN - (F_SP.LEN - B_SP.LEN) + ((x2 - x) * math.tan(B_PL.ANGL) * AC))
+    x2 = list_coordinates[1][0]
+    x = centroid[0]
 
     h_front_spar = lenghts[3]*AC
     h_back_spar = lenghts[1]*AC
-    h_middle_spar = 1 *AC
+    h_middle_spar = (h_front_spar - (h_front_spar-h_back_spar) + ((x2 - x)*tan(slopes[2] )*AC))
 
     if b<= 10:
         three_spars = True
@@ -133,10 +137,37 @@ def get_t_avg(Am , h1, h2, h3, t, AC, lenghts, z_shear,AC):
         tau_avg = z_shear/ (t*h_front_spar + t*h_middle_spar + t*h_back_spar)
     else:
         tau_avg = z_shear/ (t*h_front_spar + t*h_back_spar)
+    
+    return tau_avg 
+
+def torque_shear_flow( AC, Torsion):
+
+    Am = 0.5 * abs(sum(x0 * y1 - x1 * y0 for ((x0, y0), (x1, y1)) in area_segments([x * aerodynamic_data.chord_function(b) for x in list_coordinates])))
+
+    Torsion = T
+
+    if b<= 10:
+        three_spars = True
+    else:
+        three_spars = False
+
+    if three_spars == True:
+        q_t = 3 # write shit here
+
+    else:
+        q_t = T/2*Am
+
+    return q_t 
+
+def get_tau_max(q_t , tau_avg, kv, t):
+
+    tau_max = kv* tau_avg + (q_t/t)
+    return tau_max 
+
+    
 
 
 
-
-
+#list_coordinates = [(0.15, 0.06588533), (0.6, 0.0627513), (0.6, -0.02702924), (0.15, -0.04083288)]
 
 #skin 
