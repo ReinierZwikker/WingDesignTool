@@ -3,6 +3,7 @@
 import numpy as np
 import pickle
 import scipy as sp
+import numpy as np
 
 try:
     from Database.database_functions import DatabaseConnector
@@ -76,7 +77,7 @@ def shearflow_doublecell(spanwise_location):
 
     # END OF PROGRAM FROM REINIER
 
-    # importing the torque data
+    # importing the loading data
     try:
         with open("./data.pickle", 'rb') as file:
             data = pickle.load(file)
@@ -101,9 +102,13 @@ def shearflow_doublecell(spanwise_location):
     h_force = sp.interpolate.interp1d(y_span_lst, drag_lst, kind="cubic", fill_value="extrapolate")
     h_force_y = h_force(spanwise_location)
 
-    # importing data
+    # importing constants
     G = database_connector.load_wingbox_value("shear_modulus_pa")
+    wingbox_points = database_connector.load_wingbox_value("wingbox_points")
+    area_bottom_stringer = database_connector.load_wingbox_value("bottom_stringer_area")
+    area_top_stringer = database_connector.load_wingbox_value("top_stringer_area")
 
+    # thicknesses of spar and plates for torque calculations
     t_12 = database_connector.load_wingbox_value("plate_thickness")
     t_23 = database_connector.load_wingbox_value("plate_thickness")
     t_34 = database_connector.load_wingbox_value("spar_thickness")
@@ -112,14 +117,8 @@ def shearflow_doublecell(spanwise_location):
     t_61 = database_connector.load_wingbox_value("spar_thickness")
     t_25 = database_connector.load_wingbox_value("spar_thickness")
 
-    wingbox_points = database_connector.load_wingbox_value("wingbox_points")
-
-    area_top_stringer = database_connector.load_wingbox_value("top_stringer_area")
-    area_bottom_stringer = database_connector.load_wingbox_value("bottom_stringer_area")
-
-    # PROCESSING OF RELEVANT DATA
+    # PROCESSING OF RELEVANT DATA FOR SHEAR DUE TO TORQUE CALCULATIONS
     # the 6 points are numbered from 1 to 6 from top left to bottom left in clockwise direction
-    wingbox_points = database_connector.load_wingbox_value("wingbox_points")
     distances_1 = (wingbox_points[0][0] - centroid[0], wingbox_points[0][1] - centroid[1])
     distances_2 = (wingbox_points[1][0] - centroid[0], wingbox_points[1][1] - centroid[1])
     distances_3 = (wingbox_points[2][0] - centroid[0], wingbox_points[2][1] - centroid[1])
@@ -140,6 +139,7 @@ def shearflow_doublecell(spanwise_location):
     encl_area_1256 = (length_25 + length_61) * length_12 / 2
     encl_area_2345 = (length_25 + length_34) * length_23 / 2
 
+    # PROCESSING OF RELEVANT DATA FOR SHEAR DUE TO VERTICAL FORCE CALCULATIONS
     # q_b calculations for each boom
     MoI_xx = area_top_stringer * (distances_1[1] ** 2 + distances_2[1] ** 2 + distances_3[1] ** 2) \
              + area_bottom_stringer * (distances_4[1] ** 2 + distances_5[1] ** 2 + distances_6[1] ** 2)
@@ -155,27 +155,57 @@ def shearflow_doublecell(spanwise_location):
     q_b_16 = q_b(distances_1, area_top_stringer)
 
     integral_value_front = q_b_16
-    q_b_lst_bottom_surface_fcell = []
-    # Bottom stringers of front cell (Change as you see fit lorezno)
+    q_b_lst_bottom_surface_frontcell = []
+    # Bottom stringers of front cell (Change as you see fit Lorezno)
     for stringer_index in range(0, int(round(len(stringer_bottom_distance_from_centroid) / 2))):
         integral_value_front += (q_b(stringer_bottom_distance_from_centroid[stringer_index], area_bottom_stringer) *
                                  get_length([stringer_bottom_locations[stringer_index],
                                              stringer_bottom_locations[stringer_index - 1]])) / (plate_thickness * G)
-        q_b_lst_bottom_surface_fcell.append(integral_value_front)
+        q_b_lst_bottom_surface_frontcell.append(integral_value_front)
 
     # q_b for the second cell (two flanges)
     q_b_25 = q_b(distances_2, area_top_stringer)
     integral_value_aft = q_b_25
-    q_b_lst_bottom_surface_bcell = []
+    q_b_lst_bottom_surface_aftcell = []
     # Bottom stringers of aft cell (Change as you see fit)
     for stringer_index in range(int(round(len(stringer_bottom_distance_from_centroid) / 2)),
                                 int(round(len(stringer_bottom_distance_from_centroid)))):
         integral_value_aft += (q_b(stringer_bottom_distance_from_centroid[stringer_index], area_bottom_stringer) *
                                get_length([stringer_bottom_locations[stringer_index],
                                            stringer_bottom_locations[stringer_index - 1]])) / (plate_thickness * G)
-        q_b_lst_bottom_surface_bcell.append(integral_value_front)
+        q_b_lst_bottom_surface_aftcell.append(integral_value_front)
 
-    # print(integral_value_front, integral_value_aft)
+    inter_stringer_distance_bottom = abs(
+        stringer_bottom_distance_from_centroid[0] - stringer_bottom_distance_from_centroid[1])
+    p1 = np.array([centroid[0], centroid[1]])
+    p2 = np.array(stringer_bottom_distance_from_centroid[0])
+    p3 = np.array(stringer_bottom_distance_from_centroid[1])
+    moment_arm_bottom_surface_qbs = np.cross(p2 - p1, p3 - p1) / np.linalg.norm(p2 - p1)
+
+    # moment generated by qbs and forces around point 2
+
+    ## TO BE CHECKED WITH RASA
+    moment_due_to_forces = v_force_y * distances_2[0] + h_force_y * distances_2[1]
+
+    ## Direction to be checked
+    moment_due_to_bottom_surface_qbs_frontcell = integral_value_front * \
+                                                 length_12 \
+                                                 + moment_arm_bottom_surface_qbs * \
+                                                 sum(q_b_lst_bottom_surface_frontcell[:-1])
+    moment_due_to_bottom_surface_qbs_aftcell = moment_arm_bottom_surface_qbs * \
+                                               sum(q_b_lst_bottom_surface_aftcell[:-1]) + \
+                                               length_34 * \
+                                               q_b_lst_bottom_surface_aftcell[-1]
+
+    total_moment_forces_qbs_allcell = moment_due_to_forces - moment_due_to_bottom_surface_qbs_frontcell - \
+                                      moment_due_to_bottom_surface_qbs_aftcell
+
+    # line integrals functional to the equation with dthetha/dz
+    line_integral_qb_frontcell = integral_value_front * length_61 / (t_61 * G)
+    for element in q_b_lst_bottom_surface_frontcell:
+        line_integral_qb_frontcell += element * inter_stringer_distance_bottom / (t_56 * G)
+    dthetha_dz_contribution_qb_frontcell = line_integral_qb_frontcell / (2 * encl_area_1256)
+
 
     # Matrix
     matrix = np.array([[2 * encl_area_1256, 2 * encl_area_2345, 0],
@@ -189,7 +219,7 @@ def shearflow_doublecell(spanwise_location):
     q_t_1256, q_t_2345, dtheta_t = np.linalg.solve(matrix, solution_vector_t)
 
     # SHEAR DUE TO VERTICAL and HORIZONTAL FORCE #tbf
-    solution_vector_s = np.array([0, 0, 0])
+    solution_vector_s = np.array([total_moment_forces_qbs_allcell, 0, 0])
     q_s_s0_1256, q_s_s0_2345, dtheta_s = np.linalg.solve(matrix, solution_vector_s)
 
     # TOTAL SHEAR FORCE EVALUATION IN EACH SECTION
