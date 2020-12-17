@@ -127,7 +127,7 @@ def shearflow_doublecell(spanwise_location):
     distances_6 = (wingbox_points[5][0] - centroid[0], wingbox_points[5][1] - centroid[1])
 
     chord_length = aerodynamic_data.chord_function(spanwise_location)
-    #
+
     length_12 = abs(distances_1[0] - distances_2[0]) * chord_length
     length_23 = abs(distances_2[0] - distances_3[0]) * chord_length
     length_34 = abs(distances_3[1] - distances_4[1]) * chord_length
@@ -151,32 +151,61 @@ def shearflow_doublecell(spanwise_location):
         return - (MoI_xx * h_force_y) / (MoI_xx * MoI_yy) * (area * distance_from_centroid[0]) - \
                (MoI_yy * v_force_y) / (MoI_xx * MoI_yy) * (area * distance_from_centroid[1])
 
+    # BOTTOM FLANGES q_b
     # q_b for the first cell (two flanges)
     q_b_16 = q_b(distances_1, area_top_stringer)
 
-    integral_value_front = q_b_16
+    integral_value_front_bottom = q_b_16
     q_b_lst_bottom_surface_frontcell = []
     # Bottom stringers of front cell (Change as you see fit Lorezno)
     for stringer_index in range(0, int(round(len(stringer_bottom_distance_from_centroid) / 2))):
-        integral_value_front += (q_b(stringer_bottom_distance_from_centroid[stringer_index], area_bottom_stringer) *
-                                 get_length([stringer_bottom_locations[stringer_index],
-                                             stringer_bottom_locations[stringer_index - 1]])) / (plate_thickness * G)
-        q_b_lst_bottom_surface_frontcell.append(integral_value_front)
+        integral_value_front_bottom += (q_b(stringer_bottom_distance_from_centroid[stringer_index],
+                                            area_bottom_stringer) *
+                                        get_length([stringer_bottom_locations[stringer_index],
+                                                    stringer_bottom_locations[stringer_index - 1]])) / (
+                                               plate_thickness * G)
+        q_b_lst_bottom_surface_frontcell.append(integral_value_front_bottom)
 
     # q_b for the second cell (two flanges)
     q_b_25 = q_b(distances_2, area_top_stringer)
-    integral_value_aft = q_b_25
+    integral_value_aft_bottom = q_b_25
     q_b_lst_bottom_surface_aftcell = []
     # Bottom stringers of aft cell (Change as you see fit)
     for stringer_index in range(int(round(len(stringer_bottom_distance_from_centroid) / 2)),
                                 int(round(len(stringer_bottom_distance_from_centroid)))):
-        integral_value_aft += (q_b(stringer_bottom_distance_from_centroid[stringer_index], area_bottom_stringer) *
-                               get_length([stringer_bottom_locations[stringer_index],
-                                           stringer_bottom_locations[stringer_index - 1]])) / (plate_thickness * G)
-        q_b_lst_bottom_surface_aftcell.append(integral_value_front)
+        integral_value_aft_bottom += (q_b(stringer_bottom_distance_from_centroid[stringer_index],
+                                          area_bottom_stringer) *
+                                      get_length([stringer_bottom_locations[stringer_index],
+                                                  stringer_bottom_locations[stringer_index - 1]])) / (
+                                             plate_thickness * G)
+        q_b_lst_bottom_surface_aftcell.append(integral_value_aft_bottom)
+
+    # TOP FLANGES q_b
+    integral_value_front_top = q_b_lst_bottom_surface_frontcell[-1]
+    q_b_lst_top_surface_frontcell = []
+    # Bottom stringers of front cell (Change as you see fit Lorezno)
+    for stringer_index in range(0, int(round(len(stringer_top_distance_from_centroid) / 2))):
+        integral_value_front_top += (q_b(stringer_top_distance_from_centroid[stringer_index], area_top_stringer) *
+                                     get_length([stringer_top_locations[stringer_index],
+                                                 stringer_top_locations[stringer_index - 1]])) / (plate_thickness * G)
+        q_b_lst_bottom_surface_frontcell.append(integral_value_front_top)
+
+    # q_b for the second cell (two flanges)
+    integral_value_aft_top = q_b_lst_bottom_surface_aftcell[-1]
+    q_b_lst_top_surface_aftcell = []
+    # Bottom stringers of aft cell (Change as you see fit)
+    for stringer_index in range(int(round(len(stringer_top_distance_from_centroid) / 2)),
+                                int(round(len(stringer_top_distance_from_centroid)))):
+        integral_value_aft_top += (q_b(stringer_top_distance_from_centroid[stringer_index], area_top_stringer) *
+                                   get_length([stringer_top_locations[stringer_index],
+                                               stringer_top_locations[stringer_index - 1]])) / (plate_thickness * G)
+        q_b_lst_top_surface_aftcell.append(integral_value_aft_top)
 
     inter_stringer_distance_bottom = abs(
         stringer_bottom_distance_from_centroid[0] - stringer_bottom_distance_from_centroid[1])
+    inter_stringer_distance_top = abs(
+        stringer_top_distance_from_centroid[0] - stringer_top_distance_from_centroid[1])
+
     p1 = np.array([centroid[0], centroid[1]])
     p2 = np.array(stringer_bottom_distance_from_centroid[0])
     p3 = np.array(stringer_bottom_distance_from_centroid[1])
@@ -188,7 +217,7 @@ def shearflow_doublecell(spanwise_location):
     moment_due_to_forces = v_force_y * distances_2[0] + h_force_y * distances_2[1]
 
     ## Direction to be checked
-    moment_due_to_bottom_surface_qbs_frontcell = integral_value_front * \
+    moment_due_to_bottom_surface_qbs_frontcell = integral_value_front_bottom * \
                                                  length_12 \
                                                  + moment_arm_bottom_surface_qbs * \
                                                  sum(q_b_lst_bottom_surface_frontcell[:-1])
@@ -201,11 +230,28 @@ def shearflow_doublecell(spanwise_location):
                                       moment_due_to_bottom_surface_qbs_aftcell
 
     # line integrals functional to the equation with dthetha/dz
-    line_integral_qb_frontcell = integral_value_front * length_61 / (t_61 * G)
-    for element in q_b_lst_bottom_surface_frontcell:
-        line_integral_qb_frontcell += element * inter_stringer_distance_bottom / (t_56 * G)
-    dthetha_dz_contribution_qb_frontcell = line_integral_qb_frontcell / (2 * encl_area_1256)
+    # bottom plates
+    line_integral_qb_frontcell_bottom = (integral_value_front_bottom * length_61 + q_b_lst_bottom_surface_frontcell[
+        -1] *
+                                         length_25) / (t_61 * G)
+    for element in q_b_lst_bottom_surface_frontcell[:-1]:
+        line_integral_qb_frontcell_bottom += element * inter_stringer_distance_bottom / (t_56 * G)
+    line_integral_qb_aftcell_bottom = (integral_value_aft_bottom * length_25 + q_b_lst_bottom_surface_aftcell[-1]
+                                       * length_34) / (t_25 * G)
+    for element in q_b_lst_bottom_surface_aftcell[:-1]:
+        line_integral_qb_aftcell_bottom += element * inter_stringer_distance_bottom / (t_45 * G)
+        # top plates
+    line_integral_qb_frontcell_top = 0
+    for element in q_b_lst_top_surface_frontcell[:-1]:
+        line_integral_qb_frontcell_top += element * inter_stringer_distance_top / (t_12 * G)
+    line_integral_qb_aftcell_top = 0
+    for element in q_b_lst_top_surface_aftcell[:-1]:
+        line_integral_qb_aftcell_top += element * inter_stringer_distance_top / (t_23 * G)
 
+    dthetha_dz_contribution_qb_frontcell = (line_integral_qb_frontcell_bottom + line_integral_qb_frontcell_bottom) \
+                                           / (2 * encl_area_1256)
+    dthetha_dz_contribution_qb_aftcell = (line_integral_qb_aftcell_bottom + line_integral_qb_aftcell_top) \
+                                         / (2 * encl_area_1256)
 
     # Matrix
     matrix = np.array([[2 * encl_area_1256, 2 * encl_area_2345, 0],
@@ -219,7 +265,8 @@ def shearflow_doublecell(spanwise_location):
     q_t_1256, q_t_2345, dtheta_t = np.linalg.solve(matrix, solution_vector_t)
 
     # SHEAR DUE TO VERTICAL and HORIZONTAL FORCE #tbf
-    solution_vector_s = np.array([total_moment_forces_qbs_allcell, 0, 0])
+    solution_vector_s = np.array([total_moment_forces_qbs_allcell, dthetha_dz_contribution_qb_frontcell,
+                                  dthetha_dz_contribution_qb_aftcell])
     q_s_s0_1256, q_s_s0_2345, dtheta_s = np.linalg.solve(matrix, solution_vector_s)
 
     # TOTAL SHEAR FORCE EVALUATION IN EACH SECTION
@@ -227,8 +274,8 @@ def shearflow_doublecell(spanwise_location):
     q_max_bottom_flange_value_position = [0, (0, 0)]
 
     # top surface
-    for x in reinir_list:
-        q_tot = q_t_1256 + q_s_s0_1256 + q_b_from_reinir[x_smt]
+    for q_b in q_b_lst_top_surface_aftcell:
+        q_tot = q_t_1256 + q_s_s0_1256 + q_b
         if abs(q_tot) > q_max_top_flange_value_position[0]:
             q_max_top_flange_value_position[0] = q_tot, q_max_top_flange_value_position[1] = (x, y_top_plate)
 
