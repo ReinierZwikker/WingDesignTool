@@ -265,23 +265,43 @@ def shearflow_doublecell(spanwise_location):
     q_s_s0_1256, q_s_s0_2345, dtheta_s = np.linalg.solve(matrix, solution_vector_s)
 
     # TOTAL SHEAR FORCE EVALUATION IN EACH SECTION
-    q_max_top_flange_value_position = [0, (0, 0)]
-    q_max_bottom_flange_value_position = [0, (0, 0)]
+    q_max_top_flange_value = 0
+    q_max_bottom_flange_value = 0
 
-    # top surface
-    for q_b in q_b_lst_top_surface_aftcell:
-        q_tot = q_t_1256 + q_s_s0_1256 + q_b
-        if abs(q_tot) > q_max_top_flange_value_position[0]:
-            q_max_top_flange_value_position[0] = q_tot, q_max_top_flange_value_position[1] = (x, y_top_plate)
+    # top surface aftcell
+    for stringer_index in range(int(round(len(stringer_top_distance_from_centroid) / 2)),
+                                int(round(len(stringer_top_distance_from_centroid)))):
+        q_tot = abs(q_b(stringer_top_distance_from_centroid[stringer_index], area_top_stringer)
+                    + q_t_2345 + q_s_s0_2345)
+        if q_tot > q_max_top_flange_value:
+            q_max_top_flange_value = q_tot
+    if abs(q_t_1256 + q_s_s0_1256) > q_max_top_flange_value:
+        q_max_top_flange_value = abs(q_t_1256 + q_s_s0_1256)
+    if abs(q_t_2345 + q_s_s0_2345) > q_max_top_flange_value:
+        q_max_top_flange_value = abs(q_t_2345 + q_s_s0_2345)
 
-    # bottom surface
-    for x in reinir_list:
-        q_tot = q_t_1256 + q_s_s0_1256 + q_b_from_reinir[x]
-        if abs(q_tot) > q_max_bottom_flange_value_position[0]:
-            q_max_bottom_flange_value_position[0] = q_tot, q_max_bottom_flange_value_position[1] = (x, y_bottom_plate)
+    # bottom surface aftcell
+    for stringer_index in range(int(round(len(stringer_bottom_distance_from_centroid) / 2)),
+                                int(round(len(stringer_bottom_distance_from_centroid)))):
+        q_tot = abs(q_b(stringer_bottom_distance_from_centroid[stringer_index], area_bottom_stringer)
+                    + q_t_2345 + q_s_s0_2345)
+        if q_tot > q_max_bottom_flange_value:
+            q_max_bottom_flange_value = q_tot
 
-    # flanges
-    for x in reinir_list:
-        q_tot = q_t_1256 + q_s_s0_1256 + q_b_from_reinir[x]
+    # top surface frontcell
+    for stringer_index in range(0, int(round(len(stringer_top_distance_from_centroid) / 2))):
+        q_tot = abs(q_b(stringer_top_distance_from_centroid[stringer_index], area_top_stringer)
+                    + q_t_1256 + q_s_s0_1256)
+        if q_tot > q_max_top_flange_value:
+            q_max_top_flange_value = q_tot
 
-    return
+    # bottom surface frontcell
+    for stringer_index in range(0, int(round(len(stringer_top_distance_from_centroid) / 2))):
+        q_tot = abs(q_b(stringer_bottom_distance_from_centroid[stringer_index], area_bottom_stringer)
+                    + q_t_1256 + q_s_s0_1256)
+        if q_tot > q_max_bottom_flange_value:
+            q_max_bottom_flange_value = q_tot
+
+    return max(q_max_top_flange_value, q_max_bottom_flange_value)
+
+shearflow_doublecell(2)
