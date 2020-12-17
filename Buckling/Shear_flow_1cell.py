@@ -217,7 +217,7 @@ def delta_q_and_qb(z, x, areas, b, x_shear, z_shear):
     Vx =   - x_shear
     Vz =  - z_shear  
 
-    print (Vx, Vz)            
+    #print (Vx, Vz)            
     delta_q_list = []
 
     for i in range(len(areas)):
@@ -250,10 +250,11 @@ def qso(list_coordinates, qb_list, slope_list , centroid, AC, b , Am , x_shear ,
 
     a = botstr - 1
 
-    Mqrs =  lenghts[1] * qb_list[a] * (point_a[0] - 0.6) #NEEEED TO MAKE A FORMULA
+
+    Mqrs =  lenghts[1]*AC * qb_list[a] * (point_a[0] - 0.6) #NEEEED TO MAKE A FORMULA
 
     # cloclwise, Vz should be negative, ccw, Vx should be positive
-    q_so = (Vz*(point_a[0] - centroid[0])*AC + Vx * (point_a[1]-centroid[1])*AC + Mqrs ) / (Am*2)
+    q_so = (Vz*(point_a[0] - (centroid[0]/AC))*AC + Vx * (point_a[1]-(centroid[1]/AC))*AC + Mqrs ) / (Am*2)
 
     return q_so
 
@@ -271,22 +272,26 @@ def shear_flow(qb , qt , qso):
     return q
 
 
-def main_shear_flow_func(b):
+def main_shear_stress(b):
     #basics
 
     list_coordinates = [(0.15, 0.06588533), (0.6, 0.0627513), (0.6, -0.02702924), (0.15, -0.04083288)]
-    Am = 0.5 * abs(sum(x0 * y1 - x1 * y0 for ((x0, y0), (x1, y1)) in area_segments([x * aerodynamic_data.chord_function(b) for x in list_coordinates])))
-
-
+   
     AC      = AC_lenght(b)
     lenghts = get_lenghts(list_coordinates)
     slopes  = get_slopes(list_coordinates)
+    Am = 0.5 * abs(sum(x0 * y1 - x1 * y0 for ((x0, y0), (x1, y1)) in area_segments([x * aerodynamic_data.chord_function(b) for x in list_coordinates])))
+
+
     #******************************************************
 
     topstr = 5 #number of top stringers 
     botstr = 5 #number of bottom stingers
     A1     = 0.001 #area of corner stringers
     A2     = 0.001 #area of normal stringers
+    t_spar = 2
+    t_skin = 1
+
 
     distances_btwn_stringers = distances(topstr, botstr, lenghts)
 
@@ -307,15 +312,28 @@ def main_shear_flow_func(b):
     q_t = qt(torsion(b), Am)
     #print(q_t)
     q_list = shear_flow(qb_list , q_t , q_so)
+    
+    thicc_list = []
+    for i in range(botstr-1):
+        thicc_list.append(t_skin)
+    thicc_list.append(t_spar)
+    for i in range(topstr-1):
+        thicc_list.append(t_skin)
+    thicc_list.append(t_spar)
 
-    return q_list
+    #print(thicc_list)
+    shear_stress = [i / j for i, j in zip(q_list, thicc_list)]
+    #print(q_list)
 
 
-print(main_shear_flow_func(0))
+    return shear_stress
 
 
 
-print(main_shear_flow_func(26))
+
+
+#print(main_shear_stress(0))
+#print(main_shear_stress(26))
 
 
 
