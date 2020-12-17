@@ -24,7 +24,7 @@ except FileNotFoundError:
 
 y_lst = data[0][:-60]
 strength = database_connector.load_wingbox_value("ultimate_strength")
-
+crack_strength = 231400000
 
 def margin_safety_crit(applied, crit):
     factor = crit/applied
@@ -43,6 +43,8 @@ def plot(mode='compression'):
     margin_stringer_strength = []
     margin_stringer = []
     tension_stress = []
+    stress_crack = []
+    margin_crack = []
     for y in y_lst:
         if mode == 'compression':
             margin_stringer_crit.append(margin_safety_crit(string_stress_normal(y), crit_stress_stringer(y)))
@@ -55,6 +57,10 @@ def plot(mode='compression'):
             tension_stress.append(string_stress_tension(y))
 
             #add the same for plate and spars
+        
+        if mode == 'crack':
+            stress_crack.append(string_stress_tension(y))
+            margin_crack.append(margin_safety_crit(string_stress_tension(y), crack_strength))
             
     if mode == 'compression':
         plt.figure()
@@ -93,9 +99,26 @@ def plot(mode='compression'):
         plt.xlabel('Spanwise location on the wing (m)')
         plt.ylabel('Margin of safety')
         
+    elif mode == 'crack':
+        plt.figure()
+        plt.suptitle('Crack propagation loads on the wingbox')
 
+
+        plt.subplot(211)
+        plt.title("Maximum stress due to limiting cracks")
+        plt.plot(y_lst, stress_crack, label='Applied stress')
+        plt.plot([y_lst[0], y_lst[-1]], [crack_strength, crack_strength], 'r', label='Allowed stress')
+        plt.xlabel("Spanwise location on the wing (m)")
+        plt.ylabel("Stress (Pa)")
+        plt.legend(loc='bottom left')
+
+        plt.subplot(212)
+        plt.title("Margin of safety")
+        plt.plot(y_lst, margin_crack)
+        plt.xlabel('Spanwise location on the wing (m)')
+        plt.ylabel('Margin of safety')
     
     plt.show()
     return
 
-plot(mode='tension')
+plot(mode='crack')
