@@ -61,43 +61,51 @@ enclosed_area = 0.5 * abs(sum(x0 * y1 - x1 * y0 for ((x0, y0), (x1, y1)) in area
 #def x(centroid, coordinates)
 
 #                        0                    1               2                   3   
-list_coordinates = [(0.15, 0.06588533), (0.6, 0.0627513), (0.6, -0.02702924), (0.15, -0.04083288)]
+#list_coordinates = [(0.15, 0.06588533), (0.6, 0.0627513), (0.6, -0.02702924), (0.15, -0.04083288)]
 #unit lenghts
-lenghts = [] 
+def get_lenghts(list_coordinates):
 
-for i in range(4):
-    k = i + 1
-    if k >= 4:
-        k = 0
-    else:
-        pass
+    lenghts = [] 
 
-    len = sqrt((list_coordinates[k][0]-list_coordinates[i][0])**2+(list_coordinates[k][1]-list_coordinates[i][1])**2)
-    lenghts.append(len)
-    i = i + 1 
-    #  0Top plate , 1LE spar , 2bottom plate , 3front spar (not adjusted for ac)
+    for i in range(4):
+        k = i + 1
+        if k >= 4:
+            k = 0
+        else:
+            pass
+
+        len = sqrt((list_coordinates[k][0]-list_coordinates[i][0])**2+(list_coordinates[k][1]-list_coordinates[i][1])**2)
+        lenghts.append(len)
+        i = i + 1 
+        #  0Top plate , 1LE spar , 2bottom plate , 3front spar (not adjusted for ac)
+
+    return lenghts
 
 #unit slopes
+def get_slopes(list_coordinates):
 
-slopes=[]
-for i in range(4):
-    k = i + 1
-    if k >= 4:
-        k = 0
-    else:
-        pass
+    slopes=[]
 
-    if list_coordinates[k][0]==list_coordinates[i][0] or list_coordinates[k][1]==list_coordinates[i][1]:
-        slopes.append(0)
-        i = i+1
-    else:
+    for i in range(4):
+        k = i + 1
+        if k >= 4:
+            k = 0
+        else:
+            pass
 
-        slope = (list_coordinates[k][1]-list_coordinates[i][1])/(list_coordinates[k][0]-list_coordinates[i][0])
-        slopes.append(slope)
-        i = i+1
+        if list_coordinates[k][0]==list_coordinates[i][0] or list_coordinates[k][1]==list_coordinates[i][1]:
+            slopes.append(0)
+            i = i+1
+        else:
 
-print(lenghts)
-print(slopes)
+            slope = (list_coordinates[k][1]-list_coordinates[i][1])/(list_coordinates[k][0]-list_coordinates[i][0])
+            slopes.append(slope)
+            i = i+1
+
+    return slopes
+
+#print(lenghts)
+#print(slopes)
 #______________________________________________________
 def AC_lenght(location):
     # Wing properties: (from the sheet)
@@ -134,10 +142,10 @@ def distances(topstr, botstr, lenghts):
 #four stringers always locked 
 
 #def z
-def z(centroid, list_coordinates, topstr, botstr, lenghts, slopes, distance, AC):
+def z(get_centroid, list_coordinates, topstr, botstr, lenghts, slopes, distance, AC):
     #centroid = [x,z]
     #xc = centroid[0]
-    yc = centroid[1]
+    yc = get_centroid[1]/AC
     z_list = []
     #bottom
 
@@ -157,8 +165,8 @@ def z(centroid, list_coordinates, topstr, botstr, lenghts, slopes, distance, AC)
 
     return z_list #works
 
-def x(centroid, list_coordinates, topstr, botstr, lenghts, slopes, distance, AC):
-    xc = centroid[0]
+def x(get_centroid, list_coordinates, topstr, botstr, lenghts, slopes, distance, AC):
+    xc = get_centroid[0]/AC
     x_list = []
     c1 = list_coordinates[0][0] #0.15c
     c2 = list_coordinates[1][0] #0.6c
@@ -196,7 +204,7 @@ def area_append(A1 , A2, topstr, botstr): #A1 is corner tringer area #A2 is norm
     return area_list
 
 
-def delta_q_and_qb(z, x, areas, b):
+def delta_q_and_qb(z, x, areas, b, x_shear, z_shear):
     #Ixx = B*z^2 # Izz = b*x^2
     z_pw2 = [i ** 2 for i in z]
     x_pw2 = [i ** 2 for i in x]
@@ -206,9 +214,8 @@ def delta_q_and_qb(z, x, areas, b):
     Bx = [a * b for a, b in zip(areas, x)]
     Bz = [a * b for a, b in zip(areas, z)]
 
-    #Vx =  #drag and thrust 
-   # Vz =  #lift                     qb + ( - qs0)  +  (+qt )
-
+    Vx =   - x_shear
+    Vz =  - z_shear              
     delta_q_list = []
 
     for i in len(areas):
@@ -225,28 +232,28 @@ def delta_q_and_qb(z, x, areas, b):
     return qb_list
 
 
-def qso(list_coordinates, qb_list, slope_list , centroid, AC, b ):  #need shear Vx(b) and Vz(b) from other program
+def qso(list_coordinates, qb_list, slope_list , centroid, AC, b , Am ):  #need shear Vx(b) and Vz(b) from other program
 
     #point A is where the sloped sides 0f tapezoid join
     #since lengths are involved, adjusting for ac is needed 
 
     point_a = [2.9853 , 0.04614] #unit chord
-    Am = #mean area at AC
+    
     #ccw positive
 
-    Vx = #Vx at b
+    Vx = - x_shear
     #              >  both act on centroid 
-    Vz = #Vz at b
+    Vz = - z_shear
 
     Mqrs = 
 
     # cloclwise, Vz should be negative, ccw, Vx should be positive
     q_so = (Vz*(point_a[0] - centroid[0])*AC + Vx * (point_a[1]-centroid[1])*AC + Mqrs ) / (Am*2)
 
-    return q_do
+    return q_so
 
-def qt(Torque, Am):
-    T = #AC adjusted torque
+def qt(Torsion, Am):
+    T =Torsion #AC adjusted torque
 
     #Am AC adjusted
     q_t = T/2*Am
@@ -257,6 +264,46 @@ def shear_flow(qb , qt , qso):
 
     q = [x+qt for x in qb_qso]
     return q
+
+
+def main_shear_flow_func(b):
+    #basics
+
+    list_coordinates = [(0.15, 0.06588533), (0.6, 0.0627513), (0.6, -0.02702924), (0.15, -0.04083288)]
+    Am = 0.5 * abs(sum(x0 * y1 - x1 * y0 for ((x0, y0), (x1, y1)) in area_segments([x * aerodynamic_data.chord_function(b) for x in list_coordinates])))
+
+
+    AC      = AC_lenght(b)
+    lenghts = get_lenghts(list_coordinates)
+    slopes  = get_slopes(list_coordinates)
+    #******************************************************
+
+    topstr = 2 #number of top stringers 
+    botstr = 2 #number of bottom stingers
+    A1     = 1 #area of corner stringers
+    A2     = 1 #area of normal stringers
+
+    distances_btwn_stringers = distances(topstr, botstr, lenghts)
+
+    z_list = z(get_centroid(b), list_coordinates, topstr, botstr, lenghts, slopes, distances_btwn_stringers, AC)
+    x_list = x(get_centroid(b), list_coordinates, topstr, botstr, lenghts, slopes, distances_btwn_stringers, AC)
+
+    area_list = area_append(A1 , A2, topstr, botstr)
+
+    #****** shear*****
+    qb_list = delta_q_and_qb(z_list, x_list, area_list, b, x_shear(b), z_shear(b))
+    q_so = qso(list_coordinates, qb_list, slopes , get_centroid(b), AC, b , Am )
+    q_t = qt(Torsion(b), Am)
+    q_list = shear_flow(qb_list , q_t , q_so)
+
+    return q_list
+
+
+print(main_shear_flow_func(0))
+
+
+
+
 
 
 
