@@ -73,8 +73,8 @@ def get_centroid(spanwise_location, verbose=False):
         number_stringers_top = get_amount_of_stringers(spanwise_location, "top")
         number_stringers_bottom = get_amount_of_stringers(spanwise_location, "bottom")
 
-        spacing_stringers_top = length_top_plate / number_stringers_top
-        spacing_stringers_bottom = length_bottom_plate / number_stringers_bottom
+        spacing_stringers_top = length_top_plate / (number_stringers_top + 1)
+        spacing_stringers_bottom = length_bottom_plate / (number_stringers_bottom + 1)
 
         for number_stringer in range(1, number_stringers_top + 1):
             x_coordinate_current_stringer = left_top_corner_wingbox[0] + number_stringer * spacing_stringers_top
@@ -93,8 +93,8 @@ def get_centroid(spanwise_location, verbose=False):
         number_stringers_top = get_amount_of_stringers(spanwise_location, "top")
         number_stringers_bottom = get_amount_of_stringers(spanwise_location, "bottom")
 
-        spacing_stringers_top = length_top_plate / number_stringers_top
-        spacing_stringers_bottom = length_bottom_plate / number_stringers_bottom
+        spacing_stringers_top = length_top_plate / (number_stringers_top + 1)
+        spacing_stringers_bottom = length_bottom_plate / (number_stringers_bottom + 1)
 
         #top
         sin_angle_top = (left_top_corner_wingbox[1] - right_top_corner_wingbox[1])/(length_top_plate)
