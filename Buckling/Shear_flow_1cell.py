@@ -40,8 +40,8 @@ counterclockwise
 """
 
 y_span_lst = data[0]
-x_shear_lst = data[3]
-z_shear_lst = data[5]
+x_shear_lst = data[2]
+z_shear_lst = data[4]
 torsion_lst = data[7]
 step = y_span_lst[1] - y_span_lst[0]
 
