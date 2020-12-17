@@ -54,8 +54,8 @@ torsion = sp.interpolate.interp1d(y_span_lst, torsion_lst, kind="cubic", fill_va
 def area_segments(p):
     return zip(p, p[1:] + [p[0]])
 
-enclosed_area = 0.5 * abs(sum(x0 * y1 - x1 * y0 for ((x0, y0), (x1, y1)) in area_segments([x * aerodynamic_data.chord_function(
-    spanwise_location) for x in list_coordinates])))
+#enclosed_area = 0.5 * abs(sum(x0 * y1 - x1 * y0 for ((x0, y0), (x1, y1)) in area_segments([x * aerodynamic_data.chord_function(
+  #  spanwise_location) for x in list_coordinates])))
 
 
 #def x(centroid, coordinates)
@@ -218,7 +218,7 @@ def delta_q_and_qb(z, x, areas, b, x_shear, z_shear):
     Vz =  - z_shear              
     delta_q_list = []
 
-    for i in len(areas):
+    for i in range(len(areas)):
         eq_delta_q = - (Vx/Izz)*Bx[i] - (Vz/Ixx)*Bz[i]
         delta_q_list.append(eq_delta_q)
 
@@ -232,7 +232,7 @@ def delta_q_and_qb(z, x, areas, b, x_shear, z_shear):
     return qb_list
 
 
-def qso(list_coordinates, qb_list, slope_list , centroid, AC, b , Am ):  #need shear Vx(b) and Vz(b) from other program
+def qso(list_coordinates, qb_list, slope_list , centroid, AC, b , Am , x_shear , z_shear):  #need shear Vx(b) and Vz(b) from other program
 
     #point A is where the sloped sides 0f tapezoid join
     #since lengths are involved, adjusting for ac is needed 
@@ -245,7 +245,7 @@ def qso(list_coordinates, qb_list, slope_list , centroid, AC, b , Am ):  #need s
     #              >  both act on centroid 
     Vz = - z_shear
 
-    Mqrs = 
+    Mqrs = 1 #NEEEED TO MAKE A FORMULA
 
     # cloclwise, Vz should be negative, ccw, Vx should be positive
     q_so = (Vz*(point_a[0] - centroid[0])*AC + Vx * (point_a[1]-centroid[1])*AC + Mqrs ) / (Am*2)
@@ -278,10 +278,10 @@ def main_shear_flow_func(b):
     slopes  = get_slopes(list_coordinates)
     #******************************************************
 
-    topstr = 2 #number of top stringers 
-    botstr = 2 #number of bottom stingers
-    A1     = 1 #area of corner stringers
-    A2     = 1 #area of normal stringers
+    topstr = 5 #number of top stringers 
+    botstr = 5 #number of bottom stingers
+    A1     = 0.001 #area of corner stringers
+    A2     = 0.001 #area of normal stringers
 
     distances_btwn_stringers = distances(topstr, botstr, lenghts)
 
@@ -292,8 +292,8 @@ def main_shear_flow_func(b):
 
     #****** shear*****
     qb_list = delta_q_and_qb(z_list, x_list, area_list, b, x_shear(b), z_shear(b))
-    q_so = qso(list_coordinates, qb_list, slopes , get_centroid(b), AC, b , Am )
-    q_t = qt(Torsion(b), Am)
+    q_so = qso(list_coordinates, qb_list, slopes , get_centroid(b), AC, b , Am , x_shear(b), z_shear(b))
+    q_t = qt(torsion(b), Am)
     q_list = shear_flow(qb_list , q_t , q_so)
 
     return q_list
