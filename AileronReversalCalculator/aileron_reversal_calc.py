@@ -59,7 +59,7 @@ def get_aileron_reversal_speed():
     wing_surface_area = database_connector.load_value("surface_area")
 
     # material: AL6061-T6
-    shear_modulus = 26 * 10 ** 9  # Pa (Source: http://asm.matweb.com/search/SpecificMaterial.asp?bassnum=MA6061T6)
+    shear_modulus = 26 * 10**6  # Pa (Source: http://asm.matweb.com/search/SpecificMaterial.asp?bassnum=MA6061T6)
     #more variables
     torsional_stiffness_inboard = get_polar_moment_of_inertia(spanwise_location_inboard)
     K_inboard = shear_modulus * torsional_stiffness_inboard
@@ -82,6 +82,10 @@ def get_aileron_reversal_speed():
     dCM_dXi_inboard_sealevel = database_connector.load_value("dcm_dxi_inboard_sl")
     dCM_dXi_outboard_sealevel = database_connector.load_value("dcm_dxi_outboard_sl")
     dCM_dXi_inboard_cruise = database_connector.load_value("dcm_dxi_inboard_cruise")
+
+    # dCM_dXi_inboard_sealevel = database_connector.load_value("dcm_dxi_inboard_sl")
+    # dCM_dXi_outboard_sealevel = database_connector.load_value("dcm_dxi_outboard_sl")
+    # dCM_dXi_inboard_cruise = -0.25
 
     reversal_speed_inboard_cruise = math.sqrt( (-K_inboard * dCL_dXi_inboard_cruise)/(0.5*density_cruise_level*wing_surface_area*chord_length_inboard_aileron*dCM_dXi_inboard_cruise*CL_alpha) )
     reversal_speed_inboard_sea_level = math.sqrt( (-K_inboard * dCL_dXi_inboard_sealevel)/(0.5*density_sea_level*wing_surface_area*chord_length_inboard_aileron*dCM_dXi_inboard_sealevel*CL_alpha) )
