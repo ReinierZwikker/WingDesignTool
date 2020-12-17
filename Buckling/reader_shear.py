@@ -200,7 +200,7 @@ def torque_shear_flow( AC, Torsion):
                             1 / (2 * encl_area_2345 * G) * (1 / t_23 + 1 / t_34 + 1 / t_45 + 1 / t_25), -1]])
 
         # SHEAR DUE TO TORQUE
-        solution_vector_t = np.array([0, 0, torque_y])
+        solution_vector_t = np.array([torque_y, 0, 0])
         q_t_1256, q_t_2345, dtheta_t = np.linalg.solve(matrix, solution_vector_t)
 
     else:

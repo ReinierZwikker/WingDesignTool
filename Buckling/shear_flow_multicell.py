@@ -251,7 +251,7 @@ def shearflow_doublecell(spanwise_location):
                         1 / (2 * encl_area_2345 * G) * (1 / t_23 + 1 / t_34 + 1 / t_45 + 1 / t_25), -1]])
 
     # SHEAR DUE TO TORQUE
-    solution_vector_t = np.array([0, 0, torque_y])
+    solution_vector_t = np.array([torque_y, 0, 0])
     q_t_1256, q_t_2345, dtheta_t = np.linalg.solve(matrix, solution_vector_t)
 
     # SHEAR DUE TO VERTICAL and HORIZONTAL FORCE #tbf
@@ -300,4 +300,4 @@ def shearflow_doublecell(spanwise_location):
     return max(q_max_top_flange_value, q_max_bottom_flange_value)
 
 
-print(shearflow_doublecell(2))
+print(shearflow_doublecell(10))
