@@ -92,12 +92,12 @@ def shearflow_doublecell(spanwise_location):
 
     # positive z is downwards
     # LIFT
-    lift_lst = data[5]
+    lift_lst = data[2]
     v_force = sp.interpolate.interp1d(y_span_lst, lift_lst, kind="cubic", fill_value="extrapolate")
     v_force_y = v_force(spanwise_location)
 
     # DRAG
-    drag_lst = data[4]
+    drag_lst = data[5]
     h_force = sp.interpolate.interp1d(y_span_lst, drag_lst, kind="cubic", fill_value="extrapolate")
     h_force_y = h_force(spanwise_location)
 
