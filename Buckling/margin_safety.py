@@ -46,39 +46,43 @@ def plot(mode='compression'):
     stress_crack = []
     margin_crack = []
     for y in y_lst:
-        if mode == 'compression':
+        if mode == 'stringer':
             margin_stringer_crit.append(margin_safety_crit(string_stress_normal(y), crit_stress_stringer(y)))
             margin_stringer_strength.append(margin_safety_strength(string_stress_normal(y)))
             margin_stringer.append(min(margin_stringer_crit[-1], margin_stringer_strength[-1]))
-        
-            #add the same for plate and spars
+       
         if mode == 'tension':
             margin_stringer_strength.append(margin_safety_strength(string_stress_tension(y)))
             tension_stress.append(string_stress_tension(y))
 
-            #add the same for plate and spars
         
         if mode == 'crack':
             stress_crack.append(string_stress_tension(y))
             margin_crack.append(margin_safety_crit(string_stress_tension(y), crack_strength))
             
-    if mode == 'compression':
+    if mode == 'stringer':
         plt.figure()
-        plt.suptitle('Compressive margin of safety per component')
+        plt.suptitle('Margin of safety for the stringers with regards to compression', y=0.99)
 
-        plt.subplot(131)
-        plt.title('Buckling stringer')
+        plt.subplot(311)
+        plt.title('Buckling margin of safety', y=1)
         plt.plot(y_lst, margin_stringer_crit)
+        plt.xlabel("Spanwise location on the wing (m)")
+        plt.ylabel('Margin of safety')
+        plt.subplots_adjust(top=0.95, bottom=0.05)
 
-        plt.subplot(132)
-        plt.title('Strength stringer')
+        plt.subplot(312)
+        plt.title('Strength margin of safety', y=1)
         plt.plot(y_lst, margin_stringer_strength)
+        plt.xlabel("Spanwise location on the wing (m)")
+        plt.ylabel('Margin of safety')
 
-        plt.subplot(133)
-        plt.title('Combined stringer')
+        plt.subplot(313)
+        plt.title('Combined margin of safety', y=1)
         plt.plot(y_lst, margin_stringer)
+        plt.xlabel("Spanwise location on the wing (m)")
+        plt.ylabel('Margin of safety')
     
-        #add the same for plate and spars
 
     elif mode == 'tension':
         plt.figure()
@@ -121,4 +125,4 @@ def plot(mode='compression'):
     plt.show()
     return
 
-plot(mode='crack')
+plot(mode='stringer')

@@ -21,8 +21,10 @@ def crit_stress_stringer(y): #L is the wingbox section length, thus rib spacing.
     if y <= 10:
         L = 2.5
     if 10 < y <= 20:
-        L = 5
+        L = 3.33
     if y > 20:
-        L = 6.8
+        L = 3.4
     sigma = (K * (pi ** 2) * E * I) / (L**2)
     return sigma
+
+print(crit_stress_stringer(11))
