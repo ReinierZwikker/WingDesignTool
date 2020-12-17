@@ -2,6 +2,7 @@ from math import *
 import pickle
 import scipy as sp
 from scipy import integrate, interpolate
+import numpy as np
 
 try:
     from Database.database_functions import DatabaseConnector
@@ -153,6 +154,54 @@ def torque_shear_flow( AC, Torsion):
 
     if three_spars == True:
         q_t = 3 # write shit here
+
+        try:
+            with open("./data.pickle", 'rb') as file:
+                data = pickle.load(file)
+        except FileNotFoundError:
+            with open("../InertialLoadingCalculator/data.pickle", 'rb') as file:
+                data = pickle.load(file)
+        y_span_lst = data[0]
+
+        # TORQUE
+        torsion_lst = data[7]
+        torsion = sp.interpolate.interp1d(y_span_lst, torsion_lst, kind="cubic", fill_value="extrapolate")
+        torque_y = torsion(spanwise_location)
+
+        wingbox_points = database_connector.load_wingbox_value("wingbox_points")
+        G = database_connector.load_wingbox_value("shear_modulus_pa")
+        chord_length = aerodynamic_data.chord_function(spanwise_location)
+        centroid = get_centroid(spanwise_location)
+
+        distances_1 = (wingbox_points[0][0] - centroid[0], wingbox_points[0][1] - centroid[1])
+        distances_2 = (wingbox_points[1][0] - centroid[0], wingbox_points[1][1] - centroid[1])
+        distances_3 = (wingbox_points[2][0] - centroid[0], wingbox_points[2][1] - centroid[1])
+        distances_4 = (wingbox_points[3][0] - centroid[0], wingbox_points[3][1] - centroid[1])
+        distances_5 = (wingbox_points[4][0] - centroid[0], wingbox_points[4][1] - centroid[1])
+        distances_6 = (wingbox_points[5][0] - centroid[0], wingbox_points[5][1] - centroid[1])
+
+        length_12 = abs(distances_1[0] - distances_2[0]) * chord_length
+        length_23 = abs(distances_2[0] - distances_3[0]) * chord_length
+        length_34 = abs(distances_3[1] - distances_4[1]) * chord_length
+        length_61 = abs(distances_6[1] - distances_1[1]) * chord_length
+        length_25 = abs(distances_2[1] - distances_5[1]) * chord_length
+
+        t_12 = t_23 = t_45 = t_56 = database_connector.load_wingbox_value("plate_thickness")
+        t_34 = t_61 =  t_25 = database_connector.load_wingbox_value("spar_thickness")
+
+        encl_area_1256 = (length_25 + length_61) * length_12 / 2
+        encl_area_2345 = (length_25 + length_34) * length_23 / 2
+
+        # Matrix
+        matrix = np.array([[2 * encl_area_1256, 2 * encl_area_2345, 0],
+                           [1 / (2 * encl_area_1256 * G) * (1 / t_12 + 1 / t_61 + 1 / t_25 + 1 / t_56),
+                            1 / (2 * encl_area_1256 * G) * (- 1 / t_25), -1],
+                           [1 / (2 * encl_area_2345 * G) * (- 1 / t_25),
+                            1 / (2 * encl_area_2345 * G) * (1 / t_23 + 1 / t_34 + 1 / t_45 + 1 / t_25), -1]])
+
+        # SHEAR DUE TO TORQUE
+        solution_vector_t = np.array([0, 0, torque_y])
+        q_t_1256, q_t_2345, dtheta_t = np.linalg.solve(matrix, solution_vector_t)
 
     else:
         q_t = T/2*Am

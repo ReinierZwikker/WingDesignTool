@@ -109,13 +109,8 @@ def shearflow_doublecell(spanwise_location):
     area_top_stringer = database_connector.load_wingbox_value("top_stringer_area")
 
     # thicknesses of spar and plates for torque calculations
-    t_12 = database_connector.load_wingbox_value("plate_thickness")
-    t_23 = database_connector.load_wingbox_value("plate_thickness")
-    t_34 = database_connector.load_wingbox_value("spar_thickness")
-    t_45 = database_connector.load_wingbox_value("plate_thickness")
-    t_56 = database_connector.load_wingbox_value("plate_thickness")
-    t_61 = database_connector.load_wingbox_value("spar_thickness")
-    t_25 = database_connector.load_wingbox_value("spar_thickness")
+    t_12 = t_23 = t_45 = t_56 = database_connector.load_wingbox_value("plate_thickness")
+    t_34 = t_61 = t_25 = database_connector.load_wingbox_value("spar_thickness")
 
     # PROCESSING OF RELEVANT DATA FOR SHEAR DUE TO TORQUE CALCULATIONS
     # the 6 points are numbered from 1 to 6 from top left to bottom left in clockwise direction
