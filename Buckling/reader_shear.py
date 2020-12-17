@@ -210,7 +210,7 @@ def torque_shear_flow( AC, Torsion, b, list_coordinates):
         q_t_a = Torsion/2*Am
         q_t = (q_t_a , q_t_a)
         
-    print(q_t)
+    
     return q_t 
 
 def get_tau_max(q_t , tau_avg, kv, t):
@@ -265,7 +265,7 @@ def shear_stress_SKIN(b):
     return tau_max_SKIN
 
 
-print(shear_stress_SPARS(25) , shear_stress_SKIN(25))
+print(shear_stress_SPARS(0) , shear_stress_SKIN(0))
 
 
 
