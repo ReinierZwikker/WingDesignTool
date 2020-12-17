@@ -77,7 +77,7 @@ def get_lenghts(list_coordinates):
         len = sqrt((list_coordinates[k][0]-list_coordinates[i][0])**2+(list_coordinates[k][1]-list_coordinates[i][1])**2)
         lenghts.append(len)
         i = i + 1 
-        #  0Top plate , 1LE spar , 2bottom plate , 3front spar (not adjusted for ac)
+        #  0Top plate , 1TE spar , 2bottom plate , 3front spar (not adjusted for ac)
 
     return lenghts
 
@@ -215,14 +215,17 @@ def delta_q_and_qb(z, x, areas, b, x_shear, z_shear):
     Bz = [a * b for a, b in zip(areas, z)]
 
     Vx =   - x_shear
-    Vz =  - z_shear              
+    Vz =  - z_shear  
+
+    print (Vx, Vz )            
     delta_q_list = []
 
     for i in range(len(areas)):
         eq_delta_q = - (Vx/Izz)*Bx[i] - (Vz/Ixx)*Bz[i]
         delta_q_list.append(eq_delta_q)
 
-    qb_list = [0] # [ q12 , q23 , q34 , ..... last one being 0  ]
+    qb_list = [] # [ q12 , q23 , q34 , ..... last one being 0  ]
+    #print(delta_q_list)
 
     qb = 0
     for i in delta_q_list:
@@ -232,7 +235,7 @@ def delta_q_and_qb(z, x, areas, b, x_shear, z_shear):
     return qb_list
 
 
-def qso(list_coordinates, qb_list, slope_list , centroid, AC, b , Am , x_shear , z_shear):  #need shear Vx(b) and Vz(b) from other program
+def qso(list_coordinates, qb_list, slope_list , centroid, AC, b , Am , x_shear , z_shear, lenghts, botstr):  #need shear Vx(b) and Vz(b) from other program
 
     #point A is where the sloped sides 0f tapezoid join
     #since lengths are involved, adjusting for ac is needed 
@@ -245,7 +248,9 @@ def qso(list_coordinates, qb_list, slope_list , centroid, AC, b , Am , x_shear ,
     #              >  both act on centroid 
     Vz = - z_shear
 
-    Mqrs = 1 #NEEEED TO MAKE A FORMULA
+    a = botstr - 1
+
+    Mqrs =  lenghts[1] * qb_list[a] * (point_a[0] - 0.6) #NEEEED TO MAKE A FORMULA
 
     # cloclwise, Vz should be negative, ccw, Vx should be positive
     q_so = (Vz*(point_a[0] - centroid[0])*AC + Vx * (point_a[1]-centroid[1])*AC + Mqrs ) / (Am*2)
@@ -290,10 +295,17 @@ def main_shear_flow_func(b):
 
     area_list = area_append(A1 , A2, topstr, botstr)
 
+   # print(area_list)
+   # print(x_list)
+   # print(z_list)
+
     #****** shear*****
     qb_list = delta_q_and_qb(z_list, x_list, area_list, b, x_shear(b), z_shear(b))
-    q_so = qso(list_coordinates, qb_list, slopes , get_centroid(b), AC, b , Am , x_shear(b), z_shear(b))
+    #print(qb_list)
+    q_so = qso(list_coordinates, qb_list, slopes , get_centroid(b), AC, b , Am , x_shear(b), z_shear(b),lenghts, botstr)
+    #print(q_so)
     q_t = qt(torsion(b), Am)
+    #print(q_t)
     q_list = shear_flow(qb_list , q_t , q_so)
 
     return q_list
