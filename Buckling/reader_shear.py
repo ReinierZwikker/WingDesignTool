@@ -119,7 +119,7 @@ def AC_lenght(location):
 # spars 
 #3 spars 
 #2 spars 
-def get_t_avg( h1, h2, h3, t, lenghts, z_shear, AC, centroid, list_coordinates, slopes):
+def get_t_avg(t, lenghts, z_shear, AC, centroid, list_coordinates, slopes,b):
 
     # M_SP_LEN = (F_SP.LEN - (F_SP.LEN - B_SP.LEN) + ((x2 - x) * math.tan(B_PL.ANGL) * AC))
     x2 = list_coordinates[1][0]
@@ -135,17 +135,17 @@ def get_t_avg( h1, h2, h3, t, lenghts, z_shear, AC, centroid, list_coordinates, 
         three_spars = False
 
     if three_spars == True:
-        tau_avg = z_shear/ (t*h_front_spar + t*h_middle_spar + t*h_back_spar)
+        tau_avg = - z_shear/ (t*h_front_spar + t*h_middle_spar + t*h_back_spar)
     else:
-        tau_avg = z_shear/ (t*h_front_spar + t*h_back_spar)
+        tau_avg = - z_shear/ (t*h_front_spar + t*h_back_spar)
     
     return tau_avg 
 
-def torque_shear_flow( AC, Torsion):
+def torque_shear_flow( AC, Torsion, b, list_coordinates):
 
     Am = 0.5 * abs(sum(x0 * y1 - x1 * y0 for ((x0, y0), (x1, y1)) in area_segments([x * aerodynamic_data.chord_function(b) for x in list_coordinates])))
 
-    Torsion = T
+
 
     if b<= 10:
         three_spars = True
@@ -153,7 +153,7 @@ def torque_shear_flow( AC, Torsion):
         three_spars = False
 
     if three_spars == True:
-        q_t = 3 # write shit here
+        
 
         try:
             with open("./data.pickle", 'rb') as file:
@@ -164,6 +164,7 @@ def torque_shear_flow( AC, Torsion):
         y_span_lst = data[0]
 
         # TORQUE
+        spanwise_location = b
         torsion_lst = data[7]
         torsion = sp.interpolate.interp1d(y_span_lst, torsion_lst, kind="cubic", fill_value="extrapolate")
         torque_y = torsion(spanwise_location)
@@ -203,18 +204,72 @@ def torque_shear_flow( AC, Torsion):
         solution_vector_t = np.array([torque_y, 0, 0])
         q_t_1256, q_t_2345, dtheta_t = np.linalg.solve(matrix, solution_vector_t)
 
-    else:
-        q_t = T/2*Am
+        q_t = (q_t_1256 , q_t_2345)
 
+    else:
+        q_t_a = Torsion/2*Am
+        q_t = (q_t_a , q_t_a)
+        
+    
     return q_t 
 
 def get_tau_max(q_t , tau_avg, kv, t):
 
-    tau_max = kv* tau_avg + (q_t/t)
+    tau_max_1 = kv* tau_avg + (q_t[0]/t)
+    tau_max_2 = kv* tau_avg + (q_t[1]/t)
+    tau_max = max(tau_max_1, tau_max_2)
     return tau_max 
 
     
+def shear_stress_SPARS(b):
+    list_coordinates = [(0.15, 0.06588533), (0.6, 0.0627513), (0.6, -0.02702924), (0.15, -0.04083288)]
+    AC = AC_lenght(b)
+    lenghts = get_lenghts(list_coordinates)
+    slopes = get_slopes(list_coordinates)
 
+
+    t_spar = 1 #MANUALLY TYPE IN
+    kv = 1 #nsert #MANUALY TYPE IN
+
+    tau_average = get_t_avg( t_spar , lenghts, z_shear(b), AC, get_centroid(b), list_coordinates, slopes , b)
+    torque_shear = torque_shear_flow( AC, torsion(b),b,  list_coordinates)
+
+    tau_max_SPAR = get_tau_max(torque_shear , tau_average, kv, t_spar)
+    return tau_max_SPAR
+
+
+
+def get_t_avg_skin(t, lenghts, x_shear, AC):
+
+
+    h_top_skin = lenghts[0]*AC
+    h_bottom_skin = lenghts[2]*AC
+
+    tau_avg_skin = - x_shear/ (t* h_top_skin + t*h_bottom_skin)
+    
+    return tau_avg_skin
+
+def shear_stress_SKIN(b):
+
+    list_coordinates = [(0.15, 0.06588533), (0.6, 0.0627513), (0.6, -0.02702924), (0.15, -0.04083288)]
+    AC = AC_lenght(b)
+    lenghts = get_lenghts(list_coordinates)
+    slopes = get_slopes(list_coordinates)
+
+    t_skin = 1 #MANUALLY TYPE IN
+    kv = 1 #TYPE IN
+    
+    tau_avg_skin = get_t_avg_skin(t_skin, lenghts, x_shear(b), AC)
+    torque_shear = torque_shear_flow( AC, torsion(b), b, list_coordinates)
+    tau_max_SKIN = get_tau_max(torque_shear , tau_avg_skin, kv, t_skin)
+    return tau_max_SKIN
+
+
+print(shear_stress_SPARS(0) , shear_stress_SKIN(0))
+
+
+
+    
 
 
 #list_coordinates = [(0.15, 0.06588533), (0.6, 0.0627513), (0.6, -0.02702924), (0.15, -0.04083288)]
