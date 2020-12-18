@@ -350,7 +350,6 @@ def main_shear_stress(b):
 
 
 
-print(main_shear_stress(10))
 #print(main_shear_stress(26))
 
 

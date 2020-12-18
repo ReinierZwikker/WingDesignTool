@@ -8,6 +8,7 @@ try:
     from Buckling.shear_flow_multicell import shearflow_doublecell
     from Buckling.plate_crit import plate_crit_force
     from Buckling.spar_crit import spar_crit_stress
+    from Buckling.Shear_flow_1cell import main_shear_stress
 except ModuleNotFoundError:
     import sys
     from os import path
@@ -18,6 +19,7 @@ except ModuleNotFoundError:
     from Buckling.shear_flow_multicell import shearflow_doublecell
     from Buckling.plate_crit import plate_crit_force
     from Buckling.spar_crit import spar_crit_stress
+    from Buckling.Shear_flow_1cell import main_shear_stress
 
 database_connector = DatabaseConnector()
 
@@ -65,8 +67,8 @@ def plot(mode='compression'):
                 mos_plate_crit.append(margin_safety_crit(shearflow_doublecell(y)[0], plate_crit_force(y, mode="top")))
                 mos_plate.append(min(mos_plate_strength[-1], mos_plate_crit[-1]))
             if y > 10:
-                mos_plate_strength.append(margin_safety_crit(.........., shear_strength))
-                mos_plate_crit.append(margin_safety_crit(........., plate_crit_force(y, mode="top")))
+                mos_plate_strength.append(margin_safety_crit(main_shear_stress(y)[1], shear_strength))
+                mos_plate_crit.append(margin_safety_crit(main_shear_stress(y)[1], plate_crit_force(y, mode="top")))
                 mos_plate.append(min(mos_plate_strength[-1], mos_plate_crit[-1]))
         if mode == 'bottom_plate':
             if y < 10:
@@ -74,8 +76,8 @@ def plot(mode='compression'):
                 mos_plate_crit.append(margin_safety_crit(shearflow_doublecell(y)[1], plate_crit_force(y, mode="bottom")))
                 mos_plate.append(min(mos_plate_strength[-1], mos_plate_crit[-1]))
             if y > 10:
-                mos_plate_strength.append(margin_safety_crit(.........., shear_strength))
-                mos_plate_crit.append(margin_safety_crit(..........., plate_crit_force(y, mode="bottom")))
+                mos_plate_strength.append(margin_safety_crit(main_shear_stress(y)[0], shear_strength))
+                mos_plate_crit.append(margin_safety_crit(main_shear_stress(y)[0], plate_crit_force(y, mode="bottom")))
                 mos_plate.append(min(mos_plate_strength[-1], mos_plate_crit[-1]))
         if mode == 'spar':
             if y < 10:
@@ -83,8 +85,8 @@ def plot(mode='compression'):
                 mos_spar_crit.append(margin_safety_crit(shearflow_doublecell(y)[2], spar_crit_stress(y)))
                 mos_spar.append(min(mos_spar_strength[-1], mos_spar_crit[-1]))
             if y > 10:
-                mos_spar_strength.append(margin_safety_crit(......., shear_strength))
-                mos_spar_crit.append(margin_safety_crit(......, spar_crit_stress(y)))
+                mos_spar_strength.append(margin_safety_crit(main_shear_stress(y)[2], shear_strength))
+                mos_spar_crit.append(margin_safety_crit(main_shear_stress(y)[2], spar_crit_stress(y)))
                 mos_spar.append(min(mos_spar_strength[-1], mos_spar_crit[-1]))
 
         if mode == 'stringer':
@@ -100,7 +102,73 @@ def plot(mode='compression'):
         if mode == 'crack':
             stress_crack.append(string_stress_tension(y))
             margin_crack.append(margin_safety_crit(string_stress_tension(y), crack_strength))
-            
+    
+    if mode == 'top_plate':
+        plt.figure()
+        plt.suptitle('Margin of safety for the top plate with regards to shear', y=0.99)
+
+        plt.subplot(311)
+        plt.title('Buckling margin of safety', y=1)
+        plt.plot(y_lst, margin_stringer_crit)
+        plt.xlabel("Spanwise location on the wing (m)")
+        plt.ylabel('Margin of safety')
+        plt.subplots_adjust(top=0.95, bottom=0.05)
+
+        plt.subplot(312)
+        plt.title('Strength margin of safety', y=1)
+        plt.plot(y_lst, margin_stringer_strength)
+        plt.xlabel("Spanwise location on the wing (m)")
+        plt.ylabel('Margin of safety')
+
+        plt.subplot(313)
+        plt.title('Combined margin of safety', y=1)
+        plt.plot(y_lst, margin_stringer)
+        plt.xlabel("Spanwise location on the wing (m)")
+        plt.ylabel('Margin of safety')
+    if mode == 'bottom_plate':
+        plt.figure()
+        plt.suptitle('Margin of safety for the bottom plate with regards to shear', y=0.99)
+
+        plt.subplot(311)
+        plt.title('Buckling margin of safety', y=1)
+        plt.plot(y_lst, margin_stringer_crit)
+        plt.xlabel("Spanwise location on the wing (m)")
+        plt.ylabel('Margin of safety')
+        plt.subplots_adjust(top=0.95, bottom=0.05)
+
+        plt.subplot(312)
+        plt.title('Strength margin of safety', y=1)
+        plt.plot(y_lst, margin_stringer_strength)
+        plt.xlabel("Spanwise location on the wing (m)")
+        plt.ylabel('Margin of safety')
+
+        plt.subplot(313)
+        plt.title('Combined margin of safety', y=1)
+        plt.plot(y_lst, margin_stringer)
+        plt.xlabel("Spanwise location on the wing (m)")
+        plt.ylabel('Margin of safety')
+    if mode == 'spar':
+        plt.figure()
+        plt.suptitle('Margin of safety for the stringers with regards to shear', y=0.99)
+
+        plt.subplot(311)
+        plt.title('Buckling margin of safety', y=1)
+        plt.plot(y_lst, margin_stringer_crit)
+        plt.xlabel("Spanwise location on the wing (m)")
+        plt.ylabel('Margin of safety')
+        plt.subplots_adjust(top=0.95, bottom=0.05)
+
+        plt.subplot(312)
+        plt.title('Strength margin of safety', y=1)
+        plt.plot(y_lst, margin_stringer_strength)
+        plt.xlabel("Spanwise location on the wing (m)")
+        plt.ylabel('Margin of safety')
+
+        plt.subplot(313)
+        plt.title('Combined margin of safety', y=1)
+        plt.plot(y_lst, margin_stringer)
+        plt.xlabel("Spanwise location on the wing (m)")
+        plt.ylabel('Margin of safety')
     if mode == 'stringer':
         plt.figure()
         plt.suptitle('Margin of safety for the stringers with regards to compression', y=0.99)
