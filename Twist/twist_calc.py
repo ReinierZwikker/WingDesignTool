@@ -20,14 +20,14 @@ except ModuleNotFoundError:
 
 database_connector = DatabaseConnector()
 
-G = database_connector.load_wingbox_value("shear_modulus_pa")
+G = 26 * 10**9 # database_connector.load_value("shear_modulus_pa")
 t1 = 0.035  # database_connector.load_wingbox_value("...") left and right spar
 t2 = 0.035  # database_connector.load_wingbox_value("...") skin
 t3 = 0.035  # database_connector.load_wingbox_value("...") mid spar
 engine_pos = database_connector.load_value("engine_spanwise_location")
 
 
-wingbox_points = database_connector.load_wingbox_value("wingbox_points")
+wingbox_points = database_connector.load_wingbox_value("wingbox_corner_points")
 
 b_one = (wingbox_points[0][1] - wingbox_points[5][1])
 b_two = (wingbox_points[2][1] - wingbox_points[3][1])

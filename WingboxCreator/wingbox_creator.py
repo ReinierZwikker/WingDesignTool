@@ -61,38 +61,40 @@ def get_wingbox_corner_points(airfoil_file, spar_lst):
     return wingbox_vertices
 
 
-# file position data
-file_name = "./NACA_2412_many_points_plot.txt"  # the number of points generated is 201
+def save_wingbox_definition():
+    # file position data
+    file_name = "./NACA_2412_many_points_plot.txt"  # the number of points generated is 201
 
-# spar position data
-spar_pos = [0.15, 0.60]
+    # spar position data
+    spar_pos = [0.15, 0.60]
 
-wingbox_corner_points = get_wingbox_corner_points(wingbox_creator_folder + file_name, spar_pos)
+    wingbox_corner_points = get_wingbox_corner_points(wingbox_creator_folder + file_name, spar_pos)
 
-# Saving all definitions of the wingbox to a dict
-wingbox_definition = {'length': halfspan,
-                      'wingbox_corner_points': wingbox_corner_points,  # as a function of chord and total height?
-                      'quarter_chord_sweep': quarter_chord_sweep,
-                      'dihedral_angle': dihedral_angle,
-                      'top_stringer_lim_point_1': 12,
-                      'top_number_of_stringers_1': 35,
-                      'top_stringer_lim_point_2': 20,
-                      'top_number_of_stringers_2': 25,
-                      'top_number_of_stringers_3': 20,
-                      'top_stringer_area': 0.0015,
-                      'bottom_stringer_lim_point_1': 12,
-                      'bottom_number_of_stringers_1': 35,
-                      'bottom_stringer_lim_point_2': 20,
-                      'bottom_number_of_stringers_2': 25,
-                      'bottom_number_of_stringers_3': 20,
-                      'bottom_stringer_area': 0.0015,
-                      'spar_thickness': 0.035,
-                      'plate_thickness': 0.035,
-                      'rib_thickness': 0.1,
-                      }
+    # Saving all definitions of the wingbox to a dict
+    wingbox_definition = {'length': halfspan,
+                          'wingbox_corner_points': wingbox_corner_points,  # as a function of chord and total height?
+                          'quarter_chord_sweep': quarter_chord_sweep,
+                          'dihedral_angle': dihedral_angle,
+                          'top_stringer_lim_point_1': 12,
+                          'top_number_of_stringers_1': 15,
+                          'top_stringer_lim_point_2': 20,
+                          'top_number_of_stringers_2': 15,
+                          'top_number_of_stringers_3': 15,
+                          'top_stringer_area': 0.001,
+                          'bottom_stringer_lim_point_1': 12,
+                          'bottom_number_of_stringers_1': 15,
+                          'bottom_stringer_lim_point_2': 20,
+                          'bottom_number_of_stringers_2': 15,
+                          'bottom_number_of_stringers_3': 15,
+                          'bottom_stringer_area': 0.001,
+                          'spar_thickness': 0.03,
+                          'plate_thickness': 0.045,
+                          'rib_thickness': 0.1,
+                          'third_spar_end': 10,
+                          }
 
-# Saving the dict to a file
-with open(wingbox_file_destination, "w") as wingbox_database:
-    json.dump(wingbox_definition, wingbox_database, indent=4)
+    # Saving the dict to a file
+    with open(wingbox_file_destination, "w") as wingbox_database:
+        json.dump(wingbox_definition, wingbox_database, indent=4)
 
-print(wingbox_corner_points)
+
