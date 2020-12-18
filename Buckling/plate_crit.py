@@ -49,14 +49,9 @@ def stringer_spacing_bottom(y):
         spacing = (sqrt((points[1][0] - points[0][0])**2 + (points[1][1] - points[0][1])**2) * chord_function(y)) / (bot_num_3+1)
     return spacing
 
-def plate_crit_force(y, mode='top'): #Kc needs to be determined manually per section
+def plate_crit_stress(y, mode='top'): #Kc needs to be determined manually per section
     if mode == 'top':
         Fcr = (((pi**2)*kc*E) / (12*(1-(pois**2)))) * ((t/stringer_spacing(y))**2)
     if mode == 'bottom':
         Fcr = (((pi**2)*kc*E) / (12*(1-(pois**2)))) * ((t/stringer_spacing_bottom(y))**2)
     return Fcr
-
-
-def plate_crit_stress(y, mode='top'):
-    sigma = plate_crit_force(y, mode) / (t*stringer_spacing(y))
-    return sigma
