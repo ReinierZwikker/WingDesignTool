@@ -289,7 +289,7 @@ def main_shear_stress(b):
     botstr = 5 #number of bottom stingers
     A1     = 0.001 #area of corner stringers
     A2     = 0.001 #area of normal stringers
-    t_spar = 2
+    t_spar = 1
     t_skin = 1
 
 
@@ -323,16 +323,34 @@ def main_shear_stress(b):
 
     #print(thicc_list)
     shear_stress = [i / j for i, j in zip(q_list, thicc_list)]
+
+    #max values 
+    # max bottom
+    bottom_shear_list = []
+    for i in range(botstr-1):
+        a = shear_stress[i] 
+        bottom_shear_list.append(a)
+    # spars
+    spar_shear_stress_list = [shear_stress[botstr-1], shear_stress[-1]]
+    top_plate_list = shear_stress[botstr : -1]
+
+
+    max_tau_bottom_plate = max(bottom_shear_list)
+    max_tau_top_plate = max(top_plate_list)
+    max_tau_spars = max(spar_shear_stress_list)
+
+    max_list = [max_tau_bottom_plate , max_tau_top_plate, max_tau_spars] #<---------------------------
     #print(q_list)
+    #shear_stress_max = max(shear_stress)
 
 
-    return shear_stress
+    return max_list #shear_stress #_max
 
 
 
 
 
-#print(main_shear_stress(0))
+print(main_shear_stress(10))
 #print(main_shear_stress(26))
 
 

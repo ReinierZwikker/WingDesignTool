@@ -1,5 +1,7 @@
 from math import *
 import pickle
+from matplotlib import pyplot as plt
+import numpy as np
 import scipy as sp
 from scipy import integrate, interpolate
 import numpy as np
@@ -228,7 +230,7 @@ def shear_stress_SPARS(b):
     slopes = get_slopes(list_coordinates)
 
 
-    t_spar = 1 #MANUALLY TYPE IN
+    t_spar = 0.03 #MANUALLY TYPE IN
     kv = 1 #nsert #MANUALY TYPE IN
 
     tau_average = get_t_avg( t_spar , lenghts, z_shear(b), AC, get_centroid(b), list_coordinates, slopes , b)
@@ -256,7 +258,7 @@ def shear_stress_SKIN(b):
     lenghts = get_lenghts(list_coordinates)
     slopes = get_slopes(list_coordinates)
 
-    t_skin = 1 #MANUALLY TYPE IN
+    t_skin = 0.045 #MANUALLY TYPE IN
     kv = 1 #TYPE IN
     
     tau_avg_skin = get_t_avg_skin(t_skin, lenghts, x_shear(b), AC)
@@ -265,7 +267,35 @@ def shear_stress_SKIN(b):
     return tau_max_SKIN
 
 
-print(shear_stress_SPARS(0) , shear_stress_SKIN(0))
+print(shear_stress_SPARS(10.1) , shear_stress_SKIN(10.1))
+
+plt.suptitle("Moment of inertia")
+plt.subplot(121)
+plt.title("shear stress spar")
+plt.ylabel("shear stress spar")
+plt.xlabel("Spanwise location on a wing (m)")
+plt.ylim(-100000000, 1000000000)
+yy = []
+xx = []
+span = np.arange(0, 26.7890672, 0.01)
+
+for i in span:
+    value = shear_stress_SPARS(i)
+    xx.append(value)
+
+    #yy.append(value[1])
+for i in span:
+    value = shear_stress_SKIN(i)
+    yy.append(value)
+
+plt.plot(span, xx)
+plt.subplot(122)
+plt.title("shear stress skin")
+plt.ylabel("Moment of inertia (m^4)")
+plt.xlabel("Spanwise location on a wing (m)")
+plt.ylim(-100000000, 10000000)
+plt.plot(span, yy)
+plt.show()
 
 
 
