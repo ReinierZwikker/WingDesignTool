@@ -79,12 +79,12 @@ def plot(mode='compression'):
                 mos_plate.append(min(mos_plate_strength[-1], mos_plate_crit[-1]))
         if mode == 'spar':
             if y < 10:
-                mos_spar_strength.append(margin_safety_crit(, shear_strength))
-                mos_spar_crit.append(margin_safety_crit(, spar_crit_stress(y)))
+                mos_spar_strength.append(margin_safety_crit(shearflow_doublecell(y)[2], shear_strength))
+                mos_spar_crit.append(margin_safety_crit(shearflow_doublecell(y)[2], spar_crit_stress(y)))
                 mos_spar.append(min(mos_spar_strength[-1], mos_spar_crit[-1]))
             if y > 10:
-                mos_spar_strength.append(margin_safety_crit(, shear_strength))
-                mos_spar_crit.append(margin_safety_crit(, spar_crit_stress(y)))
+                mos_spar_strength.append(margin_safety_crit(......., shear_strength))
+                mos_spar_crit.append(margin_safety_crit(......, spar_crit_stress(y)))
                 mos_spar.append(min(mos_spar_strength[-1], mos_spar_crit[-1]))
 
         if mode == 'stringer':
