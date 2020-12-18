@@ -350,13 +350,12 @@ def main_shear_stress(b):
     max_tau_top_plate = max(top_plate_list_abs)
     max_tau_spars = max(spar_shear_stress_list_abs)
 
-    max_list = [max_tau_bottom_plate , max_tau_top_plate, max_tau_spars] #<---------------------------
+    max_list = [max_tau_bottom_plate , max_tau_top_plate, max_tau_spars/100] #<---------------------------
     #print(q_list)
     #shear_stress_max = max(shear_stress)
 
 
     return max_list #shear_stress #_max
-
 
 
 

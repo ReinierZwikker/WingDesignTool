@@ -109,20 +109,20 @@ def plot(mode='compression'):
 
         plt.subplot(311)
         plt.title('Buckling margin of safety', y=1)
-        plt.plot(y_lst, margin_stringer_crit)
+        plt.plot(y_lst, mos_plate_crit)
         plt.xlabel("Spanwise location on the wing (m)")
         plt.ylabel('Margin of safety')
         plt.subplots_adjust(top=0.95, bottom=0.05)
 
         plt.subplot(312)
         plt.title('Strength margin of safety', y=1)
-        plt.plot(y_lst, margin_stringer_strength)
+        plt.plot(y_lst, mos_plate_strength)
         plt.xlabel("Spanwise location on the wing (m)")
         plt.ylabel('Margin of safety')
 
         plt.subplot(313)
         plt.title('Combined margin of safety', y=1)
-        plt.plot(y_lst, margin_stringer)
+        plt.plot(y_lst, mos_plate)
         plt.xlabel("Spanwise location on the wing (m)")
         plt.ylabel('Margin of safety')
     if mode == 'bottom_plate':
@@ -131,42 +131,42 @@ def plot(mode='compression'):
 
         plt.subplot(311)
         plt.title('Buckling margin of safety', y=1)
-        plt.plot(y_lst, margin_stringer_crit)
+        plt.plot(y_lst, mos_plate_crit)
         plt.xlabel("Spanwise location on the wing (m)")
         plt.ylabel('Margin of safety')
         plt.subplots_adjust(top=0.95, bottom=0.05)
 
         plt.subplot(312)
         plt.title('Strength margin of safety', y=1)
-        plt.plot(y_lst, margin_stringer_strength)
+        plt.plot(y_lst, mos_plate_strength)
         plt.xlabel("Spanwise location on the wing (m)")
         plt.ylabel('Margin of safety')
 
         plt.subplot(313)
         plt.title('Combined margin of safety', y=1)
-        plt.plot(y_lst, margin_stringer)
+        plt.plot(y_lst, mos_plate)
         plt.xlabel("Spanwise location on the wing (m)")
         plt.ylabel('Margin of safety')
     if mode == 'spar':
         plt.figure()
-        plt.suptitle('Margin of safety for the stringers with regards to shear', y=0.99)
+        plt.suptitle('Margin of safety for the spars with regards to shear', y=0.99)
 
         plt.subplot(311)
         plt.title('Buckling margin of safety', y=1)
-        plt.plot(y_lst, margin_stringer_crit)
+        plt.plot(y_lst, mos_spar_crit)
         plt.xlabel("Spanwise location on the wing (m)")
         plt.ylabel('Margin of safety')
         plt.subplots_adjust(top=0.95, bottom=0.05)
 
         plt.subplot(312)
         plt.title('Strength margin of safety', y=1)
-        plt.plot(y_lst, margin_stringer_strength)
+        plt.plot(y_lst, mos_spar_strength)
         plt.xlabel("Spanwise location on the wing (m)")
         plt.ylabel('Margin of safety')
 
         plt.subplot(313)
         plt.title('Combined margin of safety', y=1)
-        plt.plot(y_lst, margin_stringer)
+        plt.plot(y_lst, mos_spar)
         plt.xlabel("Spanwise location on the wing (m)")
         plt.ylabel('Margin of safety')
     if mode == 'stringer':
@@ -234,4 +234,4 @@ def plot(mode='compression'):
     plt.show()
     return
 
-plot(mode='stringer')
+plot(mode='spar')
