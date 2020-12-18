@@ -123,7 +123,7 @@ print(min(twist_lst_deg()))
 plt.plot(y_span_lst, twist_lst_deg())
 plt.show()
 """
-#print(min(twist_lst_deg()))
+print(min(twist_lst_deg()))
 #plt.plot(y_span_lst, twist_lst_deg())
 #plt.title("Twist Distribution")
 #plt.ylabel("Angle of Twist(deg)")

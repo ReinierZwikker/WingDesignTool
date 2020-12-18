@@ -234,4 +234,4 @@ def plot(mode='compression'):
     plt.show()
     return
 
-plot(mode='spar')
+plot(mode='stringer')

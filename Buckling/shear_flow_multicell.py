@@ -310,10 +310,7 @@ def shearflow_doublecell(spanwise_location):
         area_top_stringer) + q_t_1256 + q_s_s0_1256 - q_t_2345 - q_s_s0_2345)
 
     # aft spar tot shear flow
-    q_tot_aft_spar = abs(q_b(stringer_bottom_distance_from_centroid[len(stringer_top_distance_from_centroid) -1
-                         ],
-                         area_top_stringer) + q_t_1256 + q_s_s0_1256 - q_t_2345 - q_s_s0_2345 + q_t_2345 + q_s_s0_2345)
+    #q_tot_aft_spar = abs(q_b(stringer_bottom_distance_from_centroid[len(stringer_top_distance_from_centroid) -1],
+                         #area_top_stringer) + q_t_1256 + q_s_s0_1256 - q_t_2345 - q_s_s0_2345 + q_t_2345 + q_s_s0_2345)
 
-    return q_max_top_flange_value / t_12, q_max_bottom_flange_value / t_12, max(q_tot_front_spar, q_tot_middle_spar, q_tot_aft_spar) * t_61 * 10
-
-print(shearflow_doublecell(10)[2])
+    return q_max_top_flange_value / t_12, q_max_bottom_flange_value / t_12, max(q_tot_front_spar, q_tot_middle_spar) * t_61 * 10

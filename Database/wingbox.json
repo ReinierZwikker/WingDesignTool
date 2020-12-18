@@ -3,8 +3,8 @@
     "height": 0.2,
     "quarter_chord_sweep": 32.34,
     "dihedral_angle": 2,
-    "plate_thickness": 0.045,
-    "spar_thickness": 0.03,
+    "plate_thickness": 0.06,
+    "spar_thickness": 0.045,
     "shear_modulus_gpa": 26,
     "shear_modulus_pa": 26000000000,
     "youngs_modulus_pa" : 68900000000,
@@ -57,15 +57,15 @@
         ]
     ],
     "top_stringer_lim_point_1": 10,
-    "top_number_of_stringers_1": 15,
+    "top_number_of_stringers_1": 1,
     "top_stringer_lim_point_2": 20,
-    "top_number_of_stringers_2": 15,
+    "top_number_of_stringers_2": 20,
     "top_number_of_stringers_3": 15,
-    "top_stringer_area": 0.001,
+    "top_stringer_area": 0.0075,
     "bottom_stringer_lim_point_1": 10,
-    "bottom_number_of_stringers_1": 15,
+    "bottom_number_of_stringers_1": 16,
     "bottom_stringer_lim_point_2": 20,
-    "bottom_number_of_stringers_2": 15,
-    "bottom_number_of_stringers_3": 15,
-    "bottom_stringer_area": 0.001
+    "bottom_number_of_stringers_2": 10,
+    "bottom_number_of_stringers_3": 10,
+    "bottom_stringer_area": 0.0075
 }

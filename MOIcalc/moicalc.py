@@ -672,16 +672,16 @@ def inertia(b): #[0] is ixx, [1] is izz
     CHANGE THESE VALUES!
     """
 
-    t1 = 0.03  # spar LE
-    t2 = 0.03   # spar TE
-    t3 = 0.045   # top plate
-    t4 = 0.045   # bottom plate
-    t5 = 0.03  # spar middle
-    As = 0.001 # Area of single stringer
+    t1 = 0.045  # spar LE
+    t2 = 0.045   # spar TE
+    t3 = 0.06   # top plate
+    t4 = 0.06   # bottom plate
+    t5 = 0.045  # spar middle
+    As = 0.0075 # Area of single stringer
     if b < 10:
-        Ns = 15     # N of stringers per plate
+        Ns = 20    # N of stringers per plate
     elif b < 20:
-        Ns = 15
+        Ns = 20
     else:
         Ns = 15
 
