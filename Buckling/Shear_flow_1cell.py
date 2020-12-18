@@ -284,13 +284,19 @@ def main_shear_stress(b):
 
 
     #******************************************************
-
-    topstr = 5 #number of top stringers 
-    botstr = 5 #number of bottom stingers
-    A1     = 0.001 #area of corner stringers
-    A2     = 0.001 #area of normal stringers
-    t_spar = 1
-    t_skin = 1
+    if b <= 10:
+        topstr = database_connector.load_wingbox_value("top_number_of_stringers_1") #number of top stringers 
+        botstr = database_connector.load_wingbox_value("bottom_number_of_stringers_1") #number of bottom stingers
+    if 10 < b <= 20:
+        topstr = database_connector.load_wingbox_value("top_number_of_stringers_2") #number of top stringers 
+        botstr = database_connector.load_wingbox_value("bottom_number_of_stringers_2") #number of bottom stingers
+    if b > 20:
+        topstr = database_connector.load_wingbox_value("top_number_of_stringers_3") #number of top stringers 
+        botstr = database_connector.load_wingbox_value("bottom_number_of_stringers_3") #number of bottom stingers
+    A1     = database_connector.load_wingbox_value("top_stringer_area") #area of corner stringers
+    A2     = database_connector.load_wingbox_value("top_stringer_area") #area of normal stringers
+    t_spar = database_connector.load_wingbox_value("spar_thickness")
+    t_skin = database_connector.load_wingbox_value("plate_thickness")
 
 
     distances_btwn_stringers = distances(topstr, botstr, lenghts)
