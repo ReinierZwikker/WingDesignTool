@@ -334,10 +334,15 @@ def main_shear_stress(b):
     spar_shear_stress_list = [shear_stress[botstr-1], shear_stress[-1]]
     top_plate_list = shear_stress[botstr : -1]
 
+    bottom_shear_list_abs =  [abs(x) for x in bottom_shear_list]
+    spar_shear_stress_list_abs = [abs(x) for x in spar_shear_stress_list]
+    top_plate_list_abs= [abs(x) for x in top_plate_list]
 
-    max_tau_bottom_plate = max(bottom_shear_list)
-    max_tau_top_plate = max(top_plate_list)
-    max_tau_spars = max(spar_shear_stress_list)
+
+
+    max_tau_bottom_plate = max(bottom_shear_list_abs)
+    max_tau_top_plate = max(top_plate_list_abs)
+    max_tau_spars = max(spar_shear_stress_list_abs)
 
     max_list = [max_tau_bottom_plate , max_tau_top_plate, max_tau_spars] #<---------------------------
     #print(q_list)
