@@ -298,6 +298,3 @@ def shearflow_doublecell(spanwise_location):
             q_max_bottom_flange_value = q_tot
 
     return q_max_top_flange_value / t_12, q_max_bottom_flange_value / t_12
-
-
-print(shearflow_doublecell(0))

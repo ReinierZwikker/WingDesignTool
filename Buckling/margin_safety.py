@@ -5,6 +5,9 @@ try:
     from Database.database_functions import DatabaseConnector
     from Buckling.stringer_applied import string_stress_normal
     from Buckling.stringer_crit import crit_stress_stringer
+    from Buckling.shear_flow_multicell import shearflow_doublecell
+    from Buckling.plate_crit import plate_crit_force
+    from Buckling.spar_crit import spar_crit_stress
 except ModuleNotFoundError:
     import sys
     from os import path
@@ -12,6 +15,9 @@ except ModuleNotFoundError:
     from Database.database_functions import DatabaseConnector
     from Buckling.stringer_applied import string_stress_normal, string_stress_tension
     from Buckling.stringer_crit import crit_stress_stringer
+    from Buckling.shear_flow_multicell import shearflow_doublecell
+    from Buckling.plate_crit import plate_crit_force
+    from Buckling.spar_crit import spar_crit_stress
 
 database_connector = DatabaseConnector()
 
@@ -25,6 +31,7 @@ except FileNotFoundError:
 y_lst = data[0][:-60]
 strength = database_connector.load_wingbox_value("ultimate_strength")
 crack_strength = 231400000
+shear_strength = database_connector.load_wingbox_value('shear_strength')
 
 def margin_safety_crit(applied, crit):
     factor = crit/applied
@@ -45,7 +52,41 @@ def plot(mode='compression'):
     tension_stress = []
     stress_crack = []
     margin_crack = []
+    mos_plate_strength = []
+    mos_plate_crit = []
+    mos_plate = []
+    mos_spar_strength = []
+    mos_spar_crit = []
+    mos_spar = []
     for y in y_lst:
+        if mode == 'top_plate':
+            if y < 10:
+                mos_plate_strength.append(margin_safety_crit(shearflow_doublecell(y)[0], shear_strength))
+                mos_plate_crit.append(margin_safety_crit(shearflow_doublecell(y)[0], plate_crit_force(y, mode="top")))
+                mos_plate.append(min(mos_plate_strength[-1], mos_plate_crit[-1]))
+            if y > 10:
+                mos_plate_strength.append(margin_safety_crit(.........., shear_strength))
+                mos_plate_crit.append(margin_safety_crit(........., plate_crit_force(y, mode="top")))
+                mos_plate.append(min(mos_plate_strength[-1], mos_plate_crit[-1]))
+        if mode == 'bottom_plate':
+            if y < 10:
+                mos_plate_strength.append(margin_safety_crit(shearflow_doublecell(y)[1], shear_strength))
+                mos_plate_crit.append(margin_safety_crit(shearflow_doublecell(y)[1], plate_crit_force(y, mode="bottom")))
+                mos_plate.append(min(mos_plate_strength[-1], mos_plate_crit[-1]))
+            if y > 10:
+                mos_plate_strength.append(margin_safety_crit(.........., shear_strength))
+                mos_plate_crit.append(margin_safety_crit(..........., plate_crit_force(y, mode="bottom")))
+                mos_plate.append(min(mos_plate_strength[-1], mos_plate_crit[-1]))
+        if mode == 'spar':
+            if y < 10:
+                mos_spar_strength.append(margin_safety_crit(, shear_strength))
+                mos_spar_crit.append(margin_safety_crit(, spar_crit_stress(y)))
+                mos_spar.append(min(mos_spar_strength[-1], mos_spar_crit[-1]))
+            if y > 10:
+                mos_spar_strength.append(margin_safety_crit(, shear_strength))
+                mos_spar_crit.append(margin_safety_crit(, spar_crit_stress(y)))
+                mos_spar.append(min(mos_spar_strength[-1], mos_spar_crit[-1]))
+
         if mode == 'stringer':
             margin_stringer_crit.append(margin_safety_crit(string_stress_normal(y), crit_stress_stringer(y)))
             margin_stringer_strength.append(margin_safety_strength(string_stress_normal(y)))
