@@ -9,6 +9,7 @@
     "shear_modulus_pa": 26000000000,
     "youngs_modulus_pa" : 68900000000,
     "youngs_modulus_gpa" : 68.9,
+    "shear_strength": 210000000,
     "ultimate_strength": 310000000,
     "poisson_ratio" : 0.33,
     "wingbox_points": [
@@ -56,16 +57,16 @@
         ]
     ],
     "top_stringer_lim_point_1": 10,
-    "top_number_of_stringers_1": 15,
+    "top_number_of_stringers_1": 1,
     "top_stringer_lim_point_2": 20,
-    "top_number_of_stringers_2": 15,
-    "top_number_of_stringers_3": 15,
-    "top_stringer_area": 0.0010,
+    "top_number_of_stringers_2": 5,
+    "top_number_of_stringers_3": 5,
+    "top_stringer_area": 0.01,
     "bottom_stringer_lim_point_1": 10,
-    "bottom_number_of_stringers_1": 15,
+    "bottom_number_of_stringers_1": 10,
     "bottom_stringer_lim_point_2": 20,
-    "bottom_number_of_stringers_2": 15,
-    "bottom_number_of_stringers_3": 15,
-    "bottom_stringer_area": 0.0010,
+    "bottom_number_of_stringers_2": 5,
+    "bottom_number_of_stringers_3": 5,
+    "bottom_stringer_area": 0.010,
     "rib_thickness": 0.01
 }
